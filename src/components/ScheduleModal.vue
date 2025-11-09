@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:visible="visible" modal header="Create New Schedule" :style="{ width: '500px' }">
+  <Dialog v-model:visible="visible" modal header="Create New Schedule" :style="{ width: '850px' }">
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Schedule Title</label>
