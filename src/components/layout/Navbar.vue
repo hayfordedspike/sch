@@ -23,8 +23,7 @@ const items = [
     label: "Profile",
     icon: "pi pi-user",
     command: () => {
-      console.log("Profile");
-      // TODO: Navigate to profile page
+      router.push('/profile')
     },
   },
   {

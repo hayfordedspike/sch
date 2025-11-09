@@ -1,27 +1,27 @@
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
-import type { 
-  Certificate, 
-  CreateCertificateRequest, 
-  CertificateListResponse 
+import type {
+  Certificate,
+  CreateCertificateRequest,
+  CertificateListResponse
 } from '@/views/CertificateManagement/types'
 
 export function useCertificates() {
-  const { get, post, put, delete: del, loading, error } = useApi()
-  
+  const { get, post, patch, delete: del, loading, error } = useApi()
+
   const certificates = ref<Certificate[]>([])
   const currentCertificate = ref<Certificate | null>(null)
-  
+
   // Computed properties
-  const activeCertificates = computed(() => 
+  const activeCertificates = computed(() =>
     certificates.value.filter(cert => cert.status === 'active')
   )
-  
-  const expiredCertificates = computed(() => 
+
+  const expiredCertificates = computed(() =>
     certificates.value.filter(cert => cert.status === 'expired')
   )
-  
-  const revokedCertificates = computed(() => 
+
+  const revokedCertificates = computed(() =>
     certificates.value.filter(cert => cert.status === 'revoked')
   )
 
@@ -31,7 +31,7 @@ export function useCertificates() {
       const response = await get<CertificateListResponse>(`/certificates/?page=${page}&limit=${limit}`, {
         showErrorToast: true
       })
-      
+
       if (response) {
         // Handle both array response and paginated response
         if (Array.isArray(response)) {
@@ -40,7 +40,7 @@ export function useCertificates() {
           certificates.value = response.certificates || []
         }
       }
-      
+
       return response
     } catch (err) {
       console.error('Error fetching certificates:', err)
@@ -53,11 +53,11 @@ export function useCertificates() {
       const response = await get<Certificate>(`/certificates/${id}`, {
         showErrorToast: true
       })
-      
+
       if (response) {
         currentCertificate.value = response
       }
-      
+
       return response
     } catch (err) {
       console.error('Error fetching certificate:', err)
@@ -72,11 +72,11 @@ export function useCertificates() {
         successMessage: 'Certificate created successfully',
         showErrorToast: true
       })
-      
+
       if (response) {
         certificates.value.push(response)
       }
-      
+
       return response
     } catch (err) {
       console.error('Error creating certificate:', err)
@@ -86,12 +86,14 @@ export function useCertificates() {
 
   const updateCertificate = async (id: number, certificateData: Partial<CreateCertificateRequest>) => {
     try {
-      const response = await put<Certificate>(`/certificates/${id}`, certificateData, {
+      const response = await patch<Certificate>(`/certificates/${id}`, certificateData, {
         showSuccessToast: true,
         successMessage: 'Certificate updated successfully',
         showErrorToast: true
       })
-      
+
+      // For updates, success is indicated by no error being thrown, not by response content
+      // The response might be null but operation was successful (200 status)
       if (response) {
         const index = certificates.value.findIndex(cert => cert.id === id)
         if (index !== -1) {
@@ -99,10 +101,54 @@ export function useCertificates() {
         }
         currentCertificate.value = response
       }
-      
-      return response
+
+      // Return a success indicator - if we reach here without error, operation succeeded
+      return { success: true, data: response }
     } catch (err) {
       console.error('Error updating certificate:', err)
+      return { success: false, data: null }
+    }
+  }
+
+  const fetchActiveCertificates = async () => {
+    try {
+      const response = await get<Certificate[]>('/certificates/active', {
+        showErrorToast: true
+      })
+
+      if (response) {
+        // Update the certificates list with active ones or store separately
+        certificates.value = response
+      }
+
+      return response
+    } catch (err) {
+      console.error('Error fetching active certificates:', err)
+      return null
+    }
+  }
+
+  const activateCertificate = async (id: number) => {
+    try {
+      const response = await get<Certificate>(`/certificates/${id}/activate`, {
+        showSuccessToast: true,
+        successMessage: 'Certificate activated successfully',
+        showErrorToast: true
+      })
+
+      if (response) {
+        const index = certificates.value.findIndex(cert => cert.id === id)
+        if (index !== -1) {
+          certificates.value[index] = response
+        }
+        if (currentCertificate.value?.id === id) {
+          currentCertificate.value = response
+        }
+      }
+
+      return response
+    } catch (err) {
+      console.error('Error activating certificate:', err)
       return null
     }
   }
@@ -114,18 +160,19 @@ export function useCertificates() {
         successMessage: 'Certificate deleted successfully',
         showErrorToast: true
       })
-      
-      if (response !== null) {
-        certificates.value = certificates.value.filter(cert => cert.id !== id)
-        if (currentCertificate.value?.id === id) {
-          currentCertificate.value = null
-        }
+
+      // For deletes, success is indicated by no error being thrown
+      // Remove from local state regardless of response content
+      certificates.value = certificates.value.filter(cert => cert.id !== id)
+      if (currentCertificate.value?.id === id) {
+        currentCertificate.value = null
       }
-      
-      return response
+
+      // Return success indicator - if we reach here without error, operation succeeded
+      return { success: true, data: response }
     } catch (err) {
       console.error('Error deleting certificate:', err)
-      return null
+      return { success: false, data: null }
     }
   }
 
@@ -155,24 +202,24 @@ export function useCertificates() {
 
   const isExpiringSoon = (certificate: Certificate, daysThreshold = 30) => {
     if (!certificate.validity_months) return false
-    
+
     const createdDate = new Date(certificate.created_at)
     const expiryDate = new Date(createdDate)
     expiryDate.setMonth(createdDate.getMonth() + certificate.validity_months)
-    
+
     const today = new Date()
     const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-    
+
     return daysUntilExpiry <= daysThreshold && daysUntilExpiry > 0
   }
 
   const getExpiryDate = (certificate: Certificate) => {
     if (!certificate.validity_months) return null
-    
+
     const createdDate = new Date(certificate.created_at)
     const expiryDate = new Date(createdDate)
     expiryDate.setMonth(createdDate.getMonth() + certificate.validity_months)
-    
+
     return expiryDate
   }
 
@@ -182,19 +229,21 @@ export function useCertificates() {
     currentCertificate,
     loading,
     error,
-    
+
     // Computed
     activeCertificates,
     expiredCertificates,
     revokedCertificates,
-    
+
     // Methods
     fetchCertificates,
+    fetchActiveCertificates,
     getCertificate,
     createCertificate,
     updateCertificate,
+    activateCertificate,
     deleteCertificate,
-    
+
     // Utilities
     getCertificateStatusSeverity,
     formatCertificateDate,

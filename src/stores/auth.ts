@@ -9,7 +9,7 @@ import type { SignInFormData } from '@/views/SignIn/types'
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://av-scheduler-backend-b4bc486519f2.herokuapp.com'
 
 export interface User {
-  id: string
+  id: number
   email: string
   first_name: string
   last_name: string
@@ -85,16 +85,17 @@ const handleApiError = (err: unknown, defaultMessage: string): string => {
 export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref<User | null>(null)
-  const token = ref<string | null>(localStorage.getItem('token'))
-  const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'))
-  const isAuthenticated = ref<boolean>(!!token.value)
+  const token = ref<string | null>(null)
+  const refreshToken = ref<string | null>(null)
+  const isAuthenticated = ref<boolean>(false)
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
 
   // Initialize authentication state on store creation
-  const initializeAuth = () => {
-    const storedToken = localStorage.getItem('token')
-    const storedRefreshToken = localStorage.getItem('refreshToken')
+  const initializeAuth = async () => {
+    // Get tokens from localStorage (fallback if persistence fails)
+    const storedToken = localStorage.getItem('token') || token.value
+    const storedRefreshToken = localStorage.getItem('refreshToken') || refreshToken.value
 
     if (storedToken && storedRefreshToken) {
       token.value = storedToken
@@ -106,20 +107,21 @@ export const useAuthStore = defineStore('auth', () => {
         if (payload && payload.exp > Math.floor(Date.now() / 1000)) {
           isAuthenticated.value = true
           // Try to fetch user profile in background
-          fetchUserProfile().catch(() => {
+          await fetchUserProfile().catch(() => {
             // If profile fetch fails, token might be invalid
             console.warn('Failed to fetch user profile on initialization')
           })
         } else {
           // Token is expired, try to refresh
-          refreshAccessToken().catch(() => {
+          const refreshSuccess = await refreshAccessToken()
+          if (!refreshSuccess) {
             // Refresh failed, clear tokens
-            logout()
-          })
+            await logout()
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
-        logout()
+        await logout()
       }
     }
   }
@@ -141,7 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Store user data
       user.value = {
-        id: responseData.id.toString(),
+        id: responseData.id,
         email: responseData.email,
         first_name: responseData.first_name,
         last_name: responseData.last_name,
@@ -180,7 +182,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       const userData = response.data
       user.value = {
-        id: userData.id?.toString() || '',
+        id: userData.id || 0,
         email: userData.email || '',
         first_name: userData.first_name || '',
         last_name: userData.last_name || '',
@@ -239,7 +241,7 @@ export const useAuthStore = defineStore('auth', () => {
       } else {
         // Fallback user data if profile fetch fails
         user.value = {
-          id: '',
+          id: 0,
           email: userEmail,
           first_name: '',
           last_name: '',
@@ -250,9 +252,14 @@ export const useAuthStore = defineStore('auth', () => {
 
       isAuthenticated.value = true
 
-      // Store tokens in localStorage
-      localStorage.setItem('token', token.value!)
-      localStorage.setItem('refreshToken', refreshToken.value!)
+      // Store tokens in localStorage with error handling
+      try {
+        localStorage.setItem('token', token.value!)
+        localStorage.setItem('refreshToken', refreshToken.value!)
+      } catch (storageError) {
+        console.warn('Failed to store tokens in localStorage:', storageError)
+        // Continue anyway as the session will work until page refresh
+      }
     } catch (err: unknown) {
       const errorMessage = handleApiError(err, 'Sign in failed')
       error.value = errorMessage
@@ -289,14 +296,21 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken.value = null
     isAuthenticated.value = false
     error.value = null
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
+    
+    // Clear localStorage with error handling
+    try {
+      localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('auth') // Clear Pinia persisted state
+    } catch (storageError) {
+      console.warn('Failed to clear localStorage:', storageError)
+    }
   }
 
   const refreshAccessToken = async (): Promise<boolean> => {
     if (!refreshToken.value) {
       // No refresh token available, redirect to login
-      logout()
+      await logout()
       return false
     }
 
@@ -316,9 +330,20 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = tokenData.access_token
       refreshToken.value = tokenData.refresh_token
 
-      // Update localStorage
-      localStorage.setItem('token', token.value!)
-      localStorage.setItem('refreshToken', refreshToken.value!)
+      // Update localStorage with error handling
+      try {
+        localStorage.setItem('token', token.value!)
+        localStorage.setItem('refreshToken', refreshToken.value!)
+      } catch (storageError) {
+        console.warn('Failed to update tokens in localStorage:', storageError)
+      }
+
+      // Ensure user profile is up to date after refresh
+      try {
+        await fetchUserProfile()
+      } catch (profileError) {
+        console.warn('Failed to fetch user profile after token refresh:', profileError)
+      }
 
       return true
     } catch (err: unknown) {
@@ -327,13 +352,19 @@ export const useAuthStore = defineStore('auth', () => {
       error.value = errorMessage
 
       // Refresh failed, logout user
-      logout()
+      await logout()
       return false
     }
   }
 
   const clearError = (): void => {
     error.value = null
+  }
+
+  const setUser = (userData: Partial<User>): void => {
+    if (user.value) {
+      user.value = { ...user.value, ...userData }
+    }
   }
 
   const resendVerificationEmail = async (email: string): Promise<void> => {
@@ -394,6 +425,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshAccessToken,
     fetchUserProfile,
     clearError,
+    setUser,
     resendVerificationEmail,
     initializeAuth,
 
@@ -404,5 +436,18 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading,
     getError,
     isTokenExpired
+  }
+}, {
+  persist: {
+    key: 'auth',
+    storage: localStorage,
+    paths: ['user', 'token', 'refreshToken', 'isAuthenticated'],
+    afterRestore: (ctx) => {
+      console.log('Auth state restored from localStorage')
+      // Initialize auth after restore
+      if (ctx.store.token && ctx.store.refreshToken) {
+        ctx.store.initializeAuth()
+      }
+    }
   }
 })

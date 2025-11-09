@@ -54,6 +54,16 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/houses",
+    name: "Houses",
+    component: () => import("@/views/Houses/index.vue"),
+    meta: { 
+      layout: "dashboard",
+      requiresAuth: true,
+      title: "Houses"
+    },
+  },
+  {
     path: "/roster",
     name: "Roster",
     component: () => import("@/views/Roster/index.vue"),
@@ -81,6 +91,16 @@ const routes: RouteRecordRaw[] = [
       layout: "dashboard",
       requiresAuth: true,
       title: "Settings"
+    },
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: () => import("@/views/Profile/index.vue"),
+    meta: { 
+      layout: "dashboard",
+      requiresAuth: true,
+      title: "Profile"
     },
   },
   {

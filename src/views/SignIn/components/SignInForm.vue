@@ -151,10 +151,10 @@ const onSubmit = async () => {
 
   try {
     // Call the auth store signIn method
-    await authStore.signIn({ 
-      email: formData.email, 
+    await authStore.signIn({
+      email: formData.email,
       password: formData.password,
-      rememberMe: formData.rememberMe 
+      rememberMe: formData.rememberMe
     })
 
     // Sign in successful, show success toast and redirect
@@ -164,7 +164,7 @@ const onSubmit = async () => {
       detail: 'Welcome back! You have been signed in successfully.',
       life: 3000
     })
-    
+
     // Redirect to intended page or dashboard
     const redirectPath = router.currentRoute.value.query.redirect as string
     if (redirectPath && redirectPath !== '/signin') {
@@ -175,14 +175,14 @@ const onSubmit = async () => {
   } catch (error) {
     console.error('Sign in error:', error)
     const errorMessage = authStore.getError() || 'Sign in failed'
-    
+
     toast.add({
       severity: 'error',
       summary: 'Sign In Failed',
       detail: errorMessage,
       life: 5000
     })
-    
+
     errors.api = errorMessage
   } finally {
     loading.value = false

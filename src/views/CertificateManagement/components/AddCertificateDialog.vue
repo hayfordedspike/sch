@@ -7,7 +7,9 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-3xl">Add Certificate</h2>
+      <h2 class="text-blue-500 font-bold text-3xl">
+        {{ editMode ? 'Edit Certificate' : 'Add Certificate' }}
+      </h2>
     </template>
 
     <div class="flex flex-col gap-4 py-4">
@@ -98,7 +100,7 @@
       <div class="flex justify-end gap-2">
         <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
         <Button
-          label="Add Certificate"
+          :label="editMode ? 'Update Certificate' : 'Add Certificate'"
           @click="handleSubmit"
           :loading="loading"
         />
@@ -108,9 +110,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useCertificates } from '@/composables/useCertificates'
-import type { CreateCertificateRequest } from '../types'
+import type { CreateCertificateRequest, Certificate } from '../types'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -119,17 +121,23 @@ import InputNumber from 'primevue/inputnumber'
 
 interface Props {
   visible: boolean
+  certificate?: Certificate | null
 }
 
 interface Emits {
   (e: 'update:visible', value: boolean): void
   (e: 'certificate-added'): void
+  (e: 'certificate-updated'): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  certificate: null
+})
+
 const emit = defineEmits<Emits>()
 
-const { createCertificate, loading } = useCertificates()
+const { createCertificate, updateCertificate, loading } = useCertificates()
 
 const formData = ref<CreateCertificateRequest>({
   code: '',
@@ -146,6 +154,37 @@ const isVisible = computed({
   get: () => props.visible,
   set: (value) => emit('update:visible', value)
 })
+
+const editMode = computed(() => !!props.certificate)
+
+// Watch for certificate changes to populate form in edit mode
+watch(
+  () => props.certificate,
+  (newCertificate) => {
+    if (newCertificate) {
+      formData.value = {
+        code: newCertificate.code,
+        name: newCertificate.name,
+        description: newCertificate.description,
+        validity_months: newCertificate.validity_months,
+        renewal_window_days: newCertificate.renewal_window_days,
+        grace_period_days: newCertificate.grace_period_days
+      }
+    } else {
+      // Reset form for add mode
+      formData.value = {
+        code: '',
+        name: '',
+        description: '',
+        validity_months: 12,
+        renewal_window_days: 30,
+        grace_period_days: 7
+      }
+    }
+    errors.value = {}
+  },
+  { immediate: true }
+)
 
 const validateForm = (): boolean => {
   errors.value = {}
@@ -189,15 +228,37 @@ const handleSubmit = async () => {
     return
   }
 
-  const result = await createCertificate(formData.value)
-  
-  if (result) {
-    emit('certificate-added')
-    handleClose()
+  try {
+    let result
+    if (editMode.value && props.certificate) {
+      // Update existing certificate
+      result = await updateCertificate(props.certificate.id, formData.value)
+      if (result?.success) {
+        emit('certificate-updated')
+        handleClose() // Close modal after successful update
+      } else {
+        // Handle update failure case
+        console.error('Update failed: operation was not successful')
+      }
+    } else {
+      // Create new certificate
+      result = await createCertificate(formData.value)
+      if (result) {
+        emit('certificate-added')
+        handleClose() // Close modal after successful creation
+      } else {
+        // Handle creation failure case
+        console.error('Creation failed: no result returned')
+      }
+    }
+  } catch (error) {
+    console.error('Error in handleSubmit:', error)
+    // Don't close modal on error, let user see the error and try again
   }
 }
 
 const handleClose = () => {
+  // Reset form data for both add and edit modes
   formData.value = {
     code: '',
     name: '',
@@ -206,7 +267,11 @@ const handleClose = () => {
     renewal_window_days: 30,
     grace_period_days: 7
   }
+  
+  // Clear any validation errors
   errors.value = {}
+  
+  // Close the modal
   emit('update:visible', false)
 }
 </script>

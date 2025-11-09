@@ -25,9 +25,22 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  const isAuthenticated = authStore.isAuthenticated && hasValidToken()
+  let isAuthenticated = authStore.isAuthenticated && hasValidToken()
   const requiresAuth = to.meta?.requiresAuth !== false // Default to true for dashboard routes
   const isGuestOnly = to.meta?.guestOnly === true
+
+  // If token is expired but we have a refresh token, try to refresh
+  if (!isAuthenticated && authStore.getToken() && authStore.getRefreshToken()) {
+    try {
+      const refreshSuccess = await authStore.refreshAccessToken()
+      if (refreshSuccess) {
+        isAuthenticated = true
+      }
+    } catch (error) {
+      console.error('Token refresh failed in router guard:', error)
+      // Continue with the logic below to handle unauthenticated state
+    }
+  }
 
   // If user is authenticated and trying to access guest-only routes (login, register)
   if (isAuthenticated && isGuestOnly) {
@@ -39,7 +52,7 @@ router.beforeEach(async (to, from, next) => {
   if (!isAuthenticated && requiresAuth) {
     // Clear any invalid tokens
     if (authStore.getToken() && !hasValidToken()) {
-      authStore.logout()
+      await authStore.logout()
     }
     
     next({ 
@@ -49,41 +62,9 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  // If user is authenticated but token is expired, try to refresh
-  if (isAuthenticated && authStore.getToken() && isTokenExpired(authStore.getToken()!)) {
-    const refreshToken = authStore.getRefreshToken()
-    
-    if (refreshToken) {
-      try {
-        const refreshed = await authStore.refreshAccessToken()
-        if (!refreshed) {
-          // Refresh failed, redirect to login
-          next({ 
-            name: 'SignIn',
-            query: { redirect: to.fullPath }
-          })
-          return
-        }
-      } catch (error) {
-        console.error('Token refresh failed:', error)
-        authStore.logout()
-        next({ 
-          name: 'SignIn',
-          query: { redirect: to.fullPath }
-        })
-        return
-      }
-    } else {
-      // No refresh token, logout and redirect
-      authStore.logout()
-      next({ 
-        name: 'SignIn',
-        query: { redirect: to.fullPath }
-      })
-      return
-    }
-  }
-
+  // If user is authenticated but token is expired, this should already be handled above
+  // If we reach here, user is authenticated and accessing allowed routes, or accessing public routes
+  
   // All checks passed, proceed to route
   next()
 })

@@ -1,27 +1,31 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl w-full text-center">
+  <div class="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-4xl w-full text-center space-y-8">
       <!-- Logo -->
       <div class="mb-8 animate-bounce">
-        <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg logo-glow interactive-pulse cursor-pointer"
+        <div class="inline-flex items-center justify-center w-32 h-32 bg-white rounded-full shadow-xl border border-gray-100 cursor-pointer logo-glow interactive-pulse p-6"
              @click="goHome">
-          <span class="text-3xl font-bold text-white">SC</span>
+          <img
+            src="@/assets/scheduler-logo.svg"
+            alt="Scheduler Logo"
+            class="w-full h-full object-contain filter drop-shadow-lg"
+          />
         </div>
       </div>
 
       <!-- Animated 404 Text -->
-      <div class="relative mb-8">
+      <div class="relative mb-12 py-8">
         <!-- Background decorative elements -->
         <div class="absolute inset-0 flex items-center justify-center">
-          <div class="w-64 h-64 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full opacity-20 animate-pulse"></div>
+          <div class="w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 bg-gray-100 rounded-full opacity-30 animate-pulse"></div>
         </div>
-        
+
         <!-- Main 404 text -->
         <div class="relative">
-          <h1 class="text-8xl sm:text-9xl lg:text-[12rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient leading-none">
+          <h1 class="text-6xl sm:text-8xl md:text-9xl lg:text-[12rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 animate-gradient leading-none">
             404
           </h1>
-          
+
           <!-- Floating particles -->
           <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
             <div class="particle particle-1 w-3 h-3 bg-blue-400 rounded-full opacity-60"></div>
@@ -34,48 +38,30 @@
       </div>
 
       <!-- Error Message -->
-      <div class="mb-8 space-y-4">
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 animate-fade-in-up">
+      <div class="mb-12 space-y-6 px-4">
+        <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 animate-fade-in-up">
           Oops! Page Not Found
         </h2>
-        <p class="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animation-delay-200">
-          The page you're looking for seems to have vanished into the digital void. 
+        <p class="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animation-delay-200 leading-relaxed">
+          The page you're looking for seems to have vanished into the digital void.
           Don't worry, even the best explorers sometimes take a wrong turn!
         </p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up animation-delay-400">
-        <Button
-          @click="goHome"
-          class="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-0"
-          label="Take Me Home"
-          icon="pi pi-home"
-        >
-          <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-        </Button>
-        
-        <Button
-          @click="goBack"
-          outlined
-          class="group relative overflow-hidden border-2 border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:border-purple-500 hover:text-purple-600 hover:bg-purple-50 hover:scale-105"
-          label="Go Back"
-          icon="pi pi-arrow-left"
-          severity="secondary"
-        >
-          <div class="absolute inset-0 bg-purple-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
-        </Button>
+      <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center animate-fade-in-up animation-delay-400 px-4">
+
       </div>
 
       <!-- Additional Help -->
-      <div class="mt-12 animate-fade-in-up animation-delay-600">
-        <p class="text-sm text-gray-500 mb-4">Need help? Try these popular sections:</p>
-        <div class="flex flex-wrap justify-center gap-3">
-          <span 
-            v-for="link in quickLinks" 
+      <div class="mt-16 animate-fade-in-up animation-delay-600 px-4">
+        <p class="text-sm sm:text-base text-gray-500 mb-6">Need help? Try these popular sections:</p>
+        <div class="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-2xl mx-auto">
+          <span
+            v-for="link in quickLinks"
             :key="link.name"
             @click="navigateTo(link.path)"
-            class="group inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 text-sm text-gray-600 hover:text-purple-600 hover:border-purple-300 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50"
+            class="group inline-flex items-center px-4 py-3 sm:px-6 sm:py-3 bg-white rounded-full shadow-sm border border-gray-200 text-sm sm:text-base text-gray-600 hover:text-purple-600 hover:border-purple-300 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 min-w-[120px] justify-center"
           >
             <i :class="link.icon" class="mr-2 transition-transform duration-300 group-hover:scale-110"></i>
             {{ link.name }}
@@ -84,12 +70,12 @@
       </div>
 
       <!-- Fun Animation Element -->
-      <div class="mt-16 animate-fade-in-up animation-delay-800">
+      <div class="mt-20 animate-fade-in-up animation-delay-800">
         <div class="flex justify-center">
           <div class="relative">
-            <div class="w-32 h-32 border-4 border-purple-200 rounded-full animate-spin-slow"></div>
-            <div class="absolute inset-4 border-4 border-blue-200 rounded-full animate-reverse-spin"></div>
-            <div class="absolute inset-8 w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse"></div>
+            <div class="w-24 h-24 sm:w-32 sm:h-32 border-4 border-purple-200 rounded-full animate-spin-slow"></div>
+            <div class="absolute inset-3 sm:inset-4 border-4 border-blue-200 rounded-full animate-reverse-spin"></div>
+            <div class="absolute inset-6 sm:inset-8 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -100,7 +86,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Button from 'primevue/button'
+
 
 defineOptions({ name: 'NotFoundView' })
 
@@ -117,13 +103,7 @@ const goHome = () => {
   router.push('/')
 }
 
-const goBack = () => {
-  if (window.history.length > 2) {
-    router.go(-1)
-  } else {
-    router.push('/')
-  }
-}
+
 
 const navigateTo = (path: string) => {
   router.push(path)
@@ -276,6 +256,25 @@ onMounted(() => {
   .particle {
     display: none; /* Hide particles on small screens for better performance */
   }
+
+  /* Ensure logo is properly sized on mobile */
+  .logo-glow {
+    width: 28rem !important;
+    height: 7rem !important;
+  }
+
+  /* Better spacing on mobile */
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .logo-glow {
+    width: 6rem !important;
+    height: 6rem !important;
+  }
 }
 
 /* Accessibility */
@@ -288,17 +287,10 @@ onMounted(() => {
   .particle {
     animation: none;
   }
-  
+
   .animate-fade-in-up {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .bg-gradient-to-br {
-    background: linear-gradient(to bottom right, rgb(15, 23, 42), rgb(30, 41, 59), rgb(15, 23, 42));
   }
 }
 

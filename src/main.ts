@@ -8,7 +8,7 @@ import PrimeVue from 'primevue/config'
 import { Noir } from '../primevue.config.ts'
 import '../styles.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import { ToastService } from 'primevue'
+import { ToastService, ConfirmationService } from 'primevue'
 import { useAuthStore } from './stores/auth'
 
 const app = createApp(App)
@@ -33,10 +33,21 @@ app.use(PrimeVue, {
   },
 })
 app.use(ToastService)
+app.use(ConfirmationService)
 
 // Initialize authentication state after mounting
 app.mount('#app')
 
-// Initialize auth store after app is mounted
-const authStore = useAuthStore()
-authStore.initializeAuth()
+// Initialize auth store after app is mounted with proper async handling
+const initializeApp = async () => {
+  const authStore = useAuthStore()
+  try {
+    await authStore.initializeAuth()
+    console.log('Auth initialization completed')
+  } catch (error) {
+    console.error('Auth initialization failed:', error)
+  }
+}
+
+// Initialize app
+initializeApp()
