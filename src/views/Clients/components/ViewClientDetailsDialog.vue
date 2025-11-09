@@ -38,14 +38,14 @@
       <!-- Emergency Contact -->
       <div class="section">
         <h3 class="section-title">Emergency Contact</h3>
-        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="field">
-            <label class="field-label">Contact Name</label>
-            <p class="field-value">{{ client.emergency_contact_name || 'Not provided' }}</p>
+        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+          <div class="field-column">
+            <label class="field-header">Contact Name</label>
+            <p class="field-content">{{ client.emergency_contact_name || 'Not provided' }}</p>
           </div>
-          <div class="field">
-            <label class="field-label">Contact Phone</label>
-            <p class="field-value">{{ client.emergency_contact_phone ? formatClientPhone(client.emergency_contact_phone) : 'Not provided' }}</p>
+          <div class="field-column">
+            <label class="field-header">Contact Phone</label>
+            <p class="field-content">{{ client.emergency_contact_phone ? formatClientPhone(client.emergency_contact_phone) : 'Not provided' }}</p>
           </div>
         </div>
         <div v-else class="text-gray-500 italic">
@@ -57,7 +57,7 @@
       <div class="section">
         <h3 class="section-title">Preferred Service</h3>
         <div class="field">
-          <label class="field-label">House/Service</label>
+          
           <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
             {{ getHouseName(client.house_id) }}
           </span>
@@ -91,34 +91,59 @@
       <!-- Schedules -->
       <div class="section">
         <h3 class="section-title">Schedules</h3>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-medium text-blue-900">Upcoming Appointments</p>
-              <p class="text-sm text-blue-700">2 appointments scheduled</p>
+        <div class="space-y-4">
+          <!-- Schedule Item 1 -->
+          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+              <div class="field-column">
+                <label class="field-header">From:</label>
+                <p class="field-content">23rd September, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">To:</label>
+                <p class="field-content">29th September, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">Time:</label>
+                <p class="field-content">8:00AM - 10:00PM</p>
+              </div>
             </div>
-            <Button
-              label="View Schedule"
-              icon="pi pi-calendar"
-              class="p-button-sm"
-              outlined
-              severity="info"
-            />
           </div>
-        </div>
-      </div>
-
-      <!-- Client Timestamps -->
-      <div class="section border-t pt-4">
-        <h3 class="section-title text-sm">Account Information</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
-          <div class="field">
-            <label class="field-label text-xs">Member Since</label>
-            <p class="field-value text-xs">{{ formatDate(client.created_at) }}</p>
+          
+          <!-- Schedule Item 2 -->
+          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+              <div class="field-column">
+                <label class="field-header">From:</label>
+                <p class="field-content">30th September, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">To:</label>
+                <p class="field-content">5th October, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">Time:</label>
+                <p class="field-content">9:00AM - 3:00PM</p>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <label class="field-label text-xs">Last Updated</label>
-            <p class="field-value text-xs">{{ formatDate(client.updated_at) }}</p>
+          
+          <!-- Schedule Item 3 -->
+          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+              <div class="field-column">
+                <label class="field-header">From:</label>
+                <p class="field-content">7th October, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">To:</label>
+                <p class="field-content">12th October, 2025</p>
+              </div>
+              <div class="field-column">
+                <label class="field-header">Time:</label>
+                <p class="field-content">10:00AM - 6:00PM</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -136,7 +161,7 @@
           label="Edit Client"
           icon="pi pi-pencil"
           @click="handleEdit"
-          severity="info"
+          class="bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
         />
       </div>
     </template>
@@ -177,20 +202,6 @@ const dialogVisible = computed({
 const getHouseName = (houseId: number) => {
   const house = houses.value.find(h => h.id === houseId)
   return house ? house.name : 'Unknown Service'
-}
-
-// Format date helper
-const formatDate = (dateString: string) => {
-  if (!dateString) return 'Not provided'
-  try {
-    return new Date(dateString).toLocaleDateString('en-AU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  } catch {
-    return 'Invalid date'
-  }
 }
 
 // Methods
@@ -282,11 +293,11 @@ const handleEdit = () => {
   .field-column:not(:last-child) {
     border-right: 1px solid #e5e7eb;
   }
-  
+
   .field-column:first-child {
     padding-left: 0;
   }
-  
+
   .field-column:last-child {
     padding-right: 0;
   }
