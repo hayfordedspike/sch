@@ -441,8 +441,8 @@ export const useAuthStore = defineStore('auth', () => {
   persist: {
     key: 'auth',
     storage: localStorage,
-    paths: ['user', 'token', 'refreshToken', 'isAuthenticated'],
-    afterRestore: (ctx: { store: Record<string, unknown> }) => {
+    pick: ['user', 'token', 'refreshToken', 'isAuthenticated'],
+    afterHydrate: (ctx) => {
       console.log('Auth state restored from localStorage')
       // Initialize auth after restore
       if (ctx.store.token && ctx.store.refreshToken) {
