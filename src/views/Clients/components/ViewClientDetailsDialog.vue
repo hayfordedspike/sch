@@ -243,7 +243,7 @@ const handleEdit = () => {
 /* New styles for contact information columns */
 .field-column {
   padding: 1rem;
-  text-align: center;
+  text-align: left;
   min-width: 0; /* Allows flex items to shrink */
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -257,6 +257,7 @@ const handleEdit = () => {
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-align: left;
 }
 
 .field-content {
@@ -266,6 +267,7 @@ const handleEdit = () => {
   line-height: 1.5;
   word-break: break-word;
   hyphens: auto;
+  text-align: left;
 }
 
 /* Responsive divider adjustments */
