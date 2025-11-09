@@ -12,6 +12,7 @@ declare module 'vue' {
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
+    DashboardCalendar: typeof import('./src/components/DashboardCalendar.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
     FilterCard: typeof import('./src/components/FilterCard.vue')['default']
     GreetingCard: typeof import('./src/components/GreetingCard.vue')['default']
@@ -23,6 +24,9 @@ declare module 'vue' {
     SchedulesCard: typeof import('./src/components/SchedulesCard.vue')['default']
     SearchBar: typeof import('./src/components/layout/SearchBar.vue')['default']
     Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
+    TabPanel: typeof import('primevue/tabpanel')['default']
+    TabView: typeof import('primevue/tabview')['default']
+    Tag: typeof import('primevue/tag')['default']
     VuetifyExample: typeof import('./src/components/VuetifyExample.vue')['default']
   }
   export interface GlobalDirectives {

@@ -7,8 +7,13 @@ import AddCertificateDialog from '../CertificateManagement/components/AddCertifi
 import GreetingCard from '@/components/GreetingCard.vue'
 import SchedulesCard from '@/components/SchedulesCard.vue'
 import FilterCard from '@/components/FilterCard.vue'
+import DashboardCalendar from '@/components/DashboardCalendar.vue'
 
 const showAddCertificateDialog = ref(false)
+
+// State for filter controls
+const selectedMember = ref<string>('all')
+const selectedMonth = ref<number>(new Date().getMonth())
 
 const handleAddCertificate = (data: unknown) => {
   console.log('Add certificate:', data)
@@ -20,15 +25,24 @@ const handleAddCertificate = (data: unknown) => {
   <div class="p-4">
     <!-- Dynamic Greeting Card -->
     <GreetingCard class="mb-6" />
-    
+        <!-- Certificate Warning Banner -->
+    <CertificateWarningBanner class="mb-6" @add-certificate="showAddCertificateDialog = true" />
+
     <!-- Schedules Card -->
     <SchedulesCard class="mb-6" />
-    
+
     <!-- Filter Card -->
-    <FilterCard class="mb-6" />
-    
-    <!-- Certificate Warning Banner -->
-    <CertificateWarningBanner class="mb-6" @add-certificate="showAddCertificateDialog = true" />
+    <FilterCard
+      class="mb-6"
+      v-model:selectedFilter="selectedMember"
+      v-model:currentDate="selectedMonth"
+    />
+    <DashboardCalendar
+      :selectedMember="selectedMember"
+      :selectedMonth="selectedMonth"
+    />
+
+
 
     <!-- Rest of dashboard content can go here -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
