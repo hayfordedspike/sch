@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+@import "primeicons/primeicons.css";
+
+@theme {
+  /*Custom color*/
+
+  /*--color-background: oklch(0.7952 0 0);*/
+
+  /*custom breakpoints*/
+  --breakpoint-lg: 65rem;
+}
+
+html {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  /*@apply bg-background text-black;*/
+}
+
+@utility g-padding {
+  @apply px-4 sm:px-8 md:px-13 lg:px-16 xl:px-36 2xl:px-48;
+}
+
+
+/*Paginator styles*/
+.p-paginator {
+  background-color: transparent !important;
+}
+
+.p-paginator-page {
+  color: #4d4d4d !important;
+  border: 1px solid #dee5ee !important;
+  border-radius: 2px !important;
+}
+
+.p-paginator-page-selected {
+  color: #ffffff !important;
+}
+
+[data-pc-group-section="pagebutton"] {
+  border: 1px solid #dee5ee !important;
+  border-radius: 2px !important;
+}
+
+.p-paginator-first,
+.p-paginator-last {
+  display: none !important;
+}
+
+.p-datatable-paginator-bottom {
+  width: max-content;
+  display: flex;
+  justify-self: flex-end;
+  border: none !important;
+  margin-block: 1rem;
+}
+
+.p-datatable-header-cell {
+  background: #292d32ff !important;
+  color: white !important;
+}
+
+.p-datatable-sort-icon {
+  color: white !important;
+}
