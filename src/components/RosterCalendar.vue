@@ -1,10 +1,7 @@
 <script setup lang="ts">
 // Props for filter state
 const props = defineProps<{ selectedMember: string; selectedMonth: number }>();
-const monthNames: string[] = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+
 
 import { onMounted, ref, nextTick, computed } from 'vue'
 
