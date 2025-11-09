@@ -13,86 +13,106 @@
     </template>
 
     <div class="flex flex-col gap-4 py-4">
-      <!-- First row: Certificate Code and Name -->
+      <!-- First row: Certificate ID and Issuing Organisation -->
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
-          <label for="code" class="font-semibold">Certificate Code</label>
+          <label for="certificateId" class="font-semibold">Certificate ID</label>
           <InputText
-            id="code"
-            v-model="formData.code"
-            placeholder="Enter certificate code (e.g., CERT001)"
-            :class="{ 'p-invalid': errors.code }"
+            id="certificateId"
+            v-model="formData.certificate_id"
+            placeholder="Enter certificate ID"
+            :class="{ 'p-invalid': errors.certificate_id }"
           />
-          <small v-if="errors.code" class="text-red-500">{{ errors.code }}</small>
+          <small v-if="errors.certificate_id" class="text-red-500">{{ errors.certificate_id }}</small>
         </div>
-
         <div class="flex flex-col gap-2 flex-1">
-          <label for="name" class="font-semibold">Certificate Name</label>
+          <label for="issuingOrg" class="font-semibold">Issuing Organisation</label>
           <InputText
-            id="name"
-            v-model="formData.name"
-            placeholder="Enter certificate name"
-            :class="{ 'p-invalid': errors.name }"
+            id="issuingOrg"
+            v-model="formData.issuing_organisation"
+            placeholder="Enter issuing organisation"
+            :class="{ 'p-invalid': errors.issuing_organisation }"
           />
-          <small v-if="errors.name" class="text-red-500">{{ errors.name }}</small>
+          <small v-if="errors.issuing_organisation" class="text-red-500">{{ errors.issuing_organisation }}</small>
         </div>
       </div>
 
-      <!-- Description -->
-      <div class="flex flex-col gap-2">
-        <label for="description" class="font-semibold">Description</label>
-        <Textarea
-          id="description"
-          v-model="formData.description"
-          placeholder="Enter certificate description"
-          :class="{ 'p-invalid': errors.description }"
-          rows="3"
-        />
-        <small v-if="errors.description" class="text-red-500">{{ errors.description }}</small>
-      </div>
-
-      <!-- Second row: Validity Period and Renewal Window -->
+      <!-- Second row: Issue Date and Expiry Date -->
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
-          <label for="validityMonths" class="font-semibold">Validity Period (Months)</label>
-          <InputNumber
-            id="validityMonths"
-            v-model="formData.validity_months"
-            placeholder="Enter validity in months"
-            :class="{ 'p-invalid': errors.validity_months }"
-            :min="1"
-            :max="120"
+          <label for="issueDate" class="font-semibold">Issue Date</label>
+          <Calendar
+            id="issueDate"
+            v-model="formData.issue_date"
+            placeholder="Select issue date"
+            showIcon
+            :class="{ 'p-invalid': errors.issue_date }"
           />
-          <small v-if="errors.validity_months" class="text-red-500">{{ errors.validity_months }}</small>
+          <small v-if="errors.issue_date" class="text-red-500">{{ errors.issue_date }}</small>
         </div>
-
         <div class="flex flex-col gap-2 flex-1">
-          <label for="renewalWindowDays" class="font-semibold">Renewal Window (Days)</label>
-          <InputNumber
-            id="renewalWindowDays"
-            v-model="formData.renewal_window_days"
-            placeholder="Enter renewal window in days"
-            :class="{ 'p-invalid': errors.renewal_window_days }"
-            :min="0"
-            :max="365"
+          <label for="expiryDate" class="font-semibold">Expiry Date</label>
+          <Calendar
+            id="expiryDate"
+            v-model="formData.expiry_date"
+            placeholder="Select expiry date"
+            showIcon
+            :class="{ 'p-invalid': errors.expiry_date }"
           />
-          <small v-if="errors.renewal_window_days" class="text-red-500">{{ errors.renewal_window_days }}</small>
+          <small v-if="errors.expiry_date" class="text-red-500">{{ errors.expiry_date }}</small>
         </div>
       </div>
 
-      <!-- Grace Period -->
+      <!-- Certificate Type Dropdown -->
       <div class="flex flex-col gap-2">
-        <label for="gracePeriodDays" class="font-semibold">Grace Period (Days)</label>
-        <InputNumber
-          id="gracePeriodDays"
-          v-model="formData.grace_period_days"
-          placeholder="Enter grace period in days"
-          :class="{ 'p-invalid': errors.grace_period_days }"
-          :min="0"
-          :max="365"
+        <label for="certificateType" class="font-semibold">Certificate Type</label>
+        <Dropdown
+          id="certificateType"
+          v-model="formData.certificate_type"
+          :options="certificateTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select certificate type"
+          class="w-full"
+          :class="{ 'p-invalid': errors.certificate_type }"
         />
-        <small v-if="errors.grace_period_days" class="text-red-500">{{ errors.grace_period_days }}</small>
-        <small class="text-gray-500 text-xs">Grace period allows certificate holders to continue working after expiry</small>
+        <small v-if="errors.certificate_type" class="text-red-500">{{ errors.certificate_type }}</small>
+      </div>
+
+      <!-- Certificate Item File Upload (Modern Dropzone) -->
+      <div class="flex flex-col gap-2">
+        <label for="certificateItem" class="font-semibold">Item Certificate</label>
+        <div
+          class="w-full border-2 border-dashed border-blue-400 rounded-lg flex flex-col items-center justify-center py-8 cursor-pointer hover:border-blue-600 transition relative"
+          @dragover.prevent
+          @drop.prevent="handleDrop"
+          @click="triggerFileInput"
+        >
+          <input
+            ref="fileInputRef"
+            type="file"
+            id="certificateItem"
+            accept=".pdf,.jpg,.jpeg,.png"
+            class="hidden"
+            @change="handleFileChange"
+          />
+          <div v-if="!formData.certificate_item" class="flex flex-col items-center">
+            <i class="pi pi-upload text-4xl text-blue-400 mb-2"></i>
+            <span class="text-gray-600">Drag your file or <span class="text-blue-500 font-semibold">browse</span></span>
+            <span class="text-xs text-gray-400 mt-1">Max 10MB files are allowed</span>
+          </div>
+          <div v-else class="flex flex-col items-center">
+            <template v-if="isImageFile">
+              <img :src="filePreviewUrl ?? undefined" alt="Preview" class="max-h-32 mb-2 rounded shadow" />
+            </template>
+            <template v-else>
+              <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
+              <span class="text-gray-700">{{ formData.certificate_item.name }}</span>
+            </template>
+            <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile" />
+          </div>
+        </div>
+        <small class="text-gray-500 text-xs">Only support SVG, JPG, And PNG)</small>
       </div>
     </div>
 
@@ -110,14 +130,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
 import { useCertificates } from '@/composables/useCertificates'
-import type { CreateCertificateRequest, Certificate } from '../types'
-import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import InputNumber from 'primevue/inputnumber'
+import { ref, computed, watch } from 'vue'
+import Calendar from 'primevue/calendar'
+import Dropdown from 'primevue/dropdown'
+
+import type { Certificate, CreateCertificateRequest } from '@/types/certificate' // <-- Add this import
 
 interface Props {
   visible: boolean
@@ -139,14 +157,78 @@ const emit = defineEmits<Emits>()
 
 const { createCertificate, updateCertificate, loading } = useCertificates()
 
-const formData = ref<CreateCertificateRequest>({
+import { ref as vueRef } from 'vue'
+const fileInputRef = vueRef<HTMLInputElement | null>(null)
+
+const formData = ref<CreateCertificateRequest & {
+  certificate_id?: string
+  issuing_organisation?: string
+  issue_date?: Date | null
+  expiry_date?: Date | null
+  certificate_type?: string
+  certificate_item?: File | null
+}>({
   code: '',
   name: '',
   description: '',
   validity_months: 12,
   renewal_window_days: 30,
-  grace_period_days: 7
+  grace_period_days: 7,
+  certificate_id: '',
+  issuing_organisation: '',
+  issue_date: null,
+  expiry_date: null,
+  certificate_type: '',
+  certificate_item: null
 })
+
+const filePreviewUrl = ref<string | null>(null)
+const isImageFile = computed(() => {
+  const file = formData.value.certificate_item
+  if (!file) return false
+  return file.type.startsWith('image/')
+})
+
+function triggerFileInput() {
+  fileInputRef.value?.click()
+}
+
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    formData.value.certificate_item = input.files[0]
+    if (isImageFile.value) {
+      filePreviewUrl.value = URL.createObjectURL(input.files[0])
+    } else {
+      filePreviewUrl.value = null
+    }
+  }
+}
+
+function handleDrop(event: DragEvent) {
+  if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+    const file = event.dataTransfer.files[0]
+    formData.value.certificate_item = file
+    if (file.type.startsWith('image/')) {
+      filePreviewUrl.value = URL.createObjectURL(file)
+    } else {
+      filePreviewUrl.value = null
+    }
+  }
+}
+
+function removeFile() {
+  formData.value.certificate_item = null
+  filePreviewUrl.value = null
+}
+const certificateTypeOptions = [
+  { label: 'Basic Life Support', value: 'bls' },
+  { label: 'Advanced Cardiac Life Support', value: 'acls' },
+  { label: 'Pediatric Advanced Life Support', value: 'pals' },
+  { label: 'First Aid', value: 'firstaid' },
+  { label: 'CPR', value: 'cpr' },
+  { label: 'Other', value: 'other' }
+]
 
 const errors = ref<Record<string, string>>({})
 
@@ -232,7 +314,7 @@ const handleSubmit = async () => {
     let result
     if (editMode.value && props.certificate) {
       // Update existing certificate
-      result = await updateCertificate(props.certificate.id, formData.value)
+      result = await updateCertificate(Number(props.certificate.id), formData.value)
       if (result?.success) {
         emit('certificate-updated')
         handleClose() // Close modal after successful update
@@ -267,10 +349,10 @@ const handleClose = () => {
     renewal_window_days: 30,
     grace_period_days: 7
   }
-  
+
   // Clear any validation errors
   errors.value = {}
-  
+
   // Close the modal
   emit('update:visible', false)
 }

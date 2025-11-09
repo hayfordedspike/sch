@@ -19,6 +19,7 @@ declare module 'vue' {
     Dropdown: typeof import('primevue/dropdown')['default']
     FilterCard: typeof import('./src/components/FilterCard.vue')['default']
     GreetingCard: typeof import('./src/components/GreetingCard.vue')['default']
+    InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     LoadingSpinner: typeof import('./src/components/LoadingSpinner.vue')['default']
     Navbar: typeof import('./src/components/layout/Navbar.vue')['default']
