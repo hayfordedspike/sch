@@ -8,6 +8,7 @@ defineOptions({ name: 'RosterView' })
 
 const selectedMember = ref<string>('all')
 const selectedMonth = ref<number>(new Date().getMonth())
+const calendarView = ref<'day' | 'week'>('day')
 </script>
 
 <template>
@@ -16,10 +17,12 @@ const selectedMonth = ref<number>(new Date().getMonth())
 			class="mb-6"
 			v-model:selectedFilter="selectedMember"
 			v-model:currentDate="selectedMonth"
+			v-model:calendarView="calendarView"
 		/>
 		<RosterCalendar
 			:selectedMember="selectedMember"
 			:selectedMonth="selectedMonth"
+			:calendarView="calendarView"
 		/>
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 			<!-- Roster widgets/cards will go here -->

@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, watch, defineProps, defineEmits } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 
 // Props for v-model binding
-const props = defineProps<{ selectedFilter: string; currentDate: number }>()
-const emit = defineEmits(['update:selectedFilter', 'update:currentDate'])
+const props = defineProps<{ selectedFilter: string; currentDate: number; calendarView?: 'day' | 'week' }>()
+const emit = defineEmits(['update:selectedFilter', 'update:currentDate', 'update:calendarView'])
+// Calendar view state (Day/Week)
+const calendarView = ref(props.calendarView ?? 'day')
+
+const setCalendarView = (view: 'day' | 'week') => {
+  calendarView.value = view
+  emit('update:calendarView', view)
+}
 
 // Local state mirrors parent
 const currentDate = ref(new Date(new Date().setMonth(props.currentDate)))
@@ -62,15 +67,14 @@ watch(() => props.currentDate, (val) => {
   currentDate.value = new Date(new Date().setMonth(val))
 })
 
-// Navigate to roster page
-const goToRoster = () => {
-  router.push('/roster')
-}
+
 </script>
 <template>
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-6">
+        <!-- Calendar View Toggle -->
+
         <div class="flex items-center space-x-4">
           <button
             @click="goToPreviousMonth"
@@ -105,12 +109,16 @@ const goToRoster = () => {
           </select>
         </div>
       </div>
-      <button
-        @click="goToRoster"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
-        Go To Roster
-      </button>
+      <div class="flex items-center space-x-2 mr-6">
+          <button
+            :class="['px-3 py-1 rounded-lg font-semibold text-sm', calendarView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700']"
+            @click="setCalendarView('day')"
+          >Day</button>
+          <button
+            :class="['px-3 py-1 rounded-lg font-semibold text-sm', calendarView === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700']"
+            @click="setCalendarView('week')"
+          >Week</button>
+        </div>
     </div>
   </div>
 </template>

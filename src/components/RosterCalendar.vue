@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Props for filter state
-const props = defineProps<{ selectedMember: string; selectedMonth: number }>();
+const props = defineProps<{ selectedMember: string; selectedMonth: number; calendarView?: 'day' | 'week' }>();
 
 
 import { onMounted, ref, nextTick, computed } from 'vue'
