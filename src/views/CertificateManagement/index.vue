@@ -19,40 +19,70 @@
       </div>
     </div>
 
-    <!-- Tabs for different views -->
-    <TabView>
-      <TabPanel value="0" header="Certificates">
-        <template #header>
-          <i class="pi pi-file mr-2"></i>
-          <span>Certificates</span>
-        </template>
-        
-        <!-- Warning Banner -->
-        <CertificateWarningBanner 
-          @add-certificate="showAddDialog = true"
-          @view-all="handleViewAllExpiring"
-        />
-        
-        <CertificateList 
-          @add-certificate="showAddDialog = true"
-          @view-certificate="handleViewCertificate"
-          @edit-certificate="handleEditCertificate"
-        />
-      </TabPanel>
-      
-      <TabPanel value="1" header="Certificate Types">
-        <template #header>
-          <i class="pi pi-cog mr-2"></i>
-          <span>Certificate Types</span>
-        </template>
-        <CertificateTypes />
-      </TabPanel>
-    </TabView>
+    <!-- Custom Tab Navigation -->
+    <div class="w-full mb-6">
+      <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white p-4">
+          <div class="inline-flex border-b-2 border-blue-300 relative">
+            <button
+              @click="activeTabIndex = 0"
+              :class="[
+                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
+                activeTabIndex === 0
+                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ]"
+            >
+              Certificates
+            </button>
+            <button
+              @click="activeTabIndex = 1"
+              :class="[
+                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
+                activeTabIndex === 1
+                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ]"
+            >
+              Certificate Types
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="w-full">
+      <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div v-if="activeTab === 'certificates'" class="p-6">
+            <!-- Warning Banner -->
+            <CertificateWarningBanner 
+              @add-certificate="showAddDialog = true"
+              @view-all="handleViewAllExpiring"
+            />
+            <CertificateList 
+              @add-certificate="showAddDialog = true"
+              @view-certificate="handleViewCertificate"
+              @edit-certificate="handleEditCertificate"
+            />
+          </div>
+          <div v-if="activeTab === 'types'" class="p-6">
+            <CertificateTypes />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Add Certificate Dialog -->
     <AddCertificateDialog 
       v-model:visible="showAddDialog"
       @certificate-added="handleCertificateAdded"
+    />
+
+    <!-- Add Certificate Type Dialog -->
+    <AddCertificateTypeDialog
+      v-model:visible="showAddTypeDialog"
     />
 
     <!-- Toast for notifications -->
@@ -61,24 +91,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Certificate } from './types'
 import Button from 'primevue/button'
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
 import Toast from 'primevue/toast'
 import CertificateList from './components/CertificateList.vue'
 import CertificateTypes from './components/CertificateTypes.vue'
 import AddCertificateDialog from './components/AddCertificateDialog.vue'
+import AddCertificateTypeDialog from './components/AddCertificateTypeDialog.vue'
 import CertificateWarningBanner from './components/CertificateWarningBanner.vue'
 
 defineOptions({ name: 'CertificateManagementView' })
 
 const showAddDialog = ref(false)
+const showAddTypeDialog = ref(false)
+const activeTabIndex = ref(0)
+const activeTab = computed(() => {
+  return activeTabIndex.value === 0 ? 'certificates' : 'types'
+})
 
 const handleAddCertificateType = () => {
-  // Handle adding new certificate type
-  console.log('Add new certificate type')
+  showAddTypeDialog.value = true
 }
 
 const handleViewCertificate = (certificate: Certificate) => {
