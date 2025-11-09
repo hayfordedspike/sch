@@ -16,6 +16,7 @@ interface Schedule {
   location: string;
   client: string;
   month?: number;
+  day?: number; // Add day property for week view
 }
 
 interface StaffMember {
@@ -50,9 +51,15 @@ const originalStaffSchedules: StaffMember[] = [
     position: 'Senior Caregiver',
     img: DEFAULT_USER_IMG,
     schedules: [
-      { start: '8:00 AM', end: '10:30 AM', task: 'Morning Care Routine', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10 },
-      { start: '2:00 PM', end: '4:00 PM', task: 'Physical Therapy Session', location: 'Smith Residence', client: 'Mr. Smith', month: 10 },
-      { start: '9:00 AM', end: '11:00 AM', task: 'Special Care', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 9 }
+      // November busy week
+      { start: '8:00 AM', end: '10:30 AM', task: 'Morning Care Routine', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10, day: 10 },
+      { start: '11:00 AM', end: '12:30 PM', task: 'Medication', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10, day: 10 },
+      { start: '2:00 PM', end: '4:00 PM', task: 'Physical Therapy', location: 'Smith Residence', client: 'Mr. Smith', month: 10, day: 10 },
+      { start: '8:00 AM', end: '9:00 AM', task: 'Breakfast', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10, day: 11 },
+      { start: '10:00 AM', end: '12:00 PM', task: 'Checkup', location: 'Smith Residence', client: 'Mr. Smith', month: 10, day: 11 },
+      { start: '1:00 PM', end: '2:00 PM', task: 'Lunch', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10, day: 12 },
+      { start: '3:00 PM', end: '5:00 PM', task: 'Rehab', location: 'Smith Residence', client: 'Mr. Smith', month: 10, day: 12 },
+      { start: '9:00 AM', end: '11:00 AM', task: 'Special Care', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 9, day: 5 }
     ]
   },
   {
@@ -61,9 +68,13 @@ const originalStaffSchedules: StaffMember[] = [
     position: 'Medication Specialist',
     img: DEFAULT_USER_IMG,
     schedules: [
-      { start: '9:00 AM', end: '11:00 AM', task: 'Medication Administration', location: 'Brown Residence', client: 'Ms. Brown', month: 10 },
-      { start: '3:00 PM', end: '5:00 PM', task: 'Follow-up Assessment', location: 'Wilson Residence', client: 'Mr. Wilson', month: 10 },
-      { start: '1:00 PM', end: '2:00 PM', task: 'Consultation', location: 'Brown Residence', client: 'Ms. Brown', month: 9 }
+      { start: '9:00 AM', end: '11:00 AM', task: 'Medication Administration', location: 'Brown Residence', client: 'Ms. Brown', month: 10, day: 10 },
+      { start: '1:00 PM', end: '2:00 PM', task: 'Consultation', location: 'Brown Residence', client: 'Ms. Brown', month: 10, day: 10 },
+      { start: '3:00 PM', end: '5:00 PM', task: 'Follow-up Assessment', location: 'Wilson Residence', client: 'Mr. Wilson', month: 10, day: 11 },
+      { start: '8:00 AM', end: '9:00 AM', task: 'Morning Rounds', location: 'Brown Residence', client: 'Ms. Brown', month: 10, day: 12 },
+      { start: '10:00 AM', end: '12:00 PM', task: 'Medication Review', location: 'Wilson Residence', client: 'Mr. Wilson', month: 10, day: 12 },
+      { start: '2:00 PM', end: '3:00 PM', task: 'Consultation', location: 'Brown Residence', client: 'Ms. Brown', month: 10, day: 13 },
+      { start: '4:00 PM', end: '5:00 PM', task: 'Assessment', location: 'Wilson Residence', client: 'Mr. Wilson', month: 10, day: 13 }
     ]
   },
   {
@@ -72,8 +83,12 @@ const originalStaffSchedules: StaffMember[] = [
     position: 'Physical Therapist',
     img: DEFAULT_USER_IMG,
     schedules: [
-      { start: '10:00 AM', end: '12:00 PM', task: 'Therapy Session', location: 'Davis Center', client: 'Multiple Clients', month: 10 },
-      { start: '1:30 PM', end: '3:30 PM', task: 'Mobility Training', location: 'Rehab Center', client: 'Group Session', month: 10 }
+      { start: '10:00 AM', end: '12:00 PM', task: 'Therapy Session', location: 'Davis Center', client: 'Multiple Clients', month: 10, day: 10 },
+      { start: '1:30 PM', end: '3:30 PM', task: 'Mobility Training', location: 'Rehab Center', client: 'Group Session', month: 10, day: 10 },
+      { start: '8:00 AM', end: '9:30 AM', task: 'Stretching', location: 'Davis Center', client: 'Multiple Clients', month: 10, day: 11 },
+      { start: '10:00 AM', end: '11:00 AM', task: 'Balance Training', location: 'Rehab Center', client: 'Group Session', month: 10, day: 11 },
+      { start: '2:00 PM', end: '3:00 PM', task: 'Strength', location: 'Davis Center', client: 'Multiple Clients', month: 10, day: 12 },
+      { start: '3:30 PM', end: '5:00 PM', task: 'Mobility', location: 'Rehab Center', client: 'Group Session', month: 10, day: 12 }
     ]
   },
   {
@@ -82,9 +97,13 @@ const originalStaffSchedules: StaffMember[] = [
     position: 'Home Care Assistant',
     img: DEFAULT_USER_IMG,
     schedules: [
-      { start: '7:30 AM', end: '9:30 AM', task: 'Morning Routine Assistance', location: 'Taylor Home', client: 'Mr. Taylor', month: 10 },
-      { start: '1:00 PM', end: '3:00 PM', task: 'Meal Preparation', location: 'Anderson Residence', client: 'Anderson Family', month: 10 },
-      { start: '4:00 PM', end: '6:00 PM', task: 'Evening Care', location: 'Garcia Residence', client: 'Mrs. Garcia', month: 10 }
+      { start: '7:30 AM', end: '9:30 AM', task: 'Morning Routine Assistance', location: 'Taylor Home', client: 'Mr. Taylor', month: 10, day: 10 },
+      { start: '1:00 PM', end: '3:00 PM', task: 'Meal Preparation', location: 'Anderson Residence', client: 'Anderson Family', month: 10, day: 10 },
+      { start: '4:00 PM', end: '6:00 PM', task: 'Evening Care', location: 'Garcia Residence', client: 'Mrs. Garcia', month: 10, day: 11 },
+      { start: '8:00 AM', end: '9:00 AM', task: 'Breakfast', location: 'Taylor Home', client: 'Mr. Taylor', month: 10, day: 12 },
+      { start: '10:00 AM', end: '12:00 PM', task: 'Checkup', location: 'Anderson Residence', client: 'Anderson Family', month: 10, day: 12 },
+      { start: '1:00 PM', end: '2:00 PM', task: 'Lunch', location: 'Garcia Residence', client: 'Mrs. Garcia', month: 10, day: 13 },
+      { start: '3:00 PM', end: '5:00 PM', task: 'Rehab', location: 'Taylor Home', client: 'Mr. Taylor', month: 10, day: 13 }
     ]
   },
   {
@@ -93,8 +112,12 @@ const originalStaffSchedules: StaffMember[] = [
     position: 'Nursing Assistant',
     img: DEFAULT_USER_IMG,
     schedules: [
-      { start: '8:30 AM', end: '11:30 AM', task: 'Patient Monitoring', location: 'General Hospital', client: 'Ward Patients', month: 10 },
-      { start: '12:30 PM', end: '2:30 PM', task: 'Lunch Service', location: 'General Hospital', client: 'Ward Patients', month: 10 }
+      { start: '8:30 AM', end: '11:30 AM', task: 'Patient Monitoring', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 10 },
+      { start: '12:30 PM', end: '2:30 PM', task: 'Lunch Service', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 10 },
+      { start: '8:00 AM', end: '9:00 AM', task: 'Vitals', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 11 },
+      { start: '10:00 AM', end: '12:00 PM', task: 'Rounds', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 11 },
+      { start: '1:00 PM', end: '2:00 PM', task: 'Lunch', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 12 },
+      { start: '3:00 PM', end: '5:00 PM', task: 'Rehab', location: 'General Hospital', client: 'Ward Patients', month: 10, day: 12 }
     ]
   },
   {
@@ -102,7 +125,15 @@ const originalStaffSchedules: StaffMember[] = [
     email: 'frank.rodriguez@carecompany.com',
     position: 'Emergency Response',
     img: DEFAULT_USER_IMG,
-    schedules: []
+    schedules: [
+      { start: '8:00 AM', end: '10:00 AM', task: 'Emergency Call', location: 'City Center', client: 'Unknown', month: 10, day: 10 },
+      { start: '11:00 AM', end: '12:00 PM', task: 'Ambulance Prep', location: 'City Center', client: 'Unknown', month: 10, day: 10 },
+      { start: '2:00 PM', end: '4:00 PM', task: 'Standby', location: 'City Center', client: 'Unknown', month: 10, day: 11 },
+      { start: '8:00 AM', end: '9:00 AM', task: 'Briefing', location: 'City Center', client: 'Unknown', month: 10, day: 12 },
+      { start: '10:00 AM', end: '12:00 PM', task: 'Emergency Call', location: 'City Center', client: 'Unknown', month: 10, day: 12 },
+      { start: '1:00 PM', end: '2:00 PM', task: 'Lunch', location: 'City Center', client: 'Unknown', month: 10, day: 13 },
+      { start: '3:00 PM', end: '5:00 PM', task: 'Standby', location: 'City Center', client: 'Unknown', month: 10, day: 13 }
+    ]
   }
 ];
 
@@ -178,12 +209,12 @@ const weekDays = computed(() => {
   return days;
 });
 
-// Week view: get schedule for a staff member on a specific day
-function getWeekScheduleBlock(staff: StaffMember, date: Date): Schedule | null {
-  return staff.schedules.find(s => {
-    return typeof s.month === 'number' && date.getMonth() === s.month;
-    // For demo, match by month only. Extend to match by day if you add day info to dummy data.
-  }) || null;
+// Week view: get schedules for a staff member on a specific day
+function getWeekScheduleBlocks(staff: StaffMember, date: Date): Schedule[] {
+  // Match by month and day
+  return staff.schedules.filter(s => {
+    return typeof s.month === 'number' && s.month === date.getMonth() && typeof s.day === 'number' && s.day === date.getDate();
+  });
 }
 
 // Helper function to convert time string to minutes
@@ -380,32 +411,34 @@ function getStaffColorClass(staffIdx: number) {
               <template v-else>
                 <template v-for="(day, dayIdx) in weekDays" :key="day.label">
                   <td class="px-2 py-2 border-b border-gray-100 text-center align-top">
-                    <div v-if="getWeekScheduleBlock(staff, day.date)"
-                      :class="[getStaffColorClass(dayIdx), 'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm']">
-                      <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
-                          </svg>
-                          <span class="font-semibold text-xs">
-                            {{ getWeekScheduleBlock(staff, day.date)?.start }} - {{ getWeekScheduleBlock(staff, day.date)?.end }}
-                          </span>
+                    <template v-if="getWeekScheduleBlocks(staff, day.date).length">
+                      <div v-for="(schedule, schedIdx) in getWeekScheduleBlocks(staff, day.date)" :key="schedIdx"
+                        :class="[getStaffColorClass(dayIdx + schedIdx), 'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm mb-2']">
+                        <div class="flex items-center justify-between mb-2">
+                          <div class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span class="font-semibold text-xs">
+                              {{ schedule.start }} - {{ schedule.end }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="space-y-1">
+                          <div class="font-bold text-sm leading-tight">
+                            {{ schedule.task }}
+                          </div>
+                          <div class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {{ schedule.location }}
+                          </div>
                         </div>
                       </div>
-                      <div class="space-y-1">
-                        <div class="font-bold text-sm leading-tight">
-                          {{ getWeekScheduleBlock(staff, day.date)?.task }}
-                        </div>
-                        <div class="text-xs opacity-75 flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                          </svg>
-                          {{ getWeekScheduleBlock(staff, day.date)?.location }}
-                        </div>
-                      </div>
-                    </div>
+                    </template>
                     <div v-else class="flex items-center justify-center h-full min-h-[80px]">
                       <span class="text-gray-400 text-xs italic">No Schedule</span>
                     </div>
