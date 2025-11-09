@@ -19,6 +19,8 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     LoadingSpinner: typeof import('./src/components/LoadingSpinner.vue')['default']
     Navbar: typeof import('./src/components/layout/Navbar.vue')['default']
+    RosterCalendar: typeof import('./src/components/RosterCalendar.vue')['default']
+    RosterFilterCard: typeof import('./src/components/RosterFilterCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SchedulesCard: typeof import('./src/components/SchedulesCard.vue')['default']
