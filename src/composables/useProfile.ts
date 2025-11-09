@@ -59,9 +59,10 @@ export function useProfile() {
       
       const data = await get<UserProfile>(`/users/${currentUser.id}`, {
         showErrorToast: true,
-        customErrorHandler: (err) => {
-          console.error('Profile fetch error:', err.response?.status, err.response?.data)
-          if (err.response?.status === 401) {
+        customErrorHandler: (err: unknown) => {
+          const axiosError = err as { response?: { status?: number; data?: unknown } }
+          console.error('Profile fetch error:', axiosError.response?.status, axiosError.response?.data)
+          if (axiosError.response?.status === 401) {
             authStore.logout()
           }
         }

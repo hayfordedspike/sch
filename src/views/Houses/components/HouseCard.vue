@@ -150,7 +150,8 @@ const getHouseInitials = (house: House): string => {
     .slice(0, 2)
 }
 
-const formatDate = (dateString: string): string => {
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return 'N/A'
   const date = new Date(dateString)
   return date.toLocaleDateString('en-AU', {
     year: 'numeric',

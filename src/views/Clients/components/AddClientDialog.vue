@@ -476,15 +476,6 @@ const selectHouse = (house: House) => {
   }
 }
 
-const getHouseInitials = (house: House): string => {
-  return house.name
-    .split(' ')
-    .map((word: string) => word.charAt(0))
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
-
 const validateForm = (): boolean => {
   errors.value = {}
   let isValid = true

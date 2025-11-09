@@ -276,7 +276,7 @@ export function useClients() {
 
       if (params.city) {
         filteredClients = filteredClients.filter(client => 
-          client.city.toLowerCase().includes(params.city.toLowerCase())
+          client.city.toLowerCase().includes(params.city!.toLowerCase())
         )
       }
 

@@ -10,7 +10,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppTable: typeof import('./src/components/shared/AppTable.vue')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
-    ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
     GreetingCard: typeof import('./src/components/GreetingCard.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
@@ -20,8 +19,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/layout/SearchBar.vue')['default']
     Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
-    Tag: typeof import('primevue/tag')['default']
-    Toast: typeof import('primevue/toast')['default']
     VuetifyExample: typeof import('./src/components/VuetifyExample.vue')['default']
   }
   export interface GlobalDirectives {

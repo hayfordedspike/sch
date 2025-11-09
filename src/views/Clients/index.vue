@@ -119,9 +119,6 @@ const toast = useToast()
 
 const {
   clients,
-  activeClients,
-  inactiveClients,
-  totalClients,
   currentPage,
   totalPages,
   loading,

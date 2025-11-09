@@ -141,7 +141,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
@@ -159,7 +158,7 @@ interface Emits {
   (e: 'update', field: string, value: string): void
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 // const displayFullName = computed(() => {
@@ -180,8 +179,8 @@ const emit = defineEmits<Emits>()
 //   return 'Not provided'
 // })
 
-const updateField = (field: string, value: string) => {
-  emit('update', field, value)
+const updateField = (field: string, value: string | undefined) => {
+  emit('update', field, value || '')
 }
 
 const updateDateField = (field: string, value: Date | null) => {

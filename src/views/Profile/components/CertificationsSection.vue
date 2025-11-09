@@ -138,7 +138,7 @@ interface Emits {
   (e: 'delete-certificate', certification: UserCertification): void
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 const confirm = useConfirm()
 
