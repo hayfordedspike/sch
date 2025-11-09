@@ -132,26 +132,58 @@ const staffSchedules = computed(() => {
   return sorted;
 });
 
-// Time slots: hourly intervals from 6am to 11:59pm
-const allTimeSlots = computed(() => {
-  return generateHourlySlots('6:00 AM', '11:59 PM');
-});
-
+// Helper function: generate hourly slots for Day view
 function generateHourlySlots(startTime: string, endTime: string): string[] {
   const slots: string[] = [];
   let current = convertTimeToMinutes(startTime);
   const end = convertTimeToMinutes(endTime);
-
-  // Ensure we don't exceed the end time
   while (current <= end) {
     const timeString = convertMinutesToTime(current);
-    // Only add if it doesn't exceed 11:59 PM
     if (convertTimeToMinutes(timeString) <= end) {
       slots.push(timeString);
     }
-    current += 60; // 1-hour intervals
+    current += 60;
   }
   return slots;
+}
+
+// Day view: hourly intervals from 6am to 11:59pm
+const allTimeSlots = computed(() => {
+  return generateHourlySlots('6:00 AM', '11:59 PM');
+});
+
+// Month names for week view
+const monthNames: string[] = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+// Week view: days Sun–Sat for the current week
+const weekDays = computed(() => {
+  if (props.calendarView !== 'week') return [];
+  const currentDate = new Date();
+  currentDate.setMonth(props.selectedMonth);
+  // Set to first day of week (Sunday)
+  const dayOfWeek = currentDate.getDay();
+  currentDate.setDate(currentDate.getDate() - dayOfWeek);
+  const days: { label: string; date: Date }[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(currentDate);
+    d.setDate(currentDate.getDate() + i);
+    days.push({
+      label: `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]}, ${monthNames[d.getMonth()]} ${d.getDate()}`,
+      date: d
+    });
+  }
+  return days;
+});
+
+// Week view: get schedule for a staff member on a specific day
+function getWeekScheduleBlock(staff: StaffMember, date: Date): Schedule | null {
+  return staff.schedules.find(s => {
+    return typeof s.month === 'number' && date.getMonth() === s.month;
+    // For demo, match by month only. Extend to match by day if you add day info to dummy data.
+  }) || null;
 }
 
 // Helper function to convert time string to minutes
@@ -242,23 +274,16 @@ function getStaffColorClass(staffIdx: number) {
 </script>
 
 <template>
-  <!-- Filter Controls removed; filtering is now via props -->
-<div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6">
-  <!-- Schedule Grid -->
-  <div class="overflow-x-auto">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6">
+    <div class="overflow-x-auto">
       <div class="relative min-w-max">
-        <div
-          class="absolute top-0 bottom-0 w-px bg-blue-500"
-          :style="{ left: employerColWidth + 'px', zIndex: 1 }"
-        ></div>
+        <div class="absolute top-0 bottom-0 w-px bg-blue-500" :style="{ left: employerColWidth + 'px', zIndex: 1 }"></div>
         <!-- Main Table -->
         <table class="min-w-full border-separate border-spacing-0">
           <thead>
             <tr>
-              <th
-                class="bg-gray-200 text-left px-6 py-4 font-semibold text-gray-700 border-b border-gray-200 rounded-tl-lg sticky left-0 z-10 cursor-pointer select-none flex items-center gap-2"
-                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-              >
+              <th class="bg-gray-200 text-left px-6 py-4 font-semibold text-gray-700 border-b border-gray-200 rounded-tl-lg sticky left-0 z-10 cursor-pointer select-none flex items-center gap-2"
+                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'">
                 <span>Employee Name</span>
                 <span>
                   <svg v-if="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -269,34 +294,33 @@ function getStaffColorClass(staffIdx: number) {
                   </svg>
                 </span>
               </th>
-              <th
-                v-for="timeSlot in allTimeSlots"
-                :key="timeSlot"
-                class="bg-gray-200 px-3 py-4 font-semibold text-gray-700 border-b border-gray-200 text-center min-w-[90px]"
-                :class="{
-                  'bg-blue-50': true,
-                  'rounded-tr-lg': timeSlot === allTimeSlots[allTimeSlots.length - 1]
-                }"
-              >
-                <div class="flex flex-col items-center">
-                  <span class="text-xs font-bold text-gray-700">
-                    {{ timeSlot.split(':')[0] }} {{ timeSlot.split(' ')[1] }}
-                  </span>
-                </div>
-              </th>
+              <template v-if="props.calendarView === 'day'">
+                <th v-for="timeSlot in allTimeSlots" :key="timeSlot"
+                  class="bg-gray-200 px-3 py-4 font-semibold text-gray-700 border-b border-gray-200 text-center min-w-[90px]"
+                  :class="{ 'bg-blue-50': true, 'rounded-tr-lg': timeSlot === allTimeSlots[allTimeSlots.length - 1] }">
+                  <div class="flex flex-col items-center">
+                    <span class="text-xs font-bold text-gray-700">
+                      {{ timeSlot.split(':')[0] }} {{ timeSlot.split(' ')[1] }}
+                    </span>
+                  </div>
+                </th>
+              </template>
+              <template v-else>
+                <th v-for="day in weekDays" :key="day.label"
+                  class="bg-gray-200 px-3 py-4 font-semibold text-gray-700 border-b border-gray-200 text-center min-w-[120px]"
+                  :class="{ 'bg-blue-50': true, 'rounded-tr-lg': day === weekDays[weekDays.length - 1] }">
+                  <div class="flex flex-col items-center">
+                    <span class="text-xs font-bold text-gray-700">{{ day.label }}</span>
+                  </div>
+                </th>
+              </template>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(staff, staffIdx) in staffSchedules"
-              :key="staff.name"
-              :class="staffIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-            >
+            <tr v-for="(staff, staffIdx) in staffSchedules" :key="staff.name" :class="staffIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
               <!-- Staff Info Column -->
-              <td
-                class="px-6 py-4 border-b border-gray-100 font-medium text-gray-900 whitespace-nowrap employer-cell sticky left-0 z-10 bg-inherit"
-                :style="{ width: employerColWidth + 'px' }"
-              >
+              <td class="px-6 py-4 border-b border-gray-100 font-medium text-gray-900 whitespace-nowrap employer-cell sticky left-0 z-10 bg-inherit"
+                :style="{ width: employerColWidth + 'px' }">
                 <div class="flex items-center">
                   <div class="relative">
                     <img :src="staff.img" alt="Staff photo" class="w-12 h-12 rounded-full mr-4 border-2 border-white shadow-sm" />
@@ -304,30 +328,60 @@ function getStaffColorClass(staffIdx: number) {
                   <div class="flex flex-col">
                     <div class="text-sm font-semibold text-gray-900">{{ staff.name }}</div>
                     <div class="text-xs text-gray-500 mt-0.5">{{ staff.email }}</div>
-                    <div
-                      class="text-xs mt-2 px-3 py-1 rounded-full font-semibold inline-block max-w-fit"
-                      :class="staff.schedules.length > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'"
-                    >
+                    <div class="text-xs mt-2 px-3 py-1 rounded-full font-semibold inline-block max-w-fit"
+                      :class="staff.schedules.length > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'">
                       {{ staff.position }}
                     </div>
                   </div>
                 </div>
               </td>
-              <!-- Time Slot Columns -->
-              <template v-for="timeSlot in allTimeSlots" :key="timeSlot">
-                <template v-if="shouldRenderScheduleCell(staff, timeSlot)">
-                  <td
-                    :colspan="getScheduleColspan(staff, timeSlot)"
-                    class="px-2 py-2 border-b border-gray-100 text-center align-top"
-                  >
-                    <div
-                      v-if="getScheduleBlock(staff, timeSlot)"
-                      :class="[
-                        getStaffColorClass(staffIdx),
-                        'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm'
-                      ]"
-                    >
-                      <!-- Schedule Header -->
+              <!-- Day View: Time Slot Columns -->
+              <template v-if="props.calendarView === 'day'">
+                <template v-for="timeSlot in allTimeSlots" :key="timeSlot">
+                  <template v-if="shouldRenderScheduleCell(staff, timeSlot)">
+                    <td :colspan="getScheduleColspan(staff, timeSlot)" class="px-2 py-2 border-b border-gray-100 text-center align-top">
+                      <div v-if="getScheduleBlock(staff, timeSlot)"
+                        :class="[getStaffColorClass(staffIdx), 'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm']">
+                        <!-- Schedule Header -->
+                        <div class="flex items-center justify-between mb-2">
+                          <div class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span class="font-semibold text-xs">
+                              {{ getScheduleBlock(staff, timeSlot)?.start }} - {{ getScheduleBlock(staff, timeSlot)?.end }}
+                            </span>
+                          </div>
+                        </div>
+                        <!-- Schedule Content -->
+                        <div class="space-y-1">
+                          <div class="font-bold text-sm leading-tight">
+                            {{ getScheduleBlock(staff, timeSlot)?.task }}
+                          </div>
+                          <div class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {{ getScheduleBlock(staff, timeSlot)?.location }}
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Empty State -->
+                      <div v-else class="flex items-center justify-center h-full min-h-[80px]">
+                        <span class="text-gray-400 text-xs italic">No Schedule</span>
+                      </div>
+                    </td>
+                  </template>
+                </template>
+              </template>
+              <!-- Week View: Day Columns -->
+              <template v-else>
+                <template v-for="(day, dayIdx) in weekDays" :key="day.label">
+                  <td class="px-2 py-2 border-b border-gray-100 text-center align-top">
+                    <div v-if="getWeekScheduleBlock(staff, day.date)"
+                      :class="[getStaffColorClass(dayIdx), 'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm']">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-1.5">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,25 +389,23 @@ function getStaffColorClass(staffIdx: number) {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
                           </svg>
                           <span class="font-semibold text-xs">
-                            {{ getScheduleBlock(staff, timeSlot)?.start }} - {{ getScheduleBlock(staff, timeSlot)?.end }}
+                            {{ getWeekScheduleBlock(staff, day.date)?.start }} - {{ getWeekScheduleBlock(staff, day.date)?.end }}
                           </span>
                         </div>
                       </div>
-                      <!-- Schedule Content -->
                       <div class="space-y-1">
                         <div class="font-bold text-sm leading-tight">
-                          {{ getScheduleBlock(staff, timeSlot)?.task }}
+                          {{ getWeekScheduleBlock(staff, day.date)?.task }}
                         </div>
                         <div class="text-xs opacity-75 flex items-center gap-1">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                           </svg>
-                          {{ getScheduleBlock(staff, timeSlot)?.location }}
+                          {{ getWeekScheduleBlock(staff, day.date)?.location }}
                         </div>
                       </div>
                     </div>
-                    <!-- Empty State -->
                     <div v-else class="flex items-center justify-center h-full min-h-[80px]">
                       <span class="text-gray-400 text-xs italic">No Schedule</span>
                     </div>
@@ -368,30 +420,5 @@ function getStaffColorClass(staffIdx: number) {
   </div>
 </template>
 
-<style scoped>
-th, td {
-  min-width: 90px;
-}
-tr {
-  transition: background-color 0.2s ease;
-}
-.border-separate {
-  border-spacing: 0;
-}
-th, td {
-  border-right: 1px solid #f3f4f6;
-}
-th:last-child, td:last-child {
-  border-right: none;
-}
-.sticky {
-  position: sticky;
-  background: inherit;
-}
-th.sticky {
-  z-index: 20;
-}
-td.sticky {
-  z-index: 10;
-}
-</style>
+
+// ...existing code above...
