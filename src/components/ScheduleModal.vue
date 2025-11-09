@@ -23,8 +23,9 @@
         </div>
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Time</label>
-          <div class="flex gap-2">
-            <InputText v-model="form.startTime" required class="w-1/2" placeholder="Start (e.g. 9:00 AM)" /> To
+          <div class="flex items-center gap-2">
+            <InputText v-model="form.startTime" required class="w-1/2" placeholder="Start (e.g. 9:00 AM)" />
+            <span class="mx-2 text-center font-semibold">To</span>
             <InputText v-model="form.endTime" required class="w-1/2" placeholder="End (e.g. 10:00 AM)" />
           </div>
         </div>
