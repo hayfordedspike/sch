@@ -1,3 +1,4 @@
+
 <template>
   <Dialog v-model:visible="visible" modal header="Create New Schedule" :style="{ width: '850px' }">
     <form @submit.prevent="handleSubmit">
@@ -5,13 +6,15 @@
         <label class="block text-sm font-medium mb-1">Schedule Title</label>
         <InputText v-model="form.title" required class="w-full" placeholder="Enter schedule title" />
       </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Schedule Type</label>
-        <Dropdown v-model="form.type" :options="scheduleTypes" optionLabel="label" optionValue="value" class="w-full" placeholder="Select type" />
-      </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Assign To</label>
-        <Dropdown v-model="form.assignedTo" :options="staffOptions" optionLabel="name" optionValue="email" class="w-full" placeholder="Select staff" />
+      <div class="mb-4 flex gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-1">Service Type</label>
+          <Dropdown v-model="form.type" :options="scheduleTypes" optionLabel="label" optionValue="value" class="w-full" placeholder="Select type" />
+        </div>
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-1">Assign To</label>
+          <Dropdown v-model="form.assignedTo" :options="staffOptions" optionLabel="name" optionValue="email" class="w-full" placeholder="Select staff" />
+        </div>
       </div>
       <div class="mb-4 flex gap-2">
         <div class="flex-1">
@@ -21,18 +24,21 @@
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Time</label>
           <div class="flex gap-2">
-            <InputText v-model="form.startTime" required class="w-1/2" placeholder="Start (e.g. 9:00 AM)" />
+            <InputText v-model="form.startTime" required class="w-1/2" placeholder="Start (e.g. 9:00 AM)" /> To
             <InputText v-model="form.endTime" required class="w-1/2" placeholder="End (e.g. 10:00 AM)" />
           </div>
         </div>
       </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Client</label>
-        <InputText v-model="form.client" required class="w-full" placeholder="Client name" />
-      </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Client Location</label>
-        <InputText v-model="form.location" required class="w-full" placeholder="Location" />
+      <div class="mb-4 flex gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-1">Client</label>
+          <Dropdown v-model="form.client" :options="dummyClients" optionLabel="label" optionValue="value" class="w-full" placeholder="Select client" />
+        </div>
+
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-1">Client Location</label>
+          <InputText v-model="form.location" required class="w-full" placeholder="Location" />
+        </div>
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Note <span class="text-xs text-gray-400">(optional)</span></label>
@@ -47,13 +53,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
-import Calendar from 'primevue/calendar'
-import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
+import { ref, watch, defineProps, defineEmits } from 'vue'
+
+const dummyClients = [
+  { label: 'Mrs. Joyce', value: 'Mrs. Joyce' },
+  { label: 'Mr. Smith', value: 'Mr. Smith' },
+  { label: 'Ms. Brown', value: 'Ms. Brown' },
+  { label: 'Mr. Wilson', value: 'Mr. Wilson' },
+  { label: 'Anderson Family', value: 'Anderson Family' },
+  { label: 'Mrs. Garcia', value: 'Mrs. Garcia' },
+  { label: 'Ward Patients', value: 'Ward Patients' },
+  { label: 'Multiple Clients', value: 'Multiple Clients' },
+  { label: 'Group Session', value: 'Group Session' },
+  { label: 'Mr. Taylor', value: 'Mr. Taylor' },
+  { label: 'Unknown', value: 'Unknown' }
+]
 
 const props = defineProps<{ visible: boolean, staffOptions: Array<{ name: string, email: string }> }>()
 const emit = defineEmits(['update:visible', 'submit'])

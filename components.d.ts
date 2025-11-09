@@ -10,10 +10,13 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppTable: typeof import('./src/components/shared/AppTable.vue')['default']
     Button: typeof import('primevue/button')['default']
+    Calendar: typeof import('primevue/calendar')['default']
     Card: typeof import('primevue/card')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
     DashboardCalendar: typeof import('./src/components/DashboardCalendar.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
+    Dialog: typeof import('primevue/dialog')['default']
+    Dropdown: typeof import('primevue/dropdown')['default']
     FilterCard: typeof import('./src/components/FilterCard.vue')['default']
     GreetingCard: typeof import('./src/components/GreetingCard.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
@@ -30,6 +33,7 @@ declare module 'vue' {
     TabPanel: typeof import('primevue/tabpanel')['default']
     TabView: typeof import('primevue/tabview')['default']
     Tag: typeof import('primevue/tag')['default']
+    Textarea: typeof import('primevue/textarea')['default']
     VuetifyExample: typeof import('./src/components/VuetifyExample.vue')['default']
   }
   export interface GlobalDirectives {
