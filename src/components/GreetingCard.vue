@@ -33,6 +33,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import Card from 'primevue/card'
+import { capitalizeFirstLetter } from '@/lib/utils'
 
 // Import time-based images
 import amImage from '@/assets/am.png'
@@ -60,10 +61,10 @@ onUnmounted(() => {
 const userName = computed(() => {
   const user = authStore.user
   if (user?.first_name) {
-    return user.first_name // Use first_name from backend
+    return capitalizeFirstLetter(user.first_name) // Use first_name from backend with capitalization
   }
   if (user?.email) {
-    return user.email.split('@')[0] // Use email username as fallback
+    return capitalizeFirstLetter(user.email.split('@')[0]) // Use email username as fallback with capitalization
   }
   return 'User'
 })

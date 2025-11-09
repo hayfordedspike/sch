@@ -5,6 +5,7 @@ import { useToast } from "primevue/usetoast";
 import { Avatar, Menu } from "primevue";
 import SearchBar from "./SearchBar.vue";
 import { useAuth } from "@/composables/useAuth";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
 defineOptions({ name: 'AppNavbar' })
 
@@ -65,11 +66,11 @@ const displayName = computed(() => {
   const lastName = user.value.last_name
   
   if (firstName && lastName) {
-    return `${firstName} ${lastName}`
+    return `${capitalizeFirstLetter(firstName)} ${capitalizeFirstLetter(lastName)}`
   } else if (firstName) {
-    return firstName
+    return capitalizeFirstLetter(firstName)
   } else if (user.value.email) {
-    return user.value.email.split('@')[0]
+    return capitalizeFirstLetter(user.value.email.split('@')[0])
   }
   
   return 'User'

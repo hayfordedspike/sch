@@ -65,20 +65,20 @@
       />
     </div>
 
-    <!-- Horizontal line and copyright -->
-    <div class="pt-4">
+    <!-- Horizontal line and copyright - HIDDEN -->
+    <!-- <div class="pt-4">
       <hr class="border-gray-200" />
       <p class="mt-4 text-center text-xs text-gray-500">
         © {{ currentYear }} All rights reserved
       </p>
-    </div>
+    </div> -->
   </form>
 </template>
 
 <script setup lang="ts">
 defineOptions({ name: 'SignInForm' })
 
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
@@ -98,7 +98,6 @@ const toast = useToast()
 const authStore = useAuthStore()
 
 const loading = ref(false)
-const currentYear = computed(() => new Date().getFullYear())
 
 const formData = reactive<SignInFormData>({
   email: '',
