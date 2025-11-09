@@ -11,9 +11,9 @@ import type {
 const dummyClients: Client[] = [
   {
     id: 1,
-    first_name: 'John',
-    last_name: 'Smith',
-    email: 'john.smith@email.com',
+    first_name: 'Peter',
+    last_name: 'Hayford',
+    email: 'Peter.Hayford@email.com',
     phone: '+61 412 345 678',
     house_id: 1,
     address_line_1: '123 Collins Street',
@@ -23,8 +23,9 @@ const dummyClients: Client[] = [
     postal_code: '3000',
     country: 'Australia',
     date_of_birth: '1985-03-15',
-    emergency_contact_name: 'Sarah Smith',
+    emergency_contact_name: 'Sarah Hayford',
     emergency_contact_phone: '+61 423 456 789',
+    emergency_contact_relationship: 'Spouse',
     medical_notes: 'No known allergies',
     care_notes: 'Prefers morning appointments',
     is_active: true,
@@ -35,8 +36,8 @@ const dummyClients: Client[] = [
   {
     id: 2,
     first_name: 'Emma',
-    last_name: 'Johnson',
-    email: 'emma.johnson@email.com',
+    last_name: 'Peterson',
+    email: 'emma.Peterson@email.com',
     phone: '+61 487 654 321',
     house_id: 2,
     address_line_1: '456 Queen Street',
@@ -46,8 +47,9 @@ const dummyClients: Client[] = [
     postal_code: '2000',
     country: 'Australia',
     date_of_birth: '1990-07-22',
-    emergency_contact_name: 'Michael Johnson',
+    emergency_contact_name: 'Michael Peterson',
     emergency_contact_phone: '+61 434 567 890',
+    emergency_contact_relationship: 'Brother',
     medical_notes: 'Diabetic - Type 1',
     care_notes: 'Requires insulin management',
     is_active: true,
@@ -71,6 +73,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1978-11-08',
     emergency_contact_name: 'Lisa Brown',
     emergency_contact_phone: '+61 445 678 901',
+    emergency_contact_relationship: 'Sister',
     medical_notes: 'High blood pressure',
     care_notes: 'Mobility assistance required',
     is_active: false,
@@ -94,6 +97,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1993-02-14',
     emergency_contact_name: 'David Wilson',
     emergency_contact_phone: '+61 467 890 123',
+    emergency_contact_relationship: 'Father',
     medical_notes: '',
     care_notes: 'Enjoys outdoor activities',
     is_active: true,
@@ -117,6 +121,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1982-09-30',
     emergency_contact_name: 'Jennifer Miller',
     emergency_contact_phone: '+61 489 012 345',
+    emergency_contact_relationship: 'Spouse',
     medical_notes: 'Wheelchair user',
     care_notes: 'Requires accessible facilities',
     is_active: true,
@@ -140,6 +145,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1987-06-18',
     emergency_contact_name: 'Mark Davis',
     emergency_contact_phone: '+61 412 345 678',
+    emergency_contact_relationship: 'Husband',
     medical_notes: 'Allergic to penicillin',
     care_notes: 'Prefers female caregivers',
     is_active: true,
@@ -163,6 +169,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1975-12-03',
     emergency_contact_name: 'Mary Taylor',
     emergency_contact_phone: '+61 434 567 890',
+    emergency_contact_relationship: 'Wife',
     medical_notes: 'Dementia - early stage',
     care_notes: 'Needs routine and familiar faces',
     is_active: true,
@@ -186,6 +193,7 @@ const dummyClients: Client[] = [
     date_of_birth: '1980-04-27',
     emergency_contact_name: 'James Anderson',
     emergency_contact_phone: '+61 456 789 012',
+    emergency_contact_relationship: 'Son',
     medical_notes: 'Chronic pain management',
     care_notes: 'Gentle handling required',
     is_active: false,
@@ -275,7 +283,7 @@ export function useClients() {
       }
 
       if (params.city) {
-        filteredClients = filteredClients.filter(client => 
+        filteredClients = filteredClients.filter(client =>
           client.city.toLowerCase().includes(params.city!.toLowerCase())
         )
       }
@@ -397,7 +405,7 @@ export function useClients() {
       }
 
       dummyClients[index] = updatedClient
-      
+
       const clientIndex = clients.value.findIndex(c => c.id === id)
       if (clientIndex !== -1) {
         clients.value[clientIndex] = updatedClient
@@ -429,7 +437,7 @@ export function useClients() {
 
       dummyClients.splice(index, 1)
       clients.value = clients.value.filter(c => c.id !== id)
-      
+
       if (currentClient.value?.id === id) {
         currentClient.value = null
       }

@@ -38,7 +38,7 @@
       <!-- Emergency Contact -->
       <div class="section">
         <h3 class="section-title">Emergency Contact</h3>
-        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
           <div class="field-column">
             <label class="field-header">Contact Name</label>
             <p class="field-content">{{ client.emergency_contact_name || 'Not provided' }}</p>
@@ -46,6 +46,10 @@
           <div class="field-column">
             <label class="field-header">Contact Phone</label>
             <p class="field-content">{{ client.emergency_contact_phone ? formatClientPhone(client.emergency_contact_phone) : 'Not provided' }}</p>
+          </div>
+          <div class="field-column">
+            <label class="field-header">Relationship</label>
+            <p class="field-content">{{ client.emergency_contact_relationship || 'Not specified' }}</p>
           </div>
         </div>
         <div v-else class="text-gray-500 italic">

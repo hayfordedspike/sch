@@ -16,6 +16,7 @@ export interface Client {
   date_of_birth: string
   emergency_contact_name: string
   emergency_contact_phone: string
+  emergency_contact_relationship: string
   medical_notes: string
   care_notes: string
   is_active: boolean
@@ -39,6 +40,7 @@ export interface CreateClientRequest {
   date_of_birth: string
   emergency_contact_name: string
   emergency_contact_phone: string
+  emergency_contact_relationship: string
   medical_notes?: string
   care_notes?: string
   is_active?: boolean
@@ -59,6 +61,7 @@ export interface UpdateClientRequest {
   date_of_birth?: string
   emergency_contact_name?: string
   emergency_contact_phone?: string
+  emergency_contact_relationship?: string
   medical_notes?: string
   care_notes?: string
   is_active?: boolean

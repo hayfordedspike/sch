@@ -9,14 +9,18 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppTable: typeof import('./src/components/shared/AppTable.vue')['default']
+    Button: typeof import('primevue/button')['default']
+    Card: typeof import('primevue/card')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
+    FilterCard: typeof import('./src/components/FilterCard.vue')['default']
     GreetingCard: typeof import('./src/components/GreetingCard.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     LoadingSpinner: typeof import('./src/components/LoadingSpinner.vue')['default']
     Navbar: typeof import('./src/components/layout/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SchedulesCard: typeof import('./src/components/SchedulesCard.vue')['default']
     SearchBar: typeof import('./src/components/layout/SearchBar.vue')['default']
     Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
     VuetifyExample: typeof import('./src/components/VuetifyExample.vue')['default']

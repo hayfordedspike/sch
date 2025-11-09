@@ -362,6 +362,7 @@ const formData = ref<CreateClientRequest>({
   date_of_birth: '',
   emergency_contact_name: '',
   emergency_contact_phone: '',
+  emergency_contact_relationship: '',
   medical_notes: '',
   care_notes: '',
   is_active: true
@@ -419,6 +420,7 @@ const resetForm = () => {
     date_of_birth: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
+    emergency_contact_relationship: '',
     medical_notes: '',
     care_notes: '',
     is_active: true
@@ -446,6 +448,7 @@ watch(
         date_of_birth: newClient.date_of_birth,
         emergency_contact_name: newClient.emergency_contact_name,
         emergency_contact_phone: newClient.emergency_contact_phone,
+        emergency_contact_relationship: newClient.emergency_contact_relationship || '',
         medical_notes: newClient.medical_notes || '',
         care_notes: newClient.care_notes || '',
         is_active: newClient.is_active
