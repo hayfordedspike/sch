@@ -23,6 +23,7 @@ declare module 'vue' {
     RosterFilterCard: typeof import('./src/components/RosterFilterCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ScheduleModal: typeof import('./src/components/ScheduleModal.vue')['default']
     SchedulesCard: typeof import('./src/components/SchedulesCard.vue')['default']
     SearchBar: typeof import('./src/components/layout/SearchBar.vue')['default']
     Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
