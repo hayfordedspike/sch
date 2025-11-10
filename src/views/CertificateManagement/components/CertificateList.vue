@@ -73,7 +73,12 @@
     <AddCertificateDialog
   v-if="showEditModal"
   :visible="showEditModal"
-  :certificate="editingCertificate ? { ...editingCertificate, id: String(editingCertificate.id) } : undefined"
+      :certificate="editingCertificate ? {
+        ...editingCertificate,
+        id: String(editingCertificate.id),
+        issue_date: editingCertificate.issue_date ? new Date(editingCertificate.issue_date) : null,
+        expiry_date: editingCertificate.expiry_date ? new Date(editingCertificate.expiry_date) : null
+      } : undefined"
   @update:visible="closeEditModal"
   @certificate-updated="closeEditModal"
     />

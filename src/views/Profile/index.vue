@@ -54,7 +54,12 @@
     <!-- Add Certificate Dialog -->
     <AddCertificateDialog
       v-model:visible="showAddCertificateDialog"
-      :certificate="editingCertificate"
+      :certificate="editingCertificate ? {
+        ...editingCertificate,
+        id: String(editingCertificate.id),
+        issue_date: editingCertificate.issue_date ? new Date(editingCertificate.issue_date) : null,
+        expiry_date: editingCertificate.expiry_date ? new Date(editingCertificate.expiry_date) : null
+      } : undefined"
       @certificate-added="handleCertificateAdded"
       @certificate-updated="handleCertificateUpdated"
       @update:visible="handleDialogVisibilityChange"

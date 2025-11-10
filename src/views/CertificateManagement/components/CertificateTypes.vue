@@ -81,7 +81,7 @@ const certificateTypes = ref<CertificateType[]>([
 ])
 
 const showEditTypeModal = ref(false)
-const editingType = ref<CertificateType | null>(null)
+const editingType = ref<CertificateType | undefined>(undefined)
 const showDeleteConfirm = ref(false)
 const typeToDelete = ref<CertificateType | null>(null)
 
@@ -92,7 +92,7 @@ const handleEditType = (type: CertificateType) => {
 
 const closeEditTypeModal = () => {
   showEditTypeModal.value = false
-  editingType.value = null
+  editingType.value = undefined
 }
 
 const handleDeleteType = (type: CertificateType) => {
