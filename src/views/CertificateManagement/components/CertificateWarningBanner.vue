@@ -90,9 +90,7 @@ const getExpiryDate = (certificate: Certificate) => {
 }
 
 const showBanner = computed(() => {
-  return certificates.value.length === 0 || 
-         expiringSoon.value.length > 0 || 
-         expiredCertificates.value.length > 0
+  return certificates.value.length === 0
 })
 
 const bannerTitle = computed(() => {

@@ -94,22 +94,25 @@
             id="certificateItem"
             accept=".pdf,.jpg,.jpeg,.png"
             class="hidden"
+            multiple
             @change="handleFileChange"
           />
-          <div v-if="!formData.certificate_item" class="flex flex-col items-center">
+          <div v-if="!formData.certificate_items || formData.certificate_items.length === 0" class="flex flex-col items-center">
             <i class="pi pi-upload text-4xl text-blue-400 mb-2"></i>
-            <span class="text-gray-600">Drag your file or <span class="text-blue-500 font-semibold">browse</span></span>
+            <span class="text-gray-600">Drag your files or <span class="text-blue-500 font-semibold">browse</span></span>
             <span class="text-xs text-gray-400 mt-1">Max 10MB files are allowed</span>
           </div>
-          <div v-else class="flex flex-col items-center">
-            <template v-if="isImageFile">
-              <img :src="filePreviewUrl ?? undefined" alt="Preview" class="max-h-32 mb-2 rounded shadow" />
-            </template>
-            <template v-else>
-              <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
-              <span class="text-gray-700">{{ formData.certificate_item.name }}</span>
-            </template>
-            <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile" />
+          <div v-else class="flex flex-col items-center w-full">
+            <div v-for="(file, idx) in formData.certificate_items" :key="idx" class="flex flex-col items-center mb-4 w-full">
+              <template v-if="file.type && file.type.startsWith('image/')">
+                <img :src="filePreviews[idx]" alt="Preview" class="max-h-32 mb-2 rounded shadow" />
+              </template>
+              <template v-else>
+                <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
+                <span class="text-gray-700">{{ file.name }}</span>
+              </template>
+              <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile(idx)" />
+            </div>
           </div>
         </div>
         <small class="text-gray-500 text-xs">Only support SVG, JPG, And PNG)</small>
@@ -166,7 +169,7 @@ const formData = ref<CreateCertificateRequest & {
   issue_date?: Date | null
   expiry_date?: Date | null
   certificate_type?: string
-  certificate_item?: File | null
+  certificate_items?: File[]
 }>({
   code: '',
   name: '',
@@ -179,15 +182,10 @@ const formData = ref<CreateCertificateRequest & {
   issue_date: null,
   expiry_date: null,
   certificate_type: '',
-  certificate_item: null
+  certificate_items: []
 })
 
-const filePreviewUrl = ref<string | null>(null)
-const isImageFile = computed(() => {
-  const file = formData.value.certificate_item
-  if (!file) return false
-  return file.type.startsWith('image/')
-})
+const filePreviews = ref<string[]>([])
 
 function triggerFileInput() {
   fileInputRef.value?.click()
@@ -195,31 +193,26 @@ function triggerFileInput() {
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement
-  if (input.files && input.files[0]) {
-    formData.value.certificate_item = input.files[0]
-    if (isImageFile.value) {
-      filePreviewUrl.value = URL.createObjectURL(input.files[0])
-    } else {
-      filePreviewUrl.value = null
-    }
+  if (input.files && input.files.length > 0) {
+    formData.value.certificate_items = Array.from(input.files)
+    filePreviews.value = formData.value.certificate_items.map(file =>
+      file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
+    )
   }
 }
 
 function handleDrop(event: DragEvent) {
   if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-    const file = event.dataTransfer.files[0]
-    formData.value.certificate_item = file
-    if (file.type.startsWith('image/')) {
-      filePreviewUrl.value = URL.createObjectURL(file)
-    } else {
-      filePreviewUrl.value = null
-    }
+    formData.value.certificate_items = Array.from(event.dataTransfer.files)
+    filePreviews.value = formData.value.certificate_items.map(file =>
+      file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
+    )
   }
 }
 
-function removeFile() {
-  formData.value.certificate_item = null
-  filePreviewUrl.value = null
+function removeFile(idx: number) {
+  formData.value.certificate_items?.splice(idx, 1)
+  filePreviews.value.splice(idx, 1)
 }
 const certificateTypeOptions = [
   { label: 'Basic Life Support', value: 'bls' },

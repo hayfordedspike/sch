@@ -3,6 +3,12 @@ export interface Certificate {
   code: string;
   name: string;
   description: string;
+  certificate_id?: string;
+  issuing_organisation?: string;
+  issue_date?: string;
+  expiry_date?: string;
+  certificate_type?: string;
+  certificate_items?: File[];
   created_at: string;
   updated_at: string;
   validity_months: number;
