@@ -1,3 +1,6 @@
+
+
+
 // Utility to get employee_id from auth store or composable
 import { useAuth } from '@/composables/useAuth';
 
@@ -109,6 +112,33 @@ export function useCertificates() {
     }
   }
   const { get, post, put, patch, delete: del, loading, error } = useApi()
+
+  // Fetch download URL for a specific employee certificate
+  const fetchEmployeeCertificateDownloadUrl = async (employee_certificate_id: number) => {
+    try {
+      const response = await get(`/employee-certificate/${employee_certificate_id}/init-download?employee_certificate_id=${employee_certificate_id}`, {
+        showErrorToast: true
+      });
+      return response;
+    } catch (err) {
+      console.error('Error fetching employee certificate download URL:', err);
+      return null;
+    }
+  };
+
+  // Fetch all certificates for a given employee (optionally include expired)
+  const fetchEmployeeCertificates = async (employee_id: number, include_expired = false) => {
+    try {
+      const response = await get(`/employee-certificate/${employee_id}/certificates?include_expired=${include_expired}`, {
+        showErrorToast: true
+      });
+      // Optionally, you can store or return the response as needed
+      return response;
+    } catch (err) {
+      console.error('Error fetching employee certificates:', err);
+      return null;
+    }
+  };
 
   const certificates = ref<Certificate[]>([])
   const currentCertificate = ref<Certificate | null>(null)
@@ -333,6 +363,8 @@ export function useCertificates() {
     uploadCertificateFile,
     updateEmployeeCertificate,
     createEmployeeCertificate,
+    fetchEmployeeCertificates,
+    fetchEmployeeCertificateDownloadUrl,
 
   // Utilities
   getCertificateStatusSeverity,

@@ -13,7 +13,7 @@
     </template>
 
     <div class="flex flex-col gap-4 py-4">
-      <!-- First row: Certificate ID and Issuing Organisation -->
+
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
           <label for="certificateId" class="font-semibold">Certificate ID</label>
@@ -29,16 +29,7 @@
           />
           <small v-if="errors.certificate_id" class="text-red-500">{{ errors.certificate_id }}</small>
         </div>
-        <div class="flex flex-col gap-2 flex-1">
-          <label for="issuingOrganisation" class="font-semibold">Issuing Organisation</label>
-          <InputText
-            id="issuingOrganisation"
-            v-model="formData.issuing_organisation"
-            placeholder="Enter issuing organisation"
-            :class="{ 'p-invalid': errors.issuing_organisation }"
-          />
-          <small v-if="errors.issuing_organisation" class="text-red-500">{{ errors.issuing_organisation }}</small>
-        </div>
+
       </div>
 
       <!-- Second row: Certificate ID (again for number) and Issue Date -->
@@ -301,10 +292,7 @@ const validateForm = (): boolean => {
   }
 
 
-  if (!formData.value.issuing_organisation || formData.value.issuing_organisation.trim() === '') {
-    errors.value.issuing_organisation = 'Issuing Organisation is required';
-    isValid = false;
-  }
+ 
 
 if (!formData.value.status || String(formData.value.status).trim() === '') {
   errors.value.status = 'Status is required';

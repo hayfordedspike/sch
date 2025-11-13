@@ -16,26 +16,51 @@
         <table class="min-w-full divide-y divide-gray-200 table-auto md:table-fixed">
       <thead class="bg-gray-200">
         <tr>
-
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">ID</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Employee ID</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Certificate ID</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Issuing Organisation</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Issue Date</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Expiry Date</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Type</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Certificate No</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Content Type</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Issued On</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Expires On</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Note</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Replace By</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Created At</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Updated At</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Item Certificate</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(cert, idx) in certificates" :key="cert.id" :class="idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
-          <td class="px-4 py-2 whitespace-nowrap">{{ cert.certificate_id || '-' }}</td>
-          <td class="px-4 py-2 whitespace-nowrap">{{ cert.issuing_organisation || '-' }}</td>
-          <td class="px-4 py-2 whitespace-nowrap">{{ cert.issue_date ? (new Date(cert.issue_date)).toLocaleDateString() : '-' }}</td>
-          <td class="px-4 py-2 whitespace-nowrap">{{ cert.expiry_date ? (new Date(cert.expiry_date)).toLocaleDateString() : '-' }}</td>
-          <td class="px-4 py-2 whitespace-nowrap">{{ cert.certificate_type || '-' }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.id }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.employee_id }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.certificate_id }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.certificate_no }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.content_type }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.issued_on ? (new Date(cert.issued_on)).toLocaleDateString() : '-' }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.expires_on ? (new Date(cert.expires_on)).toLocaleDateString() : '-' }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.status }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.note }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.replace_by }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.created_at ? (new Date(cert.created_at)).toLocaleDateString() : '-' }}</td>
+          <td class="px-4 py-2 whitespace-nowrap">{{ cert.updated_at ? (new Date(cert.updated_at)).toLocaleDateString() : '-' }}</td>
           <td class="px-4 py-2 whitespace-nowrap">
-            <span v-if="cert.certificate_items && cert.certificate_items.length">
-              <span class="text-blue-600">{{ cert.certificate_items[0].name }}</span>
+            <span v-if="cert.s3_key && cert.s3_key !== 'string'">
+              <template v-if="downloadUrls[cert.id]">
+                <a
+                  :href="downloadUrls[cert.id]"
+                  class="text-blue-600 underline"
+                  target="_blank"
+                >Download</a>
+              </template>
+              <template v-else>
+                <button
+                  class="text-blue-600 underline bg-transparent border-none cursor-pointer p-0"
+                  @click="getDownloadUrl(cert)"
+                >Get Download Link</button>
+              </template>
             </span>
             <span v-else class="text-gray-400">No file</span>
           </td>
@@ -73,19 +98,7 @@
     <AddCertificateDialog
   v-if="showEditModal"
   :visible="showEditModal"
-      :certificate="editingCertificate
-            ? {
-                ...editingCertificate,
-                certificate_id: editingCertificate.certificate_id ?? '',
-                issuing_organisation: editingCertificate.issuing_organisation ?? '',
-                issue_date: editingCertificate.issue_date ? String(editingCertificate.issue_date) : '',
-                expiry_date: editingCertificate.expiry_date ? String(editingCertificate.expiry_date) : '',
-                certificate_type: editingCertificate.certificate_type ?? '',
-                // status: editingCertificate.status ?? '',
-                // created_at: editingCertificate.created_at ?? '',
-                // updated_at: editingCertificate.updated_at ?? ''
-              }
-            : undefined"
+      :certificate="undefined"
   @update:visible="closeEditModal"
   @certificate-updated="closeEditModal"
     />
@@ -93,65 +106,96 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import AddCertificateDialog from './AddCertificateDialog.vue'
+import { useCertificates } from '@/composables/useCertificates'
 
-import type { Certificate } from '../types'
+// --- Types ---
+interface EmployeeCertificate {
+  id: number;
+  employee_id: number;
+  certificate_id: number;
+  certificate_no: string;
+  content_type: string;
+  issued_on: string | null;
+  expires_on: string | null;
+  status: string;
+  note?: string;
+  replace_by?: string;
+  created_at: string | null;
+  updated_at: string | null;
+  s3_key?: string;
+  [key: string]: unknown;
+}
 
-// Emits
-defineEmits<{
-  'add-certificate': []
-  'view-certificate': [certificate: Certificate]
-  'edit-certificate': [certificate: Certificate]
-}>()
+interface DownloadUrlResponse {
+  download_url: string;
+}
 
-// Dummy certificates for development
-const certificates = ref<Certificate[]>([
-  {
-    id: 1,
-    code: 'CERT-001',
-    name: 'Basic Life Support',
-    description: 'BLS for healthcare providers',
-    certificate_id: 'BLS-2025',
-    issuing_organisation: 'Red Cross',
-    issue_date: '2025-01-10',
-    expiry_date: '2027-01-10',
-    certificate_type: 'bls',
-    certificate_items: [new File([""], "bls_certificate.pdf", { type: "application/pdf" })],
-    validity_months: 24,
-    renewal_window_days: 30,
-    grace_period_days: 7,
-    status: 'active',
-    created_at: '2025-01-10',
-    updated_at: '2025-01-10'
-  },
-  {
-    id: 2,
-    code: 'CERT-002',
-    name: 'CPR',
-    description: 'CPR for adults and children',
-    certificate_id: 'CPR-2025',
-    issuing_organisation: 'American Heart Association',
-    issue_date: '2025-02-15',
-    expiry_date: '2026-02-15',
-    certificate_type: 'cpr',
-    certificate_items: [new File([""], "cpr_certificate.pdf", { type: "application/pdf" })],
-    validity_months: 12,
-    renewal_window_days: 15,
-    grace_period_days: 5,
-    status: 'active',
-    created_at: '2025-02-15',
-    updated_at: '2025-02-15'
-  }
-])
-
-// Dummy delete handler
+// --- State ---
+const certificates = ref<EmployeeCertificate[]>([])
+const downloadUrls = ref<{ [id: number]: string }>({})
 const showDeleteConfirm = ref(false)
-const certificateToDelete = ref<Certificate | null>(null)
+const certificateToDelete = ref<EmployeeCertificate | null>(null)
+const previewModalVisible = ref(false)
+const showEditModal = ref(false)
+const editingCertificate = ref<EmployeeCertificate | null>(null)
 
-const handleDeleteCertificate = (certificate: Certificate) => {
+// --- Hooks ---
+const { fetchEmployeeCertificates, getEmployeeId, fetchEmployeeCertificateDownloadUrl } = useCertificates()
+
+// --- Type guards ---
+function isEmployeeCertificateArray(val: unknown): val is EmployeeCertificate[] {
+  return Array.isArray(val) && val.every(item => typeof item === 'object' && item !== null && 'id' in item && 'employee_id' in item)
+}
+function isDownloadUrlResponse(val: unknown): val is DownloadUrlResponse {
+  return !!val && typeof val === 'object' && 'download_url' in val
+}
+
+// --- Fetch certificates on mount ---
+onMounted(async () => {
+  const employeeId = getEmployeeId()
+  if (employeeId) {
+    const res = await fetchEmployeeCertificates(employeeId)
+    if (isEmployeeCertificateArray(res)) {
+      certificates.value = res
+    } else if (isEmployeeCertificateListResponse(res) && isEmployeeCertificateArray(res.detail)) {
+      certificates.value = res.detail
+    } else {
+      certificates.value = []
+    }
+interface EmployeeCertificateListResponse {
+  detail: EmployeeCertificate[]
+}
+function isEmployeeCertificateListResponse(val: unknown): val is EmployeeCertificateListResponse {
+  return !!val && typeof val === 'object' && Array.isArray((val as EmployeeCertificateListResponse).detail)
+}
+  }
+})
+
+// --- Download logic ---
+const getDownloadUrl = async (cert: EmployeeCertificate) => {
+  if (!cert.id) return
+  const res = await fetchEmployeeCertificateDownloadUrl(cert.id)
+  if (isDownloadUrlResponse(res)) {
+    downloadUrls.value[cert.id] = res.download_url
+  }
+}
+
+// --- Edit/Delete logic ---
+const handleEditCertificate = (certificate: EmployeeCertificate) => {
+  editingCertificate.value = { ...certificate }
+  showEditModal.value = true
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  editingCertificate.value = null
+}
+
+const handleDeleteCertificate = (certificate: EmployeeCertificate) => {
   certificateToDelete.value = certificate
   showDeleteConfirm.value = true
 }
@@ -169,19 +213,7 @@ const cancelDeleteCertificate = () => {
   certificateToDelete.value = null
 }
 
-const previewModalVisible = ref(false)
-
-
-const showEditModal = ref(false)
-const editingCertificate = ref<Certificate | null | undefined>(undefined)
-
-const handleEditCertificate = (certificate: Certificate) => {
-  editingCertificate.value = { ...certificate }
-  showEditModal.value = true
-}
-
-const closeEditModal = () => {
-  showEditModal.value = false
-  editingCertificate.value = null
-}
+// --- Emits ---
+defineEmits(['add-certificate', 'view-certificate', 'edit-certificate'])
 </script>
+
