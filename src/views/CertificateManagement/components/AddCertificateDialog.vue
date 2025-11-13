@@ -17,18 +17,22 @@
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
           <label for="certificateId" class="font-semibold">Certificate ID</label>
-          <InputText
+          <Dropdown
             id="certificateId"
             v-model="formData.certificate_id"
-            placeholder="Enter certificate ID"
+            :options="certificateIdOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select certificate"
+            class="w-full"
             :class="{ 'p-invalid': errors.certificate_id }"
           />
           <small v-if="errors.certificate_id" class="text-red-500">{{ errors.certificate_id }}</small>
         </div>
         <div class="flex flex-col gap-2 flex-1">
-          <label for="issuingOrg" class="font-semibold">Issuing Organisation</label>
+          <label for="issuingOrganisation" class="font-semibold">Issuing Organisation</label>
           <InputText
-            id="issuingOrg"
+            id="issuingOrganisation"
             v-model="formData.issuing_organisation"
             placeholder="Enter issuing organisation"
             :class="{ 'p-invalid': errors.issuing_organisation }"
@@ -37,8 +41,18 @@
         </div>
       </div>
 
-      <!-- Second row: Issue Date and Expiry Date -->
+      <!-- Second row: Certificate ID (again for number) and Issue Date -->
       <div class="flex gap-4">
+        <div class="flex flex-col gap-2 flex-1">
+          <label for="certificateId2" class="font-semibold">Certificate Number</label>
+          <InputText
+            id="certificateId2"
+            v-model="formData.certificate_id"
+            placeholder="Enter certificate number"
+            :class="{ 'p-invalid': errors.certificate_id }"
+          />
+          <small v-if="errors.certificate_id" class="text-red-500">{{ errors.certificate_id }}</small>
+        </div>
         <div class="flex flex-col gap-2 flex-1">
           <label for="issueDate" class="font-semibold">Issue Date</label>
           <Calendar
@@ -46,9 +60,25 @@
             v-model="formData.issue_date"
             placeholder="Select issue date"
             showIcon
-            :class="{ 'p-invalid': errors.issue_date }"
           />
-          <small v-if="errors.issue_date" class="text-red-500">{{ errors.issue_date }}</small>
+        </div>
+      </div>
+
+      <!-- Third row: Certificate Type and Expiry Date -->
+      <div class="flex gap-4">
+        <div class="flex flex-col gap-2 flex-1">
+          <label for="certificateType" class="font-semibold">Status</label>
+        <Dropdown
+  id="status"
+  v-model="formData.status"
+  :options="statusOptions"
+  optionLabel="label"
+  optionValue="value"
+  placeholder="Select status"
+  class="w-full"
+  :class="{ 'p-invalid': errors.status }"
+/>
+          <small v-if="errors.status" class="text-red-500">{{ errors.status }}</small>
         </div>
         <div class="flex flex-col gap-2 flex-1">
           <label for="expiryDate" class="font-semibold">Expiry Date</label>
@@ -63,20 +93,15 @@
         </div>
       </div>
 
-      <!-- Certificate Type Dropdown -->
+      <!-- Note field -->
       <div class="flex flex-col gap-2">
-        <label for="certificateType" class="font-semibold">Certificate Type</label>
-        <Dropdown
-          id="certificateType"
-          v-model="formData.certificate_type"
-          :options="certificateTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select certificate type"
-          class="w-full"
-          :class="{ 'p-invalid': errors.certificate_type }"
+        <label for="note" class="font-semibold">Note</label>
+        <Textarea
+          id="note"
+          v-model="formData.note"
+          placeholder="Enter any additional notes"
+          rows="3"
         />
-        <small v-if="errors.certificate_type" class="text-red-500">{{ errors.certificate_type }}</small>
       </div>
 
       <!-- Certificate Item File Upload (Modern Dropzone) -->
@@ -97,25 +122,29 @@
             multiple
             @change="handleFileChange"
           />
-          <div v-if="!formData.certificate_items || formData.certificate_items.length === 0" class="flex flex-col items-center">
-            <i class="pi pi-upload text-4xl text-blue-400 mb-2"></i>
-            <span class="text-gray-600">Drag your files or <span class="text-blue-500 font-semibold">browse</span></span>
-            <span class="text-xs text-gray-400 mt-1">Max 10MB files are allowed</span>
-          </div>
-          <div v-else class="flex flex-col items-center w-full">
-            <div v-for="(file, idx) in formData.certificate_items" :key="idx" class="flex flex-col items-center mb-4 w-full">
-              <template v-if="file.type && file.type.startsWith('image/')">
-                <img :src="filePreviews[idx]" alt="Preview" class="max-h-32 mb-2 rounded shadow" />
-              </template>
-              <template v-else>
-                <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
-                <span class="text-gray-700">{{ file.name }}</span>
-              </template>
-              <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile(idx)" />
+          <template v-if="formData.certificate_items.length === 0">
+            <div class="flex flex-col items-center">
+              <i class="pi pi-upload text-4xl text-blue-400 mb-2"></i>
+              <span class="text-gray-600">Drag your files or <span class="text-blue-500 font-semibold">browse</span></span>
+              <span class="text-xs text-gray-400 mt-1">Max 10MB files are allowed</span>
             </div>
-          </div>
+          </template>
+          <template v-else>
+            <div class="flex flex-col items-center w-full">
+              <div v-for="(file, idx) in formData.certificate_items" :key="idx" class="flex flex-col items-center mb-4 w-full">
+                <template v-if="file.type && file.type.startsWith('image/')">
+                  <img :src="filePreviews[idx]" alt="Preview" class="max-h-32 mb-2 rounded shadow" />
+                </template>
+                <template v-else>
+                  <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
+                  <span class="text-gray-700">{{ file.name }}</span>
+                </template>
+                <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile(idx)" />
+              </div>
+            </div>
+          </template>
         </div>
-        <small class="text-gray-500 text-xs">Only support SVG, JPG, And PNG)</small>
+        <small class="text-gray-500 text-xs">Only support PDF, JPG, JPEG, and PNG</small>
       </div>
     </div>
 
@@ -133,221 +162,245 @@
 </template>
 
 <script setup lang="ts">
-import { useCertificates } from '@/composables/useCertificates'
-import { ref, computed, watch } from 'vue'
-import Calendar from 'primevue/calendar'
-import Dropdown from 'primevue/dropdown'
+import { ref, computed, watch, onMounted } from 'vue';
 
-import type { Certificate, CreateCertificateRequest } from '@/types/certificate' // <-- Add this import
+const statusOptions = [
+  { label: 'Active', value: 'ACTIVE' },
+  { label: 'Pending', value: 'PENDING' },
+  { label: 'Inactive', value: 'INACTIVE' }
+];
+import { useCertificates } from '@/composables/useCertificates';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import Calendar from 'primevue/calendar';
+import Dropdown from 'primevue/dropdown';
+import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
 
-interface Props {
-  visible: boolean
-  certificate?: Certificate | null
+import type { Certificate } from '../types';
+
+const props = defineProps<{ visible: boolean; certificate?: Certificate }>();
+const emit = defineEmits(['update:visible', 'certificate-added', 'certificate-updated']);
+
+interface CertificateFormData {
+  certificate_id: string;
+  issuing_organisation: string;
+  issue_date: Date | null;
+  expiry_date: Date | null;
+  status: string;
+  certificate_items: File[];
+  note: string;
 }
 
-interface Emits {
-  (e: 'update:visible', value: boolean): void
-  (e: 'certificate-added'): void
-  (e: 'certificate-updated'): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  visible: false,
-  certificate: null
-})
-
-const emit = defineEmits<Emits>()
-
-const { createCertificate, updateCertificate, loading } = useCertificates()
-
-import { ref as vueRef } from 'vue'
-const fileInputRef = vueRef<HTMLInputElement | null>(null)
-
-const formData = ref<CreateCertificateRequest & {
-  certificate_id?: string
-  issuing_organisation?: string
-  issue_date?: Date | null
-  expiry_date?: Date | null
-  certificate_type?: string
-  certificate_items?: File[]
-}>({
-  code: '',
-  name: '',
-  description: '',
-  validity_months: 12,
-  renewal_window_days: 30,
-  grace_period_days: 7,
+const formData = ref<CertificateFormData>({
   certificate_id: '',
   issuing_organisation: '',
   issue_date: null,
   expiry_date: null,
-  certificate_type: '',
-  certificate_items: []
-})
+  status: '',
+  certificate_items: [],
+  note: ''
+});
 
-const filePreviews = ref<string[]>([])
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const filePreviews = ref<string[]>([]);
 
 function triggerFileInput() {
-  fileInputRef.value?.click()
+  fileInputRef.value?.click();
 }
 
 function handleFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
+  const input = event.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
-    formData.value.certificate_items = Array.from(input.files)
-    filePreviews.value = formData.value.certificate_items.map(file =>
+    formData.value.certificate_items = Array.from(input.files);
+    filePreviews.value = formData.value.certificate_items.map((file: File) =>
       file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
-    )
+    );
   }
 }
 
 function handleDrop(event: DragEvent) {
   if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-    formData.value.certificate_items = Array.from(event.dataTransfer.files)
-    filePreviews.value = formData.value.certificate_items.map(file =>
+    formData.value.certificate_items = Array.from(event.dataTransfer.files);
+    filePreviews.value = formData.value.certificate_items.map((file: File) =>
       file.type.startsWith('image/') ? URL.createObjectURL(file) : ''
-    )
+    );
   }
 }
 
 function removeFile(idx: number) {
-  formData.value.certificate_items?.splice(idx, 1)
-  filePreviews.value.splice(idx, 1)
+  formData.value.certificate_items.splice(idx, 1);
+  filePreviews.value.splice(idx, 1);
 }
-const certificateTypeOptions = [
-  { label: 'Basic Life Support', value: 'bls' },
-  { label: 'Advanced Cardiac Life Support', value: 'acls' },
-  { label: 'Pediatric Advanced Life Support', value: 'pals' },
-  { label: 'First Aid', value: 'firstaid' },
-  { label: 'CPR', value: 'cpr' },
-  { label: 'Other', value: 'other' }
-]
 
-const errors = ref<Record<string, string>>({})
+const { certificateIdOptions, fetchActiveCertificates } = useCertificates();
+onMounted(() => {
+  fetchActiveCertificates();
+});
+
+const errors = ref<Record<string, string>>({});
 
 const isVisible = computed({
   get: () => props.visible,
-  set: (value) => emit('update:visible', value)
-})
+  set: (value: boolean) => emit('update:visible', value)
+});
 
-const editMode = computed(() => !!props.certificate)
+const editMode = computed(() => !!props.certificate);
 
-// Watch for certificate changes to populate form in edit mode
-watch(
-  () => props.certificate,
-  (newCertificate) => {
-    if (newCertificate) {
-      formData.value = {
-        code: newCertificate.code,
-        name: newCertificate.name,
-        description: newCertificate.description,
-        validity_months: newCertificate.validity_months,
-        renewal_window_days: newCertificate.renewal_window_days,
-        grace_period_days: newCertificate.grace_period_days
-      }
-    } else {
-      // Reset form for add mode
-      formData.value = {
-        code: '',
-        name: '',
-        description: '',
-        validity_months: 12,
-        renewal_window_days: 30,
-        grace_period_days: 7
-      }
-    }
-    errors.value = {}
-  },
-  { immediate: true }
-)
-
-const validateForm = (): boolean => {
-  errors.value = {}
-  let isValid = true
-
-  if (!formData.value.code || formData.value.code.trim() === '') {
-    errors.value.code = 'Certificate code is required'
-    isValid = false
-  }
-
-  if (!formData.value.name || formData.value.name.trim() === '') {
-    errors.value.name = 'Certificate name is required'
-    isValid = false
-  }
-
-  if (!formData.value.description || formData.value.description.trim() === '') {
-    errors.value.description = 'Description is required'
-    isValid = false
-  }
-
-  if (!formData.value.validity_months || formData.value.validity_months < 1) {
-    errors.value.validity_months = 'Validity period must be at least 1 month'
-    isValid = false
-  }
-
-  if (formData.value.renewal_window_days < 0) {
-    errors.value.renewal_window_days = 'Renewal window cannot be negative'
-    isValid = false
-  }
-
-  if (formData.value.grace_period_days < 0) {
-    errors.value.grace_period_days = 'Grace period cannot be negative'
-    isValid = false
-  }
-
-  return isValid
+interface InitUploadData {
+  upload_url: string;
+  file_name: string;
 }
 
-const handleSubmit = async () => {
-  if (!validateForm()) {
-    return
+const { initCertificateUpload, updateEmployeeCertificate, createEmployeeCertificate, loading } = useCertificates();
+
+// TODO: Replace with actual employee ID source (e.g., from props, store, or context)
+const employee_id = ref(0); // Replace 0 with the actual employee ID number as needed
+
+watch(
+  () => props.certificate,
+  (newCertificate: Certificate | undefined) => {
+    if (newCertificate) {
+      formData.value = {
+        certificate_id: newCertificate.certificate_id || '',
+        issuing_organisation: newCertificate.issuing_organisation || '',
+  issue_date: newCertificate.issue_date ? new Date(newCertificate.issue_date) : null,
+  expiry_date: newCertificate.expiry_date ? new Date(newCertificate.expiry_date) : null,
+        status: newCertificate.status || '',
+        certificate_items: [],
+
+        note: newCertificate.issuing_organisation || ''
+      };
+    } else {
+      formData.value = {
+        certificate_id: '',
+        issuing_organisation: '',
+  issue_date: null,
+  expiry_date: null,
+        status: '',
+        certificate_items: [],
+
+        note: ''
+      };
+    }
+    errors.value = {};
+  },
+  { immediate: true }
+);
+
+const validateForm = (): boolean => {
+  errors.value = {};
+  let isValid = true;
+
+  if (
+    !formData.value.certificate_id ||
+    String(formData.value.certificate_id).trim() === ''
+  ) {
+    errors.value.certificate_id = 'Certificate ID is required';
+    isValid = false;
   }
 
+
+  if (!formData.value.issuing_organisation || formData.value.issuing_organisation.trim() === '') {
+    errors.value.issuing_organisation = 'Issuing Organisation is required';
+    isValid = false;
+  }
+
+if (!formData.value.status || String(formData.value.status).trim() === '') {
+  errors.value.status = 'Status is required';
+  isValid = false;
+}
+
+  if (!formData.value.expiry_date) {
+    errors.value.expiry_date = 'Expiry date is required';
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+const handleSubmit = async () => {
   try {
-    let result
+    if (!validateForm()) {
+      return;
+    }
+
+    const employeeId = employee_id.value;
+    const certificateId = Number(formData.value.certificate_id);
+    const contentType = formData.value.certificate_items && formData.value.certificate_items[0]
+      ? formData.value.certificate_items[0].type
+      : 'application/pdf';
+
+    // 1. Init upload
+  const initUploadData = await initCertificateUpload(employeeId, certificateId, contentType) as InitUploadData;
+    if (!initUploadData || !initUploadData.upload_url || !initUploadData.file_name) {
+      throw new Error('Failed to initialize upload');
+    }
+  const { upload_url } = initUploadData;
+
+    // 2. (No S3 upload step: we only collect upload_url and use it as s3_key)
+    // 3. Prepare payload for create/update
+    const certPayload = {
+      employee_id: employeeId,
+      certificate_id: certificateId,
+      certificate_no: String(formData.value.certificate_id), // ensure string
+      issuing_organisation: formData.value.issuing_organisation,
+      issued_on: formData.value.issue_date
+        ? new Date(formData.value.issue_date).toISOString() // full ISO string with timezone
+        : new Date().toISOString(),
+      expires_on: formData.value.expiry_date
+        ? new Date(formData.value.expiry_date).toISOString() // full ISO string with timezone
+        : new Date().toISOString(),
+      status: formData.value.status,
+      s3_key: upload_url, // Use upload_url directly as s3_key
+      content_type: contentType,
+      created_at: new Date().toISOString(),
+      note: formData.value.note
+    };
+
     if (editMode.value && props.certificate) {
-      // Update existing certificate
-      result = await updateCertificate(Number(props.certificate.id), formData.value)
-      if (result?.success) {
-        emit('certificate-updated')
-        handleClose() // Close modal after successful update
+      const updated = await updateEmployeeCertificate(
+        employeeId,
+        certificateId,
+        certPayload,
+        props.certificate.id // employee_cert_id if available
+      );
+
+      if (updated) {
+        emit('certificate-updated');
+        handleClose();
       } else {
-        // Handle update failure case
-        console.error('Update failed: operation was not successful')
+        console.error('Certificate update failed:', updated);
       }
     } else {
-      // Create new certificate
-      result = await createCertificate(formData.value)
-      if (result) {
-        emit('certificate-added')
-        handleClose() // Close modal after successful creation
+      const certData = await createEmployeeCertificate(certPayload);
+
+      if (certData) {
+        emit('certificate-added');
+        handleClose();
       } else {
-        // Handle creation failure case
-        console.error('Creation failed: no result returned')
+        console.error('Certificate creation failed:', certData);
       }
     }
   } catch (error) {
-    console.error('Error in handleSubmit:', error)
-    // Don't close modal on error, let user see the error and try again
+    console.error('Error in handleSubmit:', error);
   }
-}
+};
 
-const handleClose = () => {
-  // Reset form data for both add and edit modes
-  formData.value = {
-    code: '',
-    name: '',
-    description: '',
-    validity_months: 12,
-    renewal_window_days: 30,
-    grace_period_days: 7
-  }
+function handleClose() {
+      formData.value = {
+        certificate_id: '',
+        issuing_organisation: '',
+        issue_date: null,
+        expiry_date: null,
+        status: '',
+        certificate_items: [],
 
-  // Clear any validation errors
-  errors.value = {}
-
-  // Close the modal
-  emit('update:visible', false)
+        note: ''
+      };
+  errors.value = {};
+  filePreviews.value = [];
+  emit('update:visible', false);
 }
 </script>
 

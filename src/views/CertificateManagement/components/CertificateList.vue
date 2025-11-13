@@ -2,21 +2,21 @@
   <div class="certificate-list p-4">
     <div class="mb-4 flex justify-between items-center">
       <h3 class="text-lg font-semibold">Certificate List</h3>
-      <Button 
-        label="Add Certificate" 
-        icon="pi pi-plus" 
+      <Button
+        label="Add Certificate"
+        icon="pi pi-plus"
         @click="$emit('add-certificate')"
         class="p-button-primary"
       />
     </div>
 
-   
-  
+
+
       <div class="overflow-x-auto w-full">
         <table class="min-w-full divide-y divide-gray-200 table-auto md:table-fixed">
       <thead class="bg-gray-200">
         <tr>
-    
+
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Certificate ID</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Issuing Organisation</th>
           <th class="px-4 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Issue Date</th>
@@ -73,12 +73,19 @@
     <AddCertificateDialog
   v-if="showEditModal"
   :visible="showEditModal"
-      :certificate="editingCertificate ? {
-        ...editingCertificate,
-        id: String(editingCertificate.id),
-        issue_date: editingCertificate.issue_date ? new Date(editingCertificate.issue_date) : null,
-        expiry_date: editingCertificate.expiry_date ? new Date(editingCertificate.expiry_date) : null
-      } : undefined"
+      :certificate="editingCertificate
+            ? {
+                ...editingCertificate,
+                certificate_id: editingCertificate.certificate_id ?? '',
+                issuing_organisation: editingCertificate.issuing_organisation ?? '',
+                issue_date: editingCertificate.issue_date ? String(editingCertificate.issue_date) : '',
+                expiry_date: editingCertificate.expiry_date ? String(editingCertificate.expiry_date) : '',
+                certificate_type: editingCertificate.certificate_type ?? '',
+                // status: editingCertificate.status ?? '',
+                // created_at: editingCertificate.created_at ?? '',
+                // updated_at: editingCertificate.updated_at ?? ''
+              }
+            : undefined"
   @update:visible="closeEditModal"
   @certificate-updated="closeEditModal"
     />

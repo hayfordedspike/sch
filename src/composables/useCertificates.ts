@@ -1,3 +1,8 @@
+// Utility to get employee_id from auth store or composable
+import { useAuth } from '@/composables/useAuth';
+
+
+
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
 import type {
@@ -7,7 +12,103 @@ import type {
 } from '@/views/CertificateManagement/types'
 
 export function useCertificates() {
-  const { get, post, patch, delete: del, loading, error } = useApi()
+  // Debug: Log current user structure from useAuth
+  try {
+    const { user } = useAuth();
+    console.log('Current user from useAuth:', user?.value);
+  } catch (e) {
+    console.log('Could not log user from useAuth:', e);
+  }
+  // Utility: Get employee_id from user session (if available)
+  const getEmployeeId = () => {
+    // Try to get from useAuth composable (user is likely a ComputedRef)
+    try {
+      const { user } = useAuth();
+      // user is a ComputedRef<{ id: number; ... } | null>
+      return user?.value?.id || null;
+    } catch {
+      return null;
+    }
+  };
+  // Create employee certificate (POST)
+  // NOTE: After calling initCertificateUpload, use the upload_url from the response as s3_key in the POST body for createEmployeeCertificate.
+  // No PATCH is needed after init. If you skip this, s3_key will be empty and the backend will not have the file location.
+  // If the backend expects only the S3 key (path), use file_name instead. Adjust as per backend contract.
+  interface CreateEmployeeCertificatePayload {
+    employee_id: number;
+    certificate_id: number;
+    certificate_no: string;
+    issued_on: string;
+    expires_on: string;
+    status: string;
+    s3_key: string; // Store upload_url if backend expects full URL, or file_name if only key is needed
+    content_type: string;
+    created_at: string;
+    note?: string;
+  }
+  // Dropdown options for certificate id selection
+  // (Removed duplicate declaration of certificateIdOptions)
+  const createEmployeeCertificate = async (payload: CreateEmployeeCertificatePayload) => {
+    try {
+      const response = await post(`/employee-certificate/${payload.employee_id}/certificates`, payload, {
+        showSuccessToast: true,
+        successMessage: 'Certificate created successfully',
+        showErrorToast: true
+      })
+      return response
+    } catch (err) {
+      console.error('Error creating employee certificate:', err)
+      return null
+    }
+  }
+  // PATCH update employee certificate
+  const updateEmployeeCertificate = async (employee_id: number, certificate_id: number, payload: Partial<CreateEmployeeCertificatePayload>, employee_cert_id?: number) => {
+    try {
+      let url = `/employee-certificate/${employee_id}/certificates/${certificate_id}`
+      if (employee_cert_id) {
+        url += `?employee_cert_id=${employee_cert_id}`
+      }
+      const response = await patch(url, payload, {
+        showSuccessToast: true,
+        successMessage: 'Certificate updated successfully',
+        showErrorToast: true
+      })
+      return response
+    } catch (err) {
+      console.error('Error updating employee certificate:', err)
+      return null
+    }
+  }
+  // Backend certificate upload flow
+  const initCertificateUpload = async (employee_id: number, certificate_id: number, content_type: string) => {
+    try {
+      const response = await post(`/employee-certificate/${certificate_id}/init-upload`, {
+        employee_id,
+        certificate_id,
+        content_type
+      })
+      return response
+    } catch (err) {
+      console.error('Error initializing certificate upload:', err)
+      return null
+    }
+  }
+
+  const uploadCertificateFile = async (upload_url: string, file: File, content_type: string) => {
+    try {
+      // Use PUT for S3 upload, skip auth headers
+      const response = await put(upload_url, file, {
+        customHeaders: { 'Content-Type': content_type },
+        customMethod: 'PUT',
+        skipAuth: true
+      })
+      return response
+    } catch (err) {
+      console.error('Error uploading certificate file to S3:', err)
+      return null
+    }
+  }
+  const { get, post, put, patch, delete: del, loading, error } = useApi()
 
   const certificates = ref<Certificate[]>([])
   const currentCertificate = ref<Certificate | null>(null)
@@ -180,38 +281,22 @@ export function useCertificates() {
   const getCertificateStatusSeverity = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active':
-        return 'success'
+        return 'success';
       case 'expired':
-        return 'warning'
+        return 'warning';
       case 'revoked':
-        return 'danger'
+        return 'danger';
       case 'pending':
-        return 'info'
+        return 'info';
       default:
-        return 'secondary'
+        return 'info';
     }
   }
 
-  const formatCertificateDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
-  const isExpiringSoon = (certificate: Certificate, daysThreshold = 30) => {
-    if (!certificate.validity_months) return false
-
-    const createdDate = new Date(certificate.created_at)
-    const expiryDate = new Date(createdDate)
-    expiryDate.setMonth(createdDate.getMonth() + certificate.validity_months)
-
-    const today = new Date()
-    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-
-    return daysUntilExpiry <= daysThreshold && daysUntilExpiry > 0
-  }
+  // Dropdown options for certificate id selection
+  const certificateIdOptions = computed(() =>
+    certificates.value.map((cert: Certificate) => ({ label: cert.name, value: cert.id }))
+  );
 
   const getExpiryDate = (certificate: Certificate) => {
     if (!certificate.validity_months) return null
@@ -234,6 +319,7 @@ export function useCertificates() {
     activeCertificates,
     expiredCertificates,
     revokedCertificates,
+    certificateIdOptions,
 
     // Methods
     fetchCertificates,
@@ -243,11 +329,14 @@ export function useCertificates() {
     updateCertificate,
     activateCertificate,
     deleteCertificate,
+    initCertificateUpload,
+    uploadCertificateFile,
+    updateEmployeeCertificate,
+    createEmployeeCertificate,
 
-    // Utilities
-    getCertificateStatusSeverity,
-    formatCertificateDate,
-    isExpiringSoon,
-    getExpiryDate
+  // Utilities
+  getCertificateStatusSeverity,
+  getExpiryDate
+  ,getEmployeeId
   }
 }
