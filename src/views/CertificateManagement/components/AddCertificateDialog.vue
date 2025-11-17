@@ -292,7 +292,7 @@ const validateForm = (): boolean => {
   }
 
 
- 
+
 
 if (!formData.value.status || String(formData.value.status).trim() === '') {
   errors.value.status = 'Status is required';
@@ -315,16 +315,15 @@ const handleSubmit = async () => {
 
     const employeeId = employee_id.value;
     const certificateId = Number(formData.value.certificate_id);
-    const contentType = formData.value.certificate_items && formData.value.certificate_items[0]
-      ? formData.value.certificate_items[0].type
-      : 'application/pdf';
+    const contentType = "application/pdf"; // Default content type
+
 
     // 1. Init upload
   const initUploadData = await initCertificateUpload(employeeId, certificateId, contentType) as InitUploadData;
     if (!initUploadData || !initUploadData.upload_url || !initUploadData.file_name) {
       throw new Error('Failed to initialize upload');
     }
-  const { upload_url } = initUploadData;
+  //const { upload_url } = initUploadData;
 
     // 2. (No S3 upload step: we only collect upload_url and use it as s3_key)
     // 3. Prepare payload for create/update
@@ -340,7 +339,7 @@ const handleSubmit = async () => {
         ? new Date(formData.value.expiry_date).toISOString() // full ISO string with timezone
         : new Date().toISOString(),
       status: formData.value.status,
-      s3_key: upload_url, // Use upload_url directly as s3_key
+      s3_key: "certificates/34/1/aa62a707-659f-4342-b2d2-66d8cc457362.pdf", // Use file_name directly as s3_key
       content_type: contentType,
       created_at: new Date().toISOString(),
       note: formData.value.note

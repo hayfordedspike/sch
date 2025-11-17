@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, watch, defineProps, defineEmits } from 'vue'
+import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useEmployees } from '@/composables/useEmployees'
 
 const router = useRouter()
 
 // Props for v-model binding
 const props = defineProps<{ selectedFilter: string; currentDate: number }>()
 const emit = defineEmits(['update:selectedFilter', 'update:currentDate'])
+
+// Initialize employees composable
+const { fetchEmployees, employees } = useEmployees()
 
 // Local state mirrors parent
 const currentDate = ref(new Date(new Date().setMonth(props.currentDate)))
@@ -19,6 +23,26 @@ const formattedDate = computed(() => {
     month: 'long',
     day: 'numeric'
   })
+})
+
+// Fetch employees on mount
+onMounted(async () => {
+  await fetchEmployees()
+})
+
+// Team members from API
+const teamMembers = computed(() => {
+  return employees.value.map(employee => ({
+    label: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id.toString() // Use employee ID as value
+  }))
+})
+
+const filterOptions = computed(() => {
+  return [
+    { label: 'All Team Members', value: 'all' },
+    ...teamMembers.value
+  ]
 })
 
 // Navigation functions
@@ -35,20 +59,6 @@ const goToNextMonth = () => {
   currentDate.value = newDate
   emit('update:currentDate', newDate.getMonth())
 }
-
-// Dummy team members for filter options
-const teamMembers = [
-  { label: 'Alice Johnson', value: 'alice' },
-  { label: 'Bob Smith', value: 'bob' },
-  { label: 'Carol Lee', value: 'carol' },
-  { label: 'David Kim', value: 'david' },
-  { label: 'Eva Brown', value: 'eva' }
-]
-
-const filterOptions = ref([
-  { label: 'All Team Members', value: 'all' },
-  ...teamMembers
-])
 
 watch(selectedFilter, (val) => {
   emit('update:selectedFilter', val)

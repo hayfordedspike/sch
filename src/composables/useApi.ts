@@ -13,6 +13,61 @@ export function useApi() {
   const error = ref<string | null>(null)
   const toast = useToast()
 
+  // Helper function to decode JWT token
+  const decodeJWT = (token: string) => {
+    try {
+      const parts = token.split('.')
+      if (parts.length === 3) {
+        return JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+      }
+    } catch (e) {
+      console.error('Error decoding token:', e)
+    }
+    return null
+  }
+
+  // Helper function to check if token is expired
+  const isTokenExpired = (token: string): boolean => {
+    const payload = decodeJWT(token)
+    if (!payload || !payload.exp) return true
+    return payload.exp < Math.floor(Date.now() / 1000)
+  }
+
+  // Ensure we have a valid token before making requests
+  const ensureValidToken = async (): Promise<void> => {
+    const token = localStorage.getItem('token')
+    const refreshToken = localStorage.getItem('refreshToken')
+
+    // If no token, redirect to login
+    if (!token) {
+      window.location.href = '/signin'
+      throw new Error('No authentication token found')
+    }
+
+    // If token is expired, try to refresh
+    if (isTokenExpired(token)) {
+      if (!refreshToken) {
+        localStorage.removeItem('token')
+        window.location.href = '/signin'
+        throw new Error('Token expired and no refresh token available')
+      }
+
+      try {
+        const response = await api.post('/auth/refresh', { refresh_token: refreshToken })
+        const { access_token, refresh_token: newRefreshToken } = response.data
+
+        localStorage.setItem('token', access_token)
+        localStorage.setItem('refreshToken', newRefreshToken)
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError)
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        window.location.href = '/signin'
+        throw new Error('Failed to refresh token')
+      }
+    }
+  }
+
   const handleApiError = (err: unknown): string => {
     if (err instanceof Error) {
       return err.message
@@ -27,19 +82,26 @@ export function useApi() {
       successMessage?: string
       showErrorToast?: boolean
       customErrorHandler?: (error: AxiosError) => void
+      skipAuth?: boolean
     } = {}
   ): Promise<T | null> => {
     const {
       showSuccessToast = false,
       successMessage = 'Operation completed successfully',
       showErrorToast = true,
-      customErrorHandler
+      customErrorHandler,
+      skipAuth = false
     } = options
 
     loading.value = true
     error.value = null
 
     try {
+      // Ensure we have a valid token before making the request
+      if (!skipAuth) {
+        await ensureValidToken()
+      }
+
       const response = await requestFn()
       
       if (showSuccessToast) {

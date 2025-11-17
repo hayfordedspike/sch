@@ -12,6 +12,7 @@ declare module 'vue' {
     Button: typeof import('primevue/button')['default']
     Calendar: typeof import('primevue/calendar')['default']
     Card: typeof import('primevue/card')['default']
+    CheckInOutSidebar: typeof import('./src/components/layout/CheckInOutSidebar.vue')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
     DashboardCalendar: typeof import('./src/components/DashboardCalendar.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']

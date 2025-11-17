@@ -9,7 +9,7 @@
               <i class="pi pi-user text-blue-600 text-lg"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">{{ member.name }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900">{{ memberName }}</h3>
               <p class="text-sm text-gray-600">{{ member.role }}</p>
             </div>
           </div>
@@ -38,54 +38,43 @@
         <!-- Contact Information -->
         <div class="space-y-2 mb-4">
           <div class="flex items-center text-sm text-gray-600">
+            <i class="pi pi-users mr-2 text-gray-400"></i>
+            <span>{{ teamName }}</span>
+          </div>
+          <div class="flex items-center text-sm text-gray-600">
             <i class="pi pi-phone mr-2 text-gray-400"></i>
-            <span>{{ member.phone || 'No phone number' }}</span>
+            <span>{{ employee?.phone || 'No phone number' }}</span>
           </div>
           <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-envelope mr-2 text-gray-400"></i>
-            <span>{{ member.email }}</span>
-          </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-map-marker mr-2 text-gray-400"></i>
-            <span>{{ member.address || 'No address provided' }}</span>
+            <i class="pi pi-circle-fill mr-2 text-xs" :class="memberStatus === 'active' ? 'text-green-500' : 'text-red-500'"></i>
+            <span>{{ memberStatus === 'active' ? 'Active' : 'Inactive' }}</span>
           </div>
         </div>
 
-        <!-- Schedule Information -->
+        <!-- Membership Information -->
         <div class="mb-4">
           <div class="flex items-center mb-2">
             <i class="pi pi-calendar mr-2 text-gray-400"></i>
-
-
-          <div class="flex flex-wrap gap-2">
-            <span
-              v-for="day in member.schedule"
-              :key="day"
-              class="px-2 py-1 text-xs bg-green-100 text-gray-700 rounded-md font-medium"
-            >
-              {{ day }}
-            </span>
-            <span
-              v-if="!member.schedule || member.schedule.length === 0"
-              class="text-xs text-gray-500 italic"
-            >
-              No schedule set
-            </span>
-          </div> </div>
-        </div>
-
-        <!-- Rate Information -->
-        <div class="pt-3 ">
-          <div class="flex items-center mb-2">
-
-            <span class="text-sm font-medium text-gray-700">Rate</span>
+            <span class="text-sm font-medium text-gray-700">Member since</span>
           </div>
           <div class="text-left">
-            <div v-if="member.hourlyRate" class="text-lg font-bold text-black">
-              ${{ member.hourlyRate }}/hr
+            <div class="text-sm text-gray-600">
+              {{ new Date(member.joined_at).toLocaleDateString() }}
             </div>
-            <div v-else class="text-sm text-gray-500 italic">
-              Rate not set
+          </div>
+        </div>
+
+        <!-- Role and Primary Status -->
+        <div class="pt-3 border-t border-gray-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-700">Role</span>
+            <span v-if="member.is_primary" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+              Primary
+            </span>
+          </div>
+          <div class="text-left">
+            <div class="text-sm font-semibold text-gray-900 capitalize">
+              {{ member.role.toLowerCase() }}
             </div>
           </div>
         </div>
@@ -95,29 +84,74 @@
 </template>
 
 <script setup lang="ts">
-interface MemberDisplay {
-  id: number
-  name: string
-  email: string
-  phone?: string
-  address?: string
-  role: string
-  status: 'active' | 'inactive'
-  schedule?: string[]
-  hourlyRate?: number
-  teams?: Array<{ id: number; name: string }>
-}
+import { ref, computed, onMounted } from 'vue'
+import { useTeams } from '@/composables/useTeams'
+import { useEmployees } from '@/composables/useEmployees'
+import type { TeamMember } from '@/composables/useTeamMembers'
+import type { Team } from '@/composables/useTeams'
+import type { Employee } from '@/views/Employees/types'
 
 interface Props {
-  member: MemberDisplay
+  member: TeamMember
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 defineEmits<{
-  edit: [member: MemberDisplay]
-  delete: [member: MemberDisplay]
+  edit: [member: TeamMember]
+  delete: [member: TeamMember]
 }>()
+
+// Reactive data for fetched details
+const team = ref<Team | null>(null)
+const employee = ref<Employee | null>(null)
+const loading = ref(true)
+
+// Hooks
+const { getTeam } = useTeams()
+const { getEmployee: fetchEmployee } = useEmployees()
+
+// Computed properties for display
+const memberName = computed(() => {
+  if (employee.value) {
+    return `${employee.value.first_name} ${employee.value.last_name}`
+  }
+  return `Employee #${props.member.employee_id}`
+})
+
+const teamName = computed(() => {
+  return team.value?.name || `Team #${props.member.team_id}`
+})
+
+const memberStatus = computed(() => {
+  return employee.value?.status === 'ACTIVE' ? 'active' : 'inactive'
+})
+
+// Load team and employee details
+const loadDetails = async () => {
+  loading.value = true
+  try {
+    // Fetch team details
+    const teamData = await getTeam(props.member.team_id)
+    if (teamData) {
+      team.value = teamData
+    }
+
+    // Fetch employee details
+    const employeeData = await fetchEmployee(props.member.employee_id)
+    if (employeeData) {
+      employee.value = employeeData
+    }
+  } catch (err) {
+    console.error('Failed to load member details:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadDetails()
+})
 </script>
 
 <style scoped>

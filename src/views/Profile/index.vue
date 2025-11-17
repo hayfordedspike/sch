@@ -54,12 +54,7 @@
     <!-- Add Certificate Dialog -->
     <AddCertificateDialog
       v-model:visible="showAddCertificateDialog"
-      :certificate="editingCertificate ? {
-        ...editingCertificate,
-        id: String(editingCertificate.id),
-        issue_date: editingCertificate.issue_date ? new Date(editingCertificate.issue_date) : null,
-        expiry_date: editingCertificate.expiry_date ? new Date(editingCertificate.expiry_date) : null
-      } : undefined"
+      :certificate="editingCertificate"
       @certificate-added="handleCertificateAdded"
       @certificate-updated="handleCertificateUpdated"
       @update:visible="handleDialogVisibilityChange"
@@ -98,7 +93,7 @@ const {
 // State
 const editingProfile = ref(false)
 const showAddCertificateDialog = ref(false)
-const editingCertificate = ref<Certificate | null>(null)
+const editingCertificate = ref<Certificate | undefined>(undefined)
 const profileData = ref<ProfileData>({
   fullName: '',
   address: '',
@@ -222,7 +217,7 @@ const handleProfileUpdate = (field: string, value: string) => {
 }
 
 const handleAddCertificate = () => {
-  editingCertificate.value = null  // Ensure we're in add mode
+  editingCertificate.value = undefined  // Ensure we're in add mode
   showAddCertificateDialog.value = true
 }
 
@@ -240,7 +235,7 @@ const handleCertificateAdded = async () => {
 
   // Ensure modal is closed
   showAddCertificateDialog.value = false
-  editingCertificate.value = null
+  editingCertificate.value = undefined
 }
 
 const handleCertificateUpdated = async () => {
@@ -257,14 +252,14 @@ const handleCertificateUpdated = async () => {
 
   // Ensure modal is closed and editing state is cleared
   showAddCertificateDialog.value = false
-  editingCertificate.value = null
+  editingCertificate.value = undefined
 }
 
 const handleDialogVisibilityChange = (visible: boolean) => {
   showAddCertificateDialog.value = visible
   if (!visible) {
     // Clear editing certificate when dialog is closed
-    editingCertificate.value = null
+    editingCertificate.value = undefined
   }
 }
 

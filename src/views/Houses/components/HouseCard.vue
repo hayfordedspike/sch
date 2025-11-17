@@ -69,7 +69,6 @@
         <i class="pi pi-home mr-2 text-blue-500 mt-0.5 flex-shrink-0"></i>
         <div class="text-sm text-gray-700">
           <div>{{ house.address_line1 }}</div>
-          <div v-if="house.address_line2" class="text-gray-500">{{ house.address_line2 }}</div>
         </div>
       </div>
 
@@ -79,34 +78,11 @@
         <span class="text-sm text-gray-700">{{ house.postal_code }}</span>
       </div>
 
-      <!-- Contact Information -->
-      <div v-if="house.phone" class="flex items-center">
-        <i class="pi pi-phone mr-2 text-green-500"></i>
-        <span class="text-sm text-gray-700">{{ house.phone }}</span>
-      </div>
-
-      <div v-if="house.email" class="flex items-center">
-        <i class="pi pi-at mr-2 text-blue-500"></i>
-        <span class="text-sm text-gray-700">{{ house.email }}</span>
-      </div>
-
       <!-- Note -->
       <div v-if="house.note" class="border-t border-gray-100 pt-3 mt-3">
         <div class="flex items-start">
           <i class="pi pi-comment mr-2 text-purple-500 mt-0.5 flex-shrink-0"></i>
           <p class="text-sm text-gray-600 italic">"{{ house.note }}"</p>
-        </div>
-      </div>
-
-      <!-- Timestamps -->
-      <div class="border-t border-gray-100 pt-3 mt-3 text-xs text-gray-500 space-y-1">
-        <div class="flex items-center">
-          <i class="pi pi-calendar-plus mr-1"></i>
-          <span>Created: {{ formatDate(house.created_at) }}</span>
-        </div>
-        <div v-if="house.updated_at !== house.created_at" class="flex items-center">
-          <i class="pi pi-calendar-times mr-1"></i>
-          <span>Updated: {{ formatDate(house.updated_at) }}</span>
         </div>
       </div>
     </div>
@@ -115,7 +91,7 @@
     <div class="px-4 pb-4">
       <div class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
         <i class="pi pi-users mr-1"></i>
-        <span>{{ house.teams?.length || 0 }} Teams</span>
+        <span>0 Teams</span>
       </div>
     </div>
   </div>
@@ -148,16 +124,6 @@ const getHouseInitials = (house: House): string => {
     .join('')
     .toUpperCase()
     .slice(0, 2)
-}
-
-const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
 }
 
 const toggleDropdown = () => {

@@ -110,7 +110,6 @@
               >
                 <!-- House Header -->
                 <div class="flex items-center mb-2">
-         
                   <div class="flex-1 min-w-0">
                     <h4 class="font-semibold text-sm text-gray-900 truncate">{{ house.name }}</h4>
                   </div>
@@ -316,7 +315,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useClients } from '@/composables/useClients'
-import { useHousesDummy } from '@/composables/useHousesDummy'
+import { useHouses } from '@/composables/useHouses'
 import type { CreateClientRequest, Client } from '@/views/Clients/types'
 import type { House } from '@/views/Houses/types'
 import Dialog from 'primevue/dialog'
@@ -345,7 +344,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const { createClient, updateClient, loading } = useClients()
-const { houses, fetchHouses, loading: housesLoading } = useHousesDummy()
+const { houses, fetchHouses, loading: housesLoading } = useHouses()
 
 const formData = ref<CreateClientRequest>({
   first_name: '',
@@ -362,7 +361,6 @@ const formData = ref<CreateClientRequest>({
   date_of_birth: '',
   emergency_contact_name: '',
   emergency_contact_phone: '',
-  emergency_contact_relationship: '',
   medical_notes: '',
   care_notes: '',
   is_active: true
@@ -420,7 +418,6 @@ const resetForm = () => {
     date_of_birth: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
-    emergency_contact_relationship: '',
     medical_notes: '',
     care_notes: '',
     is_active: true
@@ -448,7 +445,6 @@ watch(
         date_of_birth: newClient.date_of_birth,
         emergency_contact_name: newClient.emergency_contact_name,
         emergency_contact_phone: newClient.emergency_contact_phone,
-        emergency_contact_relationship: newClient.emergency_contact_relationship || '',
         medical_notes: newClient.medical_notes || '',
         care_notes: newClient.care_notes || '',
         is_active: newClient.is_active

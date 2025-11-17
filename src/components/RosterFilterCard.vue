@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch, defineProps, defineEmits } from 'vue'
+import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue'
+import { useEmployees } from '@/composables/useEmployees'
 
 
 // Props for v-model binding
 const props = defineProps<{ selectedFilter: string; currentDate: number; calendarView?: 'day' | 'week' }>()
 const emit = defineEmits(['update:selectedFilter', 'update:currentDate', 'update:calendarView'])
+
+// Initialize employees composable
+const { fetchEmployees, employees } = useEmployees()
+
 // Calendar view state (Day/Week)
 const calendarView = ref(props.calendarView ?? 'day')
 
@@ -26,6 +31,26 @@ const formattedDate = computed(() => {
   })
 })
 
+// Fetch employees on mount
+onMounted(async () => {
+  await fetchEmployees()
+})
+
+// Team members from API
+const teamMembers = computed(() => {
+  return employees.value.map(employee => ({
+    label: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id.toString() // Use employee ID as value
+  }))
+})
+
+const filterOptions = computed(() => {
+  return [
+    { label: 'All Team Members', value: 'all' },
+    ...teamMembers.value
+  ]
+})
+
 // Navigation functions
 const goToPreviousMonth = () => {
   const newDate = new Date(currentDate.value)
@@ -40,20 +65,6 @@ const goToNextMonth = () => {
   currentDate.value = newDate
   emit('update:currentDate', newDate.getMonth())
 }
-
-// Dummy team members for filter options
-const teamMembers = [
-  { label: 'Alice Johnson', value: 'alice' },
-  { label: 'Bob Smith', value: 'bob' },
-  { label: 'Carol Lee', value: 'carol' },
-  { label: 'David Kim', value: 'david' },
-  { label: 'Eva Brown', value: 'eva' }
-]
-
-const filterOptions = ref([
-  { label: 'All Team Members', value: 'all' },
-  ...teamMembers
-])
 
 watch(selectedFilter, (val) => {
   emit('update:selectedFilter', val)

@@ -1,4 +1,4 @@
-// Client Management Types
+// Clients Management Types
 
 export interface Client {
   id: number
@@ -8,7 +8,7 @@ export interface Client {
   phone: string
   house_id: number
   address_line_1: string
-  address_line_2: string
+  address_line_2?: string
   city: string
   state: string
   postal_code: string
@@ -16,7 +16,6 @@ export interface Client {
   date_of_birth: string
   emergency_contact_name: string
   emergency_contact_phone: string
-  emergency_contact_relationship: string
   medical_notes: string
   care_notes: string
   is_active: boolean
@@ -40,10 +39,9 @@ export interface CreateClientRequest {
   date_of_birth: string
   emergency_contact_name: string
   emergency_contact_phone: string
-  emergency_contact_relationship: string
-  medical_notes?: string
-  care_notes?: string
-  is_active?: boolean
+  medical_notes: string
+  care_notes: string
+  is_active: boolean
 }
 
 export interface UpdateClientRequest {
@@ -61,7 +59,6 @@ export interface UpdateClientRequest {
   date_of_birth?: string
   emergency_contact_name?: string
   emergency_contact_phone?: string
-  emergency_contact_relationship?: string
   medical_notes?: string
   care_notes?: string
   is_active?: boolean
@@ -77,6 +74,7 @@ export interface ClientListResponse {
 export interface ClientSearchParams {
   skip?: number
   limit?: number
+  is_active?: boolean
   house_id?: number
   city?: string
   search?: string
@@ -84,17 +82,11 @@ export interface ClientSearchParams {
   include_visits?: boolean
 }
 
-export interface ClientStatus {
-  active: boolean
-  client_since: string
-  last_visit?: string
-}
-
 // Computed client properties for display
 export interface ClientDisplayInfo {
   fullName: string
   fullAddress: string
+  shortAddress: string
   age: number
-  membershipDuration: string
-  status: 'active' | 'inactive'
+  isActive: boolean
 }

@@ -65,10 +65,6 @@
                         class="px-2 py-1 rounded-full">
                     {{ team.active ? 'Active' : 'Inactive' }}
                   </span>
-                  <span class="text-gray-500">
-                    <i class="pi pi-calendar mr-1"></i>
-                    Added: {{ formatDate(team.created_at) }}
-                  </span>
                 </div>
               </div>
               <div class="flex gap-2">
@@ -160,15 +156,6 @@ const getHouseInitials = (house: House): string => {
     .join('')
     .toUpperCase()
     .slice(0, 2)
-}
-
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
 }
 
 const fetchTeams = async () => {

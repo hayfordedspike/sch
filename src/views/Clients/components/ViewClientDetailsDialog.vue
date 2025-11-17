@@ -47,10 +47,6 @@
             <label class="field-header">Contact Phone</label>
             <p class="field-content">{{ client.emergency_contact_phone ? formatClientPhone(client.emergency_contact_phone) : 'Not provided' }}</p>
           </div>
-          <div class="field-column">
-            <label class="field-header">Relationship</label>
-            <p class="field-content">{{ client.emergency_contact_relationship || 'Not specified' }}</p>
-          </div>
         </div>
         <div v-else class="text-gray-500 italic">
           No emergency contact information provided
@@ -177,8 +173,9 @@ import { computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { useClients } from '@/composables/useClients'
-import { useHousesDummy } from '@/composables/useHousesDummy'
+import { useHouses } from '@/composables/useHouses'
 import type { Client } from '@/views/Clients/types'
+import type { House } from '@/views/Houses/types'
 
 interface Props {
   visible: boolean
@@ -194,7 +191,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const { formatClientPhone } = useClients()
-const { houses } = useHousesDummy()
+const { houses } = useHouses()
 
 // Computed for dialog visibility
 const dialogVisible = computed({
@@ -204,7 +201,7 @@ const dialogVisible = computed({
 
 // Get house name by ID
 const getHouseName = (houseId: number) => {
-  const house = houses.value.find(h => h.id === houseId)
+  const house = houses.value.find((h: House) => h.id === houseId)
   return house ? house.name : 'Unknown Service'
 }
 

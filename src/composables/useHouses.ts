@@ -6,7 +6,6 @@ import type {
   UpdateHouseRequest,
   HouseTeam,
   CreateHouseTeamRequest,
-  HouseListResponse,
   HouseSearchParams,
   HouseDisplayInfo
 } from '@/views/Houses/types'
@@ -48,30 +47,26 @@ export function useHouses() {
   // API Methods
   const fetchHouses = async (params: HouseSearchParams = {}) => {
     try {
+      console.log('Fetching houses with params:', params)
+
       const queryParams = new URLSearchParams()
 
+      if (params.city) queryParams.append('city', params.city)
+      if (params.region) queryParams.append('region', params.region)
       if (params.skip !== undefined) queryParams.append('skip', params.skip.toString())
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString())
-      if (params.include_teams !== undefined) queryParams.append('include_teams', params.include_teams.toString())
 
-      const url = `/houses/?${queryParams.toString()}`
+      const url = `/houses/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      console.log('Making request to:', url)
+
       const response = await get<House[]>(url, {
         showErrorToast: true
       })
 
       if (response) {
-        // Handle both array response and paginated response
-        if (Array.isArray(response)) {
-          houses.value = response
-          totalHouses.value = response.length
-        } else {
-          // If response has pagination data
-          const paginatedResponse = response as unknown as HouseListResponse
-          houses.value = paginatedResponse.houses || response as House[]
-          totalHouses.value = paginatedResponse.total || houses.value.length
-          currentPage.value = paginatedResponse.page || 1
-          totalPages.value = paginatedResponse.pages || 1
-        }
+        houses.value = response
+        totalHouses.value = response.length
+        console.log('Fetched houses:', response.length)
       }
 
       return response
@@ -253,19 +248,19 @@ export function useHouses() {
       // For now, we'll filter client-side. In a real app, this would be a server-side search
       const searchTerm = query.toLowerCase()
       const allHouses = houses.value.length > 0 ? houses.value : []
-      
+
       // If we don't have houses loaded, fetch them first
       if (allHouses.length === 0) {
         await fetchHouses()
       }
-      
+
       const filteredHouses = houses.value.filter(house =>
         house.name.toLowerCase().includes(searchTerm) ||
         house.city.toLowerCase().includes(searchTerm) ||
         house.region.toLowerCase().includes(searchTerm) ||
         house.address_line1.toLowerCase().includes(searchTerm)
       )
-      
+
       houses.value = filteredHouses
       totalHouses.value = filteredHouses.length
     } catch (err) {

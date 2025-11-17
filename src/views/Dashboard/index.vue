@@ -9,6 +9,7 @@ import SchedulesCard from '@/components/SchedulesCard.vue'
 import FilterCard from '@/components/FilterCard.vue'
 import DashboardCalendar from '@/components/DashboardCalendar.vue'
 
+
 const showAddCertificateDialog = ref(false)
 
 // State for filter controls
@@ -23,6 +24,9 @@ const handleAddCertificate = (data: unknown) => {
 
 <template>
   <div class="p-4">
+    <!-- Authentication Debug (Temporary) -->
+  
+
     <!-- Dynamic Greeting Card -->
     <GreetingCard class="mb-6" />
         <!-- Certificate Warning Banner -->

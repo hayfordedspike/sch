@@ -113,9 +113,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useClients } from '@/composables/useClients'
-import { useHousesDummy } from '@/composables/useHousesDummy'
+import { useHouses } from '@/composables/useHouses'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -142,7 +142,7 @@ const {
   formatClientPhone
 } = useClients()
 
-const { houses } = useHousesDummy()
+const { houses, fetchHouses } = useHouses()
 
 // Reactive data
 const showDetailsDialog = ref(false)
@@ -176,6 +176,11 @@ const handleActivate = () => {
 const handleDeactivate = () => {
   emit('deactivate', props.client)
 }
+
+// Lifecycle
+onMounted(() => {
+  fetchHouses({ limit: 100 })
+})
 </script>
 
 <style scoped>

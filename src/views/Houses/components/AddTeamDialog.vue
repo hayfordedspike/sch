@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useHouses } from '@/composables/useHouses'
 import type { CreateHouseTeamRequest } from '../types'
 import Dialog from 'primevue/dialog'
@@ -96,7 +96,6 @@ const { addTeamToHouse, loading } = useHouses()
 
 const teamIdInput = ref('')
 const formData = ref<CreateHouseTeamRequest>({
-  house_id: 0,
   team_id: 0,
   coverage_notes: '',
   active: true
@@ -117,23 +116,22 @@ const isVisible = computed({
 const resetForm = () => {
   teamIdInput.value = ''
   formData.value = {
-    house_id: props.houseId || 0,
     team_id: 0,
     coverage_notes: '',
     active: true
   }
 }
 
-// Watch for houseId changes
-watch(
-  () => props.houseId,
-  (newHouseId) => {
-    if (newHouseId) {
-      formData.value.house_id = newHouseId
-    }
-  },
-  { immediate: true }
-)
+// Watch for houseId changes - no longer needed since house_id is not in request body
+// watch(
+//   () => props.houseId,
+//   (newHouseId) => {
+//     if (newHouseId) {
+//       formData.value.house_id = newHouseId
+//     }
+//   },
+//   { immediate: true }
+// )
 
 const validateForm = (): boolean => {
   errors.value = {}

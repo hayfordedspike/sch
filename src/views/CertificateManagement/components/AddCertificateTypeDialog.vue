@@ -35,6 +35,17 @@
         <small v-if="errors.description" class="text-red-500">{{ errors.description }}</small>
       </div>
 
+      <div class="flex flex-col gap-2">
+        <label for="code" class="font-semibold">Code</label>
+        <InputText
+          id="code"
+          v-model="formData.code"
+          placeholder="Enter code"
+          :class="{ 'p-invalid': errors.code }"
+        />
+        <small v-if="errors.code" class="text-red-500">{{ errors.code }}</small>
+      </div>
+
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
           <label for="validityPeriod" class="font-semibold">Validity Period (months)</label>
@@ -84,8 +95,10 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
+import { useApi } from '@/composables/useApi'
 
 interface CertificateTypeForm {
+  code: string
   typeName: string
   validityPeriod: number | null
   gracePeriod: number | null
@@ -96,6 +109,7 @@ interface Props {
   visible: boolean
   certificateType?: {
     id: number
+    code: string
     typeName: string
     validityPeriod: number
     gracePeriod: number
@@ -105,7 +119,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:visible', value: boolean): void
-  (e: 'submit', data: CertificateTypeForm): void
+  (e: 'certificate-type-updated'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -115,8 +129,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const { post, patch } = useApi()
 const loading = ref(false)
 const formData = ref<CertificateTypeForm>({
+  code: '',
   typeName: '',
   validityPeriod: null,
   gracePeriod: null,
@@ -138,6 +154,7 @@ watch(
   (newValue) => {
     if (newValue) {
       formData.value = {
+        code: newValue.code,
         typeName: newValue.typeName,
         validityPeriod: newValue.validityPeriod,
         gracePeriod: newValue.gracePeriod,
@@ -151,6 +168,11 @@ watch(
 const validateForm = (): boolean => {
   errors.value = {}
   let isValid = true
+
+  if (!formData.value.code || formData.value.code.trim() === '') {
+    errors.value.code = 'Code is required'
+    isValid = false
+  }
 
   if (!formData.value.typeName || formData.value.typeName.trim() === '') {
     errors.value.typeName = 'Type name is required'
@@ -178,10 +200,40 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    emit('submit', formData.value)
+    if (editMode.value) {
+      const updatePayload = {
+        code: formData.value.code,
+        name: formData.value.typeName,
+        description: formData.value.description,
+        validity_months: formData.value.validityPeriod!,
+        renewal_window_days: 0,
+        grace_period_days: formData.value.gracePeriod!,
+        updated_at: new Date().toISOString(),
+        active: 'ACTIVE'
+      }
+      await patch(`/certificates/${props.certificateType!.id}`, updatePayload, {
+        showSuccessToast: true,
+        successMessage: 'Certificate type updated successfully',
+        showErrorToast: true
+      })
+    } else {
+      const createPayload = {
+        code: formData.value.code,
+        name: formData.value.typeName,
+        description: formData.value.description,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        validity_months: formData.value.validityPeriod!,
+        renewal_window_days: 0,
+        grace_period_days: formData.value.gracePeriod!
+      }
+      await post('/certificates/', createPayload, {
+        showSuccessToast: true,
+        successMessage: 'Certificate type created successfully',
+        showErrorToast: true
+      })
+    }
+    emit('certificate-type-updated')
     handleClose()
   } catch (error) {
     console.error('Error submitting form:', error)
@@ -192,6 +244,7 @@ const handleSubmit = async () => {
 
 const handleClose = () => {
   formData.value = {
+    code: '',
     typeName: '',
     validityPeriod: null,
     gracePeriod: null,

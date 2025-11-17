@@ -65,10 +65,16 @@ interface Emits {
 
 defineEmits<Emits>()
 
-const { certificates, isExpiringSoon } = useCertificates()
+const { certificates } = useCertificates()
 
 const expiringSoon = computed(() => 
-  certificates.value.filter(cert => isExpiringSoon(cert, 30))
+  certificates.value.filter(cert => {
+    if (!cert.expiry_date) return false
+    const expiryDate = new Date(cert.expiry_date)
+    const now = new Date()
+    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    return daysUntilExpiry <= 30 && daysUntilExpiry > 0
+  })
 )
 
 const expiredCertificates = computed(() => 

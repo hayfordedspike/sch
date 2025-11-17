@@ -3,7 +3,17 @@
 const props = defineProps<{ selectedMember: string; selectedMonth: number }>();
 
 
-import { onMounted, ref, nextTick, computed } from 'vue'
+import { onMounted, ref, nextTick, computed, watch } from 'vue'
+import { useAssignments } from '@/composables/useAssignments'
+import { useEmployees } from '@/composables/useEmployees'
+import { useVisits } from '@/composables/useVisits'
+import { useClients } from '@/composables/useClients'
+import { useHouses } from '@/composables/useHouses'
+import type { Assignment } from '@/views/Roster/types'
+import type { Employee } from '@/views/Employees/types'
+import type { Visit } from '@/views/Roster/types'
+import type { Client } from '@/views/Clients/types'
+import type { House } from '@/views/Houses/types'
 
 // Reactive data
 const employerColWidth = ref(200)
@@ -41,96 +51,136 @@ const STAFF_COLORS = [
   { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900', accent: 'bg-emerald-500' }
 ]
 
-// Enhanced dummy data with realistic schedules that fit within time ranges
-// Dummy data with month property for each schedule
-const originalStaffSchedules: StaffMember[] = [
-  {
-    name: 'Alice Johnson',
-    email: 'alice.johnson@carecompany.com',
-    position: 'Senior Caregiver',
-    img: DEFAULT_USER_IMG,
-    schedules: [
-      { start: '8:00 AM', end: '10:30 AM', task: 'Morning Care Routine', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 10 },
-      { start: '2:00 PM', end: '4:00 PM', task: 'Physical Therapy Session', location: 'Smith Residence', client: 'Mr. Smith', month: 10 },
-      { start: '9:00 AM', end: '11:00 AM', task: 'Special Care', location: 'Joyce Residence', client: 'Mrs. Joyce', month: 9 }
-    ]
-  },
-  {
-    name: 'Bob Smith',
-    email: 'bob.smith@carecompany.com',
-    position: 'Medication Specialist',
-    img: DEFAULT_USER_IMG,
-    schedules: [
-      { start: '9:00 AM', end: '11:00 AM', task: 'Medication Administration', location: 'Brown Residence', client: 'Ms. Brown', month: 10 },
-      { start: '3:00 PM', end: '5:00 PM', task: 'Follow-up Assessment', location: 'Wilson Residence', client: 'Mr. Wilson', month: 10 },
-      { start: '1:00 PM', end: '2:00 PM', task: 'Consultation', location: 'Brown Residence', client: 'Ms. Brown', month: 9 }
-    ]
-  },
-  {
-    name: 'Carol Lee',
-    email: 'carol.lee@carecompany.com',
-    position: 'Physical Therapist',
-    img: DEFAULT_USER_IMG,
-    schedules: [
-      { start: '10:00 AM', end: '12:00 PM', task: 'Therapy Session', location: 'Davis Center', client: 'Multiple Clients', month: 10 },
-      { start: '1:30 PM', end: '3:30 PM', task: 'Mobility Training', location: 'Rehab Center', client: 'Group Session', month: 10 }
-    ]
-  },
-  {
-    name: 'David Chen',
-    email: 'david.chen@carecompany.com',
-    position: 'Home Care Assistant',
-    img: DEFAULT_USER_IMG,
-    schedules: [
-      { start: '7:30 AM', end: '9:30 AM', task: 'Morning Routine Assistance', location: 'Taylor Home', client: 'Mr. Taylor', month: 10 },
-      { start: '1:00 PM', end: '3:00 PM', task: 'Meal Preparation', location: 'Anderson Residence', client: 'Anderson Family', month: 10 },
-      { start: '4:00 PM', end: '6:00 PM', task: 'Evening Care', location: 'Garcia Residence', client: 'Mrs. Garcia', month: 10 }
-    ]
-  },
-  {
-    name: 'Emma Wilson',
-    email: 'emma.wilson@carecompany.com',
-    position: 'Nursing Assistant',
-    img: DEFAULT_USER_IMG,
-    schedules: [
-      { start: '8:30 AM', end: '11:30 AM', task: 'Patient Monitoring', location: 'General Hospital', client: 'Ward Patients', month: 10 },
-      { start: '12:30 PM', end: '2:30 PM', task: 'Lunch Service', location: 'General Hospital', client: 'Ward Patients', month: 10 }
-    ]
-  },
-  {
-    name: 'Frank Rodriguez',
-    email: 'frank.rodriguez@carecompany.com',
-    position: 'Emergency Response',
-    img: DEFAULT_USER_IMG,
-    schedules: []
-  }
-];
+// Initialize composables
+const { fetchAssignments, assignments, loading: assignmentsLoading } = useAssignments()
+const { fetchEmployees, employees, loading: employeesLoading } = useEmployees()
+const { fetchVisits, visits, loading: visitsLoading } = useVisits()
+const { fetchClients, clients, loading: clientsLoading } = useClients()
+const { fetchHouses, houses, loading: housesLoading } = useHouses()
 
 // Sorting state
 const sortOrder = ref<'asc' | 'desc'>('asc');
 
+// Fetch data on mount and when props change
+const fetchData = async () => {
+  // Calculate date range for the selected month
+  const currentYear = new Date().getFullYear()
+  const startDate = new Date(currentYear, props.selectedMonth, 1).toISOString().split('T')[0]
+  const endDate = new Date(currentYear, props.selectedMonth + 1, 0).toISOString().split('T')[0]
+
+  // Fetch assignments for the selected month
+  await fetchAssignments({
+    start_date: startDate,
+    end_date: endDate
+  })
+
+  // Fetch all employees
+  await fetchEmployees()
+
+  // Fetch all visits to get client/house details
+  await fetchVisits()
+
+  // Fetch clients and houses for name resolution
+  await fetchClients()
+  await fetchHouses()
+}
+
+// Watch for prop changes to refetch data
+watch(() => [props.selectedMonth, props.selectedMember], fetchData, { immediate: true })
+
+// Transform assignments to schedule format
+const transformAssignmentsToSchedules = (assignments: Assignment[], employees: Employee[], visits: Visit[], clients: Client[], houses: House[]): StaffMember[] => {
+  const employeeMap = new Map(employees.map(emp => [emp.id, emp]))
+  const visitMap = new Map(visits.map(visit => [visit.id, visit]))
+  const clientMap = new Map(clients.map(client => [client.id, client]))
+  const houseMap = new Map(houses.map(house => [house.id, house]))
+
+  // Group assignments by employee
+  const employeeSchedules = new Map<number, Schedule[]>()
+
+  assignments.forEach(assignment => {
+    const employee = employeeMap.get(assignment.employee_id)
+    const visit = visitMap.get(assignment.visit_id)
+
+    if (!employee) return
+
+    const scheduledStart = new Date(assignment.scheduled_start_at)
+    const scheduledEnd = new Date(assignment.scheduled_end_at)
+
+    const client = visit ? clientMap.get(visit.client_id) : null
+    const house = visit ? houseMap.get(visit.house_id) : null
+
+    const schedule: Schedule = {
+      start: scheduledStart.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
+      end: scheduledEnd.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }),
+      task: `Visit #${assignment.visit_id} (${assignment.role_on_visit})`,
+      location: house ? house.name : `House #${visit?.house_id || 'Unknown'}`,
+      client: client ? `${client.first_name} ${client.last_name}` : `Client #${visit?.client_id || 'Unknown'}`,
+      month: scheduledStart.getMonth()
+    }
+
+    if (!employeeSchedules.has(assignment.employee_id)) {
+      employeeSchedules.set(assignment.employee_id, [])
+    }
+    employeeSchedules.get(assignment.employee_id)!.push(schedule)
+  })
+
+  // Convert to StaffMember format
+  return Array.from(employeeSchedules.entries()).map(([employeeId, schedules]) => {
+    const employee = employeeMap.get(employeeId)!
+    return {
+      name: `${employee.first_name} ${employee.last_name}`,
+      email: `${employee.first_name.toLowerCase()}.${employee.last_name.toLowerCase()}@company.com`, // Generate email
+      position: 'Care Staff', // Default position since not in employee data
+      img: DEFAULT_USER_IMG,
+      schedules
+    }
+  })
+}
+
 // Reactive sorted staff list
 const staffSchedules = computed(() => {
-  let filtered = [...originalStaffSchedules];
-  // Filter by member
-  if (props.selectedMember !== 'all') {
-    filtered = filtered.filter(m => m.name === props.selectedMember);
+  if (assignmentsLoading.value || employeesLoading.value || visitsLoading.value || clientsLoading.value || housesLoading.value) {
+    return []
   }
+
+  let staffData = transformAssignmentsToSchedules(assignments.value, employees.value, visits.value, clients.value, houses.value)
+
+  // Filter by member - now using employee ID
+  if (props.selectedMember !== 'all') {
+    const selectedEmployeeId = parseInt(props.selectedMember)
+    staffData = staffData.filter(staff => {
+      // Find the employee that matches this staff member's name
+      const employee = employees.value.find(emp => `${emp.first_name} ${emp.last_name}` === staff.name)
+      return employee && employee.id === selectedEmployeeId
+    })
+  }
+
   // Filter schedules by month
-  filtered = filtered.map(m => ({
+  staffData = staffData.map(m => ({
     ...m,
     schedules: m.schedules.filter(s => typeof s.month === 'number' ? s.month === props.selectedMonth : true)
-  }));
+  }))
+
   // Sort
-  const sorted = filtered.sort((a, b) => {
+  const sorted = staffData.sort((a, b) => {
     if (sortOrder.value === 'asc') {
-      return a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name)
     } else {
-      return b.name.localeCompare(a.name);
+      return b.name.localeCompare(a.name)
     }
-  });
-  return sorted;
-});
+  })
+
+  return sorted
+})
 
 // Time slots: hourly intervals from 6am to 11:59pm
 const allTimeSlots = computed(() => {

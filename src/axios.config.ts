@@ -31,9 +31,12 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Skip attaching token for auth endpoints
   const authEndpoints = ['auth/login', 'auth/register', 'auth/refresh']
   const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint))
-  
+
   if (token && !isAuthEndpoint) {
     config.headers.Authorization = `Bearer ${token}`
+    console.log('Added Authorization header for:', config.url)
+  } else if (!token && !isAuthEndpoint) {
+    console.warn('No token found for authenticated request to:', config.url)
   }
 
   return config

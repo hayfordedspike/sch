@@ -49,7 +49,7 @@ export const useTeams = () => {
   const getTeams = async (skip = 0, limit = 100) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await get<Team[]>(`/teams/?skip=${skip}&limit=${limit}`)
       if (response) {
@@ -69,7 +69,7 @@ export const useTeams = () => {
   const getTeam = async (teamId: number, includeMembers = false) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await get<Team>(`/teams/${teamId}?include_members=${includeMembers}`)
       return response
@@ -85,10 +85,10 @@ export const useTeams = () => {
   const createTeam = async (teamData: CreateTeamRequest) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await post<Team>('/teams/', teamData)
-      
+
       if (response) {
         // Add to local teams array
         teams.value.push(response)
@@ -107,10 +107,10 @@ export const useTeams = () => {
   const updateTeam = async (teamId: number, teamData: UpdateTeamRequest) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await put<Team>(`/teams/${teamId}`, teamData)
-      
+
       if (response) {
         // Update local teams array
         const index = teams.value.findIndex(team => team.id === teamId)
@@ -132,10 +132,10 @@ export const useTeams = () => {
   const deleteTeam = async (teamId: number) => {
     loading.value = true
     error.value = null
-    
+
     try {
       await del(`/teams/${teamId}`)
-      
+
       // Remove from local teams array
       teams.value = teams.value.filter(team => team.id !== teamId)
       return true
@@ -151,10 +151,10 @@ export const useTeams = () => {
   const addTeamMember = async (teamId: number, memberData: AddTeamMemberRequest) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await post<TeamMember>(`/teams/${teamId}/members`, memberData)
-      
+
       if (response) {
         // Add to local team members array
         teamMembers.value.push(response)
@@ -173,7 +173,7 @@ export const useTeams = () => {
   const getTeamMembers = async (teamId: number) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await get<TeamMember[]>(`/teams/${teamId}/members`)
       if (response) {
@@ -193,10 +193,10 @@ export const useTeams = () => {
   const removeTeamMember = async (teamId: number, employeeId: number) => {
     loading.value = true
     error.value = null
-    
+
     try {
       await del(`/teams/${teamId}/members/${employeeId}`)
-      
+
       // Remove from local team members array
       teamMembers.value = teamMembers.value.filter(
         member => !(member.team_id === teamId && member.employee_id === employeeId)

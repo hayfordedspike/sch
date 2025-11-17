@@ -17,7 +17,7 @@
       <div class="border border-gray-200 rounded-lg p-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           <i class="pi pi-home mr-2 text-blue-500"></i>
-          Basic Information
+          House Information
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,16 +43,6 @@
               :class="{ 'p-invalid': errors.address_line1 }"
             />
             <small v-if="errors.address_line1" class="text-red-500">{{ errors.address_line1 }}</small>
-          </div>
-
-          <!-- Address Line 2 -->
-          <div class="flex flex-col gap-2 md:col-span-2">
-            <label for="addressLine2" class="font-semibold">Address Line 2</label>
-            <InputText
-              id="addressLine2"
-              v-model="formData.address_line2"
-              placeholder="Apartment, suite, etc. (optional)"
-            />
           </div>
 
           <!-- City -->
@@ -81,59 +71,14 @@
 
           <!-- Postal Code -->
           <div class="flex flex-col gap-2">
-            <label for="postalCode" class="font-semibold">Postal Code</label>
+            <label for="postalCode" class="font-semibold">Postal Code *</label>
             <InputText
               id="postalCode"
               v-model="formData.postal_code"
               placeholder="Enter postal code"
+              :class="{ 'p-invalid': errors.postal_code }"
             />
-          </div>
-
-          <!-- Country -->
-          <div class="flex flex-col gap-2">
-            <label for="country" class="font-semibold">Country *</label>
-            <Dropdown
-              id="country"
-              v-model="formData.country"
-              :options="countryOptions"
-              placeholder="Select country"
-              :class="{ 'p-invalid': errors.country }"
-              filter
-            />
-            <small v-if="errors.country" class="text-red-500">{{ errors.country }}</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contact Information Section -->
-      <div class="border border-gray-200 rounded-lg p-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <i class="pi pi-phone mr-2 text-green-500"></i>
-          Contact Information
-        </h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Phone -->
-          <div class="flex flex-col gap-2">
-            <label for="phone" class="font-semibold">Phone Number</label>
-            <InputText
-              id="phone"
-              v-model="formData.phone"
-              placeholder="Enter phone number"
-            />
-          </div>
-
-          <!-- Email -->
-          <div class="flex flex-col gap-2">
-            <label for="email" class="font-semibold">Email Address</label>
-            <InputText
-              id="email"
-              v-model="formData.email"
-              type="email"
-              placeholder="Enter email address"
-              :class="{ 'p-invalid': errors.email }"
-            />
-            <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
+            <small v-if="errors.postal_code" class="text-red-500">{{ errors.postal_code }}</small>
           </div>
         </div>
       </div>
@@ -148,13 +93,15 @@
         <div class="grid grid-cols-1 gap-4">
           <!-- Note -->
           <div class="flex flex-col gap-2">
-            <label for="note" class="font-semibold">Notes</label>
+            <label for="note" class="font-semibold">Notes *</label>
             <Textarea
               id="note"
               v-model="formData.note"
               placeholder="Enter any additional notes about this house"
               rows="3"
+              :class="{ 'p-invalid': errors.note }"
             />
+            <small v-if="errors.note" class="text-red-500">{{ errors.note }}</small>
           </div>
         </div>
       </div>
@@ -182,7 +129,6 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Dropdown from 'primevue/dropdown'
 
 interface Props {
   visible: boolean
@@ -207,36 +153,13 @@ const { createHouse, updateHouse, loading } = useHouses()
 const formData = ref<CreateHouseRequest>({
   name: '',
   address_line1: '',
-  address_line2: '',
   city: '',
   region: '',
   postal_code: '',
-  country: 'Australia',
-  phone: '',
-  email: '',
   note: ''
 })
 
 const errors = ref<Record<string, string>>({})
-
-// Country options
-const countryOptions = [
-  'Australia',
-  'United States',
-  'Canada',
-  'United Kingdom',
-  'New Zealand',
-  'Germany',
-  'France',
-  'Italy',
-  'Spain',
-  'Japan',
-  'China',
-  'India',
-  'Brazil',
-  'Mexico',
-  'South Africa'
-]
 
 const isVisible = computed({
   get: () => props.visible,
@@ -250,13 +173,9 @@ const resetForm = () => {
   formData.value = {
     name: '',
     address_line1: '',
-    address_line2: '',
     city: '',
     region: '',
     postal_code: '',
-    country: 'Australia',
-    phone: '',
-    email: '',
     note: ''
   }
 }
@@ -269,13 +188,9 @@ watch(
       formData.value = {
         name: newHouse.name,
         address_line1: newHouse.address_line1,
-        address_line2: newHouse.address_line2 || '',
         city: newHouse.city,
         region: newHouse.region,
         postal_code: newHouse.postal_code || '',
-        country: newHouse.country,
-        phone: newHouse.phone || '',
-        email: newHouse.email || '',
         note: newHouse.note || ''
       }
     } else {
@@ -291,7 +206,7 @@ const validateForm = (): boolean => {
   let isValid = true
 
   // Required field validations
-  const requiredFields = ['name', 'address_line1', 'city', 'region', 'country']
+  const requiredFields = ['name', 'address_line1', 'city', 'region']
 
   requiredFields.forEach(field => {
     if (!formData.value[field as keyof CreateHouseRequest] || 
@@ -300,15 +215,6 @@ const validateForm = (): boolean => {
       isValid = false
     }
   })
-
-  // Email validation
-  if (formData.value.email && formData.value.email.trim()) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.value.email)) {
-      errors.value.email = 'Please enter a valid email address'
-      isValid = false
-    }
-  }
 
   return isValid
 }

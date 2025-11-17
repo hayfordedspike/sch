@@ -4,7 +4,6 @@ import type {
   Client,
   CreateClientRequest,
   UpdateClientRequest,
-  ClientListResponse,
   ClientSearchParams,
   ClientDisplayInfo
 } from '@/views/Clients/types'
@@ -36,37 +35,21 @@ export function useClients() {
       client.address_line_2,
       client.city,
       client.state,
-      client.postal_code,
-      client.country
+      client.postal_code
     ].filter(Boolean)
     const fullAddress = addressParts.join(', ')
+    const shortAddress = `${client.city}, ${client.state}`
 
     const birthDate = new Date(client.date_of_birth)
     const today = new Date()
     const age = Math.floor((today.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
 
-    const clientSince = new Date(client.client_since)
-    const membershipYears = Math.floor((today.getTime() - clientSince.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-    const membershipMonths = Math.floor(((today.getTime() - clientSince.getTime()) % (365.25 * 24 * 60 * 60 * 1000)) / (30.44 * 24 * 60 * 60 * 1000))
-
-    let membershipDuration = ''
-    if (membershipYears > 0) {
-      membershipDuration = `${membershipYears} year${membershipYears > 1 ? 's' : ''}`
-      if (membershipMonths > 0) {
-        membershipDuration += ` ${membershipMonths} month${membershipMonths > 1 ? 's' : ''}`
-      }
-    } else if (membershipMonths > 0) {
-      membershipDuration = `${membershipMonths} month${membershipMonths > 1 ? 's' : ''}`
-    } else {
-      membershipDuration = 'Less than a month'
-    }
-
     return {
       fullName,
       fullAddress,
+      shortAddress,
       age,
-      membershipDuration,
-      status: client.is_active ? 'active' : 'inactive'
+      isActive: client.is_active
     }
   }
 
@@ -77,28 +60,19 @@ export function useClients() {
 
       if (params.skip !== undefined) queryParams.append('skip', params.skip.toString())
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString())
+      if (params.is_active !== undefined) queryParams.append('is_active', params.is_active.toString())
       if (params.house_id !== undefined) queryParams.append('house_id', params.house_id.toString())
       if (params.city) queryParams.append('city', params.city)
       if (params.search) queryParams.append('search', params.search)
 
-      const url = `/clients/?${queryParams.toString()}`
+      const url = `/clients/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
       const response = await get<Client[]>(url, {
         showErrorToast: true
       })
 
       if (response) {
-        // Handle both array response and paginated response
-        if (Array.isArray(response)) {
-          clients.value = response
-          totalClients.value = response.length
-        } else {
-          // If response has pagination data
-          const paginatedResponse = response as unknown as ClientListResponse
-          clients.value = paginatedResponse.clients || response as Client[]
-          totalClients.value = paginatedResponse.total || clients.value.length
-          currentPage.value = paginatedResponse.page || 1
-          totalPages.value = paginatedResponse.pages || 1
-        }
+        clients.value = response
+        totalClients.value = response.length
       }
 
       return response

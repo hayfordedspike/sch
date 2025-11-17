@@ -106,7 +106,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import { useClients } from '@/composables/useClientsDummy'
+import { useClients } from '@/composables/useClients'
 import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ClientCard, AddClientDialog } from './components'

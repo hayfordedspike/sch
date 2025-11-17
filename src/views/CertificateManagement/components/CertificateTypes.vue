@@ -1,13 +1,18 @@
 <template>
   <div class="card">
     <h2 class="text-xl font-semibold mb-4">Certificate Types</h2>
+    <div class="mb-4">
+      <Button label="Add New Type" @click="handleAddNewType" />
+    </div>
   
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-200">
         <tr>
           <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Type Name</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Code</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Validity Period</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Grace Period</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Description</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
@@ -17,8 +22,12 @@
             <i class="pi pi-crown text-yellow-500 mr-2" />
             {{ type.typeName }}
           </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="font-mono text-sm">{{ type.code }}</span>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap">{{ type.validityPeriod }} months</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ type.gracePeriod }} days</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ type.description || '-' }}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex gap-2">
               <Button icon="pi pi-pencil" rounded outlined severity="info" aria-label="Edit" @click="handleEditType(type)" />
@@ -34,7 +43,7 @@
       :visible="showEditTypeModal"
       :certificateType="editingType"
       @update:visible="closeEditTypeModal"
-      @certificate-type-updated="closeEditTypeModal"
+      @certificate-type-updated="onCertificateTypeUpdated"
     />
     <div v-if="showDeleteConfirm" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30">
       <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
@@ -53,32 +62,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
 import AddCertificateTypeDialog from './AddCertificateTypeDialog.vue'
+import { useCertificates } from '@/composables/useCertificates'
 
 interface CertificateType {
   id: number
+  code: string
   typeName: string
   validityPeriod: number // in months
   gracePeriod: number // in days
+  description?: string
 }
 
-// Sample data - replace with actual data from your API
-const certificateTypes = ref<CertificateType[]>([
-  {
-    id: 1,
-    typeName: 'First Aid',
-    validityPeriod: 24,
-    gracePeriod: 30
-  },
-  {
-    id: 2,
-    typeName: 'CPR',
-    validityPeriod: 12,
-    gracePeriod: 15
-  }
-])
+const { certificates, fetchActiveCertificates, deleteCertificate } = useCertificates()
+
+// Map certificates to certificateTypes format
+const certificateTypes = ref<CertificateType[]>([])
+
+const updateCertificateTypes = () => {
+  certificateTypes.value = certificates.value.map(cert => ({
+    id: cert.id,
+    code: cert.code || '',
+    typeName: cert.name,
+    validityPeriod: cert.validity_months || 0,
+    gracePeriod: cert.grace_period_days || 0,
+    description: cert.description
+  }))
+}
+
+onMounted(async () => {
+  await fetchActiveCertificates()
+  updateCertificateTypes()
+})
 
 const showEditTypeModal = ref(false)
 const editingType = ref<CertificateType | undefined>(undefined)
@@ -88,6 +105,17 @@ const typeToDelete = ref<CertificateType | null>(null)
 const handleEditType = (type: CertificateType) => {
   editingType.value = { ...type }
   showEditTypeModal.value = true
+}
+
+const handleAddNewType = () => {
+  editingType.value = undefined
+  showEditTypeModal.value = true
+}
+
+const onCertificateTypeUpdated = async () => {
+  await fetchActiveCertificates()
+  updateCertificateTypes()
+  closeEditTypeModal()
 }
 
 const closeEditTypeModal = () => {
@@ -100,9 +128,12 @@ const handleDeleteType = (type: CertificateType) => {
   showDeleteConfirm.value = true
 }
 
-const confirmDeleteType = () => {
+const confirmDeleteType = async () => {
   if (typeToDelete.value) {
-    certificateTypes.value = certificateTypes.value.filter(t => t.id !== typeToDelete.value!.id)
+    const result = await deleteCertificate(typeToDelete.value.id)
+    if (result.success) {
+      updateCertificateTypes()
+    }
   }
   showDeleteConfirm.value = false
   typeToDelete.value = null
