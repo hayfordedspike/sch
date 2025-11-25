@@ -23,7 +23,7 @@
       <div class="flex items-center justify-between p-1">
         <div class="flex items-center gap-4">
           <div>
-            <h3 class="text-2xl font-bold text-gray-900">{{ displayInfo.clientName }}</h3>
+            <h3 class="text-2xl font-bold text-gray-900"></h3>
             <div class="flex items-center gap-3 mt-2">
               <Tag
                 v-if="displayInfo"
@@ -46,21 +46,7 @@
         </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Client -->
-          <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">Client</label>
-            <div class="text-gray-900 text-lg font-normal py-2">
-              {{ displayInfo.clientName }}
-            </div>
-          </div>
-
-          <!-- House -->
-          <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">House</label>
-            <div class="text-gray-900 text-lg font-normal py-2">
-              {{ displayInfo.houseName }}
-            </div>
-          </div>
+          <!-- Client & House removed -->
 
           <!-- Required Staff -->
           <div class="flex flex-col gap-1">
@@ -163,7 +149,15 @@
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">Created By</label>
             <div class="text-gray-900 text-lg font-normal py-2">
-              Employee #{{ visit.created_by_id }}
+              {{ displayInfo.createdByName }}
+            </div>
+          </div>
+
+          <!-- Assigned By -->
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">Assigned By</label>
+            <div class="text-gray-900 text-lg font-normal py-2">
+              {{ displayInfo.assignedByName }}
             </div>
           </div>
         </div>
@@ -190,8 +184,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, ref, onMounted } from 'vue'
 import { useVisits } from '@/composables/useVisits'
+import { useClients } from '@/composables/useClients'
+import { useHouses } from '@/composables/useHouses'
+import { useEmployees } from '@/composables/useEmployees'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -213,6 +210,9 @@ const emit = defineEmits<Emits>()
 const {
   getVisitDisplayInfo
 } = useVisits()
+const { getClient } = useClients()
+const { getHouse } = useHouses()
+const { getEmployee } = useEmployees()
 
 // Reactive state
 const isVisible = computed<boolean>({
@@ -220,13 +220,75 @@ const isVisible = computed<boolean>({
   set: (value) => emit('update:visible', value)
 })
 
+
+const clientName = ref<string>('')
+const houseName = ref<string>('')
+const assignedByName = ref<string>('')
+const createdByName = ref<string>('')
+
+async function fetchNames() {
+  if (props.visit?.client_id) {
+    const client = await getClient(props.visit.client_id)
+    clientName.value = client ? `${client.first_name} ${client.last_name}` : `Client #${props.visit.client_id}`
+  }
+  if (props.visit?.house_id) {
+    const house = await getHouse(props.visit.house_id)
+    houseName.value = house ? house.name : `House #${props.visit.house_id}`
+  }
+  if (props.visit?.created_by_id) {
+    const employee = await getEmployee(props.visit.created_by_id)
+    createdByName.value = employee ? `${employee.first_name} ${employee.last_name}` : `Employee #${props.visit.created_by_id}`
+  }
+  if (props.visit?.assigned_by_id) {
+    const assignedBy = await getEmployee(props.visit.assigned_by_id)
+    assignedByName.value = assignedBy ? `${assignedBy.first_name} ${assignedBy.last_name}` : ''
+  } else {
+    assignedByName.value = ''
+  }
+}
+
+onMounted(fetchNames)
+watch(() => props.visit, fetchNames, { immediate: true })
+
+function getDuration(start: string | Date, end: string | Date): string {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  const diffMs = endDate.getTime() - startDate.getTime()
+  if (diffMs <= 0) return '0 min'
+  const diffMins = Math.floor(diffMs / 60000)
+  const hours = Math.floor(diffMins / 60)
+  const mins = diffMins % 60
+  if (hours > 0 && mins > 0) return `${hours} hr${hours > 1 ? 's' : ''} ${mins} min${mins > 1 ? 's' : ''}`
+  if (hours > 0) return `${hours} hr${hours > 1 ? 's' : ''}`
+  return `${mins} min${mins > 1 ? 's' : ''}`
+}
+
 const displayInfo = computed(() => {
   if (!props.visit) return null
   try {
-    return getVisitDisplayInfo(props.visit)
+    const info = getVisitDisplayInfo(props.visit)
+    return {
+      ...info,
+      clientName: clientName.value || info.clientName,
+      houseName: houseName.value || info.houseName,
+      duration: getDuration(props.visit.start_at, props.visit.end_at),
+      createdByName: createdByName.value || `Employee #${props.visit?.created_by_id}`,
+      assignedByName: assignedByName.value
+    }
   } catch (error) {
     console.error('Error getting visit display info:', error)
-    return null
+    return {
+      clientName: clientName.value || `Client #${props.visit?.client_id}`,
+      houseName: houseName.value || `House #${props.visit?.house_id}`,
+      startDate: props.visit ? new Date(props.visit.start_at).toLocaleDateString() : '',
+      endDate: props.visit ? new Date(props.visit.end_at).toLocaleDateString() : '',
+      duration: props.visit ? getDuration(props.visit.start_at, props.visit.end_at) : '',
+      requiredStaff: props.visit?.required_staff_count,
+      status: props.visit?.status || 'scheduled',
+      statusLabel: props.visit?.status ? props.visit.status.replace('_', ' ') : 'Scheduled',
+      createdByName: createdByName.value || `Employee #${props.visit?.created_by_id}`,
+      assignedByName: assignedByName.value
+    }
   }
 })
 

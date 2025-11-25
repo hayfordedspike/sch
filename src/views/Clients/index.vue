@@ -60,7 +60,7 @@
         </div>
 
         <!-- Clients Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-else class="grid gap-6 clients-grid">
           <ClientCard
             v-for="client in filteredClients"
             :key="client.id"
@@ -297,16 +297,18 @@ onMounted(() => {
   border-radius: 8px;
 }
 
-/* Grid responsive adjustments */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+
+/* Flexible grid for client cards */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 600px) {
+  .clients-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 </style>

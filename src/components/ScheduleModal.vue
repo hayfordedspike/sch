@@ -8,12 +8,8 @@
       </div>
       <div class="mb-4 flex gap-4">
         <div class="flex-1">
-          <label class="block text-sm font-medium mb-1">Service Type</label>
-          <Dropdown v-model="form.type" :options="scheduleTypes" optionLabel="label" optionValue="value" class="w-full" placeholder="Select type" />
-        </div>
-        <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Assign To</label>
-          <Dropdown v-model="form.assignedTo" :options="staffOptions" optionLabel="name" optionValue="email" class="w-full" placeholder="Select staff" />
+          <Dropdown v-model="form.assignedTo" :options="assignToOptions" optionLabel="name" optionValue="email" class="w-full" placeholder="Select staff" />
         </div>
       </div>
       <div class="mb-4 flex gap-2">
@@ -24,16 +20,16 @@
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Time</label>
           <div class="flex items-center gap-2">
-            <InputText v-model="form.startTime" required class="w-1/2" placeholder="Start (e.g. 9:00 AM)" />
+            <Dropdown v-model="form.startTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2" placeholder="Start time" />
             <span class="mx-2 text-center font-semibold">To</span>
-            <InputText v-model="form.endTime" required class="w-1/2" placeholder="End (e.g. 10:00 AM)" />
+            <Dropdown v-model="form.endTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2" placeholder="End time" />
           </div>
         </div>
       </div>
       <div class="mb-4 flex gap-4">
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Client</label>
-          <Dropdown v-model="form.client" :options="dummyClients" optionLabel="label" optionValue="value" class="w-full" placeholder="Select client" />
+          <Dropdown v-model="form.client" :options="clientOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="Select client" />
         </div>
 
         <div class="flex-1">
@@ -54,31 +50,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch, onMounted, defineProps } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import api from '@/axios.config'
+import { useEmployees } from '@/composables/useEmployees'
+import { useClients } from '@/composables/useClients'
 
-const dummyClients = [
-  { label: 'Mrs. Joyce', value: 'Mrs. Joyce' },
-  { label: 'Mr. Smith', value: 'Mr. Smith' },
-  { label: 'Ms. Brown', value: 'Ms. Brown' },
-  { label: 'Mr. Wilson', value: 'Mr. Wilson' },
-  { label: 'Anderson Family', value: 'Anderson Family' },
-  { label: 'Mrs. Garcia', value: 'Mrs. Garcia' },
-  { label: 'Ward Patients', value: 'Ward Patients' },
-  { label: 'Multiple Clients', value: 'Multiple Clients' },
-  { label: 'Group Session', value: 'Group Session' },
-  { label: 'Mr. Taylor', value: 'Mr. Taylor' },
-  { label: 'Unknown', value: 'Unknown' }
-]
+// Use active clients for client dropdown
+const { clients, fetchClients, activeClients } = useClients()
+const clientOptions = ref<{ label: string, value: string }[]>([])
 
-const props = defineProps<{ visible: boolean, staffOptions: Array<{ name: string, email: string }> }>()
-const emit = defineEmits(['update:visible', 'submit'])
+const props = defineProps<{ visible: boolean }>()
+const emit = defineEmits(['update:visible'])
 
 const visible = ref(props.visible)
 watch(() => props.visible, v => visible.value = v)
 
+
 const form = ref({
   title: '',
-  type: '',
   assignedTo: '',
   date: null,
   startTime: '',
@@ -88,21 +78,66 @@ const form = ref({
   note: ''
 })
 
-const scheduleTypes = [
-  { label: 'Care Routine', value: 'care' },
-  { label: 'Medication', value: 'medication' },
-  { label: 'Physical Therapy', value: 'therapy' },
-  { label: 'Consultation', value: 'consultation' },
-  { label: 'Other', value: 'other' }
-]
+// Generate 24-hour time options in 15-minute intervals, AM/PM format
+const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
+  const hour = Math.floor(i / 4)
+  const minute = (i % 4) * 15
+  const ampm = hour < 12 ? 'AM' : 'PM'
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12
+  const label = `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`
+  const value = `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`
+  return { label, value }
+})
+
+
+
+// Use active employees for assign-to dropdown
+const { employees, fetchEmployees, activeEmployees } = useEmployees()
+const assignToOptions = ref<{ name: string, email: string }[]>([])
+
+onMounted(async () => {
+  await fetchEmployees({ status: 'ACTIVE', limit: 100 })
+  assignToOptions.value = activeEmployees.value.map(e => ({ name: `${e.first_name} ${e.last_name}`, email: e.email }))
+
+  await fetchClients({ is_active: true, limit: 100 })
+  clientOptions.value = activeClients.value.map(c => ({ label: `${c.first_name} ${c.last_name}`, value: c.id }))
+})
 
 function close() {
   emit('update:visible', false)
 }
 
-function handleSubmit() {
-  emit('submit', { ...form.value })
-  close()
+const toast = useToast()
+
+async function handleSubmit() {
+  try {
+    // You may want to validate form here
+    const payload = { ...form.value }
+    const response = await api.post('/schedules', payload)
+    if (response?.data) {
+      toast.add({
+        severity: 'success',
+        summary: 'Schedule Created',
+        detail: 'The schedule was created successfully.',
+        life: 3000
+      })
+      close()
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to create schedule.',
+        life: 4000
+      })
+    }
+  } catch (err) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: err?.message || 'Failed to create schedule.',
+      life: 4000
+    })
+  }
 }
 </script>
 

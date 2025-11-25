@@ -56,7 +56,7 @@ export function useHouses() {
       if (params.skip !== undefined) queryParams.append('skip', params.skip.toString())
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString())
 
-      const url = `/houses/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `/houses/${queryParams.toString() ? '?' + queryParams.toString() : ''}`.replace('/houses?', '/houses/?')
       console.log('Making request to:', url)
 
       const response = await get<House[]>(url, {
@@ -81,7 +81,7 @@ export function useHouses() {
       const queryParams = new URLSearchParams()
       if (includeTeams) queryParams.append('include_teams', 'true')
 
-      const url = `/houses/${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `/houses/${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`.replace(`/houses${id}?`, `/houses/${id}/?`)
       const response = await get<House>(url, {
         showErrorToast: true
       })
@@ -99,11 +99,17 @@ export function useHouses() {
 
   const createHouse = async (houseData: CreateHouseRequest) => {
     try {
-      const response = await post<House>('/houses', houseData, {
-        showSuccessToast: true,
-        successMessage: 'House created successfully',
+      // Debug: log token before making request
+      const token = localStorage.getItem('token')
+      console.debug('[Houses] Token before POST /houses:', token)
+
+      const response = await post<House>('/houses/', houseData, {
+        showSuccessToast: false,
         showErrorToast: true
       })
+
+      // Debug: log response and check for errors
+      console.debug('[Houses] Response from POST /houses:', response)
 
       if (response) {
         houses.value.push(response)
@@ -119,7 +125,7 @@ export function useHouses() {
 
   const updateHouse = async (id: number, houseData: UpdateHouseRequest) => {
     try {
-      const response = await put<House>(`/houses/${id}`, houseData, {
+      const response = await put<House>(`/houses/${id}/`, houseData, {
         showSuccessToast: true,
         successMessage: 'House updated successfully',
         showErrorToast: true
@@ -142,7 +148,7 @@ export function useHouses() {
 
   const deleteHouse = async (id: number) => {
     try {
-      const response = await del(`/houses/${id}`, {
+      const response = await del(`/houses/${id}/`, {
         showSuccessToast: true,
         successMessage: 'House deleted successfully',
         showErrorToast: true
@@ -165,7 +171,7 @@ export function useHouses() {
   // House Teams Management
   const fetchHouseTeams = async (houseId: number) => {
     try {
-      const response = await get<HouseTeam[]>(`/houses/${houseId}/teams`, {
+      const response = await get<HouseTeam[]>(`/houses/${houseId}/teams/`, {
         showErrorToast: true
       })
 
@@ -182,7 +188,7 @@ export function useHouses() {
 
   const addTeamToHouse = async (houseId: number, teamData: CreateHouseTeamRequest) => {
     try {
-      const response = await post<HouseTeam>(`/houses/${houseId}/teams`, teamData, {
+      const response = await post<HouseTeam>(`/houses/${houseId}/teams/`, teamData, {
         showSuccessToast: true,
         successMessage: 'Team added to house successfully',
         showErrorToast: true
@@ -201,7 +207,7 @@ export function useHouses() {
 
   const removeTeamFromHouse = async (houseId: number, teamId: number) => {
     try {
-      const response = await del(`/houses/${houseId}/teams/${teamId}`, {
+      const response = await del(`/houses/${houseId}/teams/${teamId}/`, {
         showSuccessToast: true,
         successMessage: 'Team removed from house successfully',
         showErrorToast: true

@@ -58,7 +58,7 @@
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">Visit</label>
             <div class="text-gray-900 text-lg font-normal py-2">
-              {{ displayInfo.visitInfo }}
+              {{ displayInfo.clientName }} @ {{ displayInfo.houseName }}
             </div>
           </div>
 
@@ -225,7 +225,7 @@
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-gray-700 uppercase tracking-wide">Assigned By</label>
             <div class="text-gray-900 text-lg font-normal py-2">
-              Employee #{{ assignment.assigned_by_id }}
+              {{ displayInfo.assignedByName }}
             </div>
           </div>
         </div>
@@ -252,8 +252,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, ref, onMounted } from 'vue'
 import { useAssignments } from '@/composables/useAssignments'
+import { useEmployees } from '@/composables/useEmployees'
+import { useVisits } from '@/composables/useVisits'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -284,13 +286,72 @@ const isVisible = computed<boolean>({
   set: (value) => emit('update:visible', value)
 })
 
+const { getEmployee } = useEmployees()
+const { getVisit } = useVisits()
+
+const employeeName = ref('')
+const visitInfo = ref('')
+const assignedByName = ref('')
+const clientName = ref('')
+const houseName = ref('')
+
+async function fetchNames() {
+  if (props.assignment?.employee_id) {
+    const emp = await getEmployee(props.assignment.employee_id)
+    employeeName.value = emp ? `${emp.first_name} ${emp.last_name}` : `Employee #${props.assignment.employee_id}`
+  }
+  if (props.assignment?.visit_id) {
+    const visit = await getVisit(props.assignment.visit_id)
+    if (visit?.client_id) {
+      const client = await getEmployee(visit.client_id)
+      clientName.value = client ? `${client.first_name} ${client.last_name}` : ''
+    }
+    if (visit?.house_id) {
+      const house = await getHouse(visit.house_id)
+      houseName.value = house ? house.name : ''
+    }
+  }
+  if (props.assignment?.assigned_by_id) {
+    const assignedBy = await getEmployee(props.assignment.assigned_by_id)
+    assignedByName.value = assignedBy ? `${assignedBy.first_name} ${assignedBy.last_name}` : ''
+  }
+}
+
+onMounted(fetchNames)
+watch(() => props.assignment, fetchNames, { immediate: true })
+
+function getDuration(start: string | Date, end: string | Date): string {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  const diffMs = endDate.getTime() - startDate.getTime()
+  if (diffMs <= 0) return '0 min'
+  const diffMins = Math.floor(diffMs / 60000)
+  const hours = Math.floor(diffMins / 60)
+  const mins = diffMins % 60
+  if (hours > 0 && mins > 0) return `${hours} hr${hours > 1 ? 's' : ''} ${mins} min${mins > 1 ? 's' : ''}`
+  if (hours > 0) return `${hours} hr${hours > 1 ? 's' : ''}`
+  return `${mins} min${mins > 1 ? 's' : ''}`
+}
+
 const displayInfo = computed(() => {
   if (!props.assignment) return null
-  try {
-    return getAssignmentDisplayInfo(props.assignment)
-  } catch (error) {
-    console.error('Error getting assignment display info:', error)
-    return null
+  return {
+    id: props.assignment.id,
+    employeeName: employeeName.value || `Employee #${props.assignment.employee_id}`,
+    visitInfo: visitInfo.value || `Visit #${props.assignment.visit_id}`,
+    role: props.assignment.role_on_visit,
+    status: props.assignment.status,
+    scheduledStart: new Date(props.assignment.scheduled_start_at).toLocaleString(),
+    scheduledEnd: new Date(props.assignment.scheduled_end_at).toLocaleString(),
+    duration: getDuration(props.assignment.scheduled_start_at, props.assignment.scheduled_end_at),
+    assignedAt: new Date(props.assignment.assigned_at).toLocaleDateString(),
+    assignedByName: assignedByName.value,
+    checkInTime: props.assignment.check_in_at ? new Date(props.assignment.check_in_at).toLocaleString() : null,
+    checkOutTime: props.assignment.check_out_at ? new Date(props.assignment.check_out_at).toLocaleString() : null,
+    isCheckedIn: !!props.assignment.check_in_at,
+    isCheckedOut: !!props.assignment.check_out_at,
+    clientName: clientName.value,
+    houseName: houseName.value
   }
 })
 
@@ -325,6 +386,25 @@ const handleEdit = () => {
 :deep(.p-dialog-footer) {
   padding: 1rem 2rem;
   border-top: 1px solid #f1f5f9;
+}
+
+:deep(.w-14) {
+  width: 3.5rem !important;
+  min-width: 3.5rem !important;
+  max-width: 3.5rem !important;
+}
+:deep(.h-14) {
+  height: 3.5rem !important;
+  min-height: 3.5rem !important;
+  max-height: 3.5rem !important;
+}
+:deep(.flex.items-center.justify-center) > i {
+  font-size: 2rem !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Remove all rounded corners, backgrounds, and borders */

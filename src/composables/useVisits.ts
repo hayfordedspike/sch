@@ -87,14 +87,23 @@ export function useVisits() {
 
       const url = `/visits/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
-      const response = await get<Visit[]>(url, {
+      const response = await get<Visit[] | { data: Visit[] }>(url, {
         showErrorToast: true
       })
 
-      if (response) {
+      console.log('API response for visits:', response)
+      if (Array.isArray(response)) {
         visits.value = response
         totalVisits.value = response.length
-        console.log('Fetched visits:', response.length)
+        console.log('Visits array after assignment:', visits.value)
+      } else if (response && Array.isArray(response.data)) {
+        visits.value = response.data
+        totalVisits.value = response.data.length
+        console.log('Visits array after assignment (from .data):', visits.value)
+      } else {
+        visits.value = []
+        totalVisits.value = 0
+        console.warn('Visits response was not an array:', response)
       }
 
       return response

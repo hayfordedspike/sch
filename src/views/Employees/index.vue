@@ -102,7 +102,7 @@
         </div>
 
         <!-- Employees Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-else class="employee-grid gap-6">
           <EmployeeCard
             v-for="employee in filteredEmployees"
             :key="employee.id"
@@ -330,16 +330,19 @@ onMounted(async () => {
   border-radius: 8px;
 }
 
-/* Grid responsive adjustments */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+/* Employee grid layout improvements */
+.employee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 600px) {
+  .employee-grid {
+    grid-template-columns: 1fr;
+    overflow-x: auto;
+    padding-bottom: 1rem;
   }
 }
 </style>

@@ -102,15 +102,18 @@ const transformAssignmentsToSchedules = (assignments: Assignment[], employees: E
   assignments.forEach(assignment => {
     const employee = employeeMap.get(assignment.employee_id)
     const visit = visitMap.get(assignment.visit_id)
-
     if (!employee) return
 
     const scheduledStart = new Date(assignment.scheduled_start_at)
     const scheduledEnd = new Date(assignment.scheduled_end_at)
+    const checkIn = assignment.check_in_at ? new Date(assignment.check_in_at) : null
+    const checkOut = assignment.check_out_at ? new Date(assignment.check_out_at) : null
 
     const client = visit ? clientMap.get(visit.client_id) : null
     const house = visit ? houseMap.get(visit.house_id) : null
 
+    // Always use visit.name if present, otherwise fallback to visit ID
+    let visitName = visit && typeof visit.name === 'string' && visit.name.trim() !== '' ? visit.name : null;
     const schedule: Schedule = {
       start: scheduledStart.toLocaleTimeString('en-US', {
         hour: 'numeric',
@@ -122,11 +125,14 @@ const transformAssignmentsToSchedules = (assignments: Assignment[], employees: E
         minute: '2-digit',
         hour12: true
       }),
-      task: `Visit #${assignment.visit_id} (${assignment.role_on_visit})`,
+      // Task: show visit name, role, status
+      task: `${visitName ? visitName : `Visit #${assignment.visit_id}`} (${assignment.role_on_visit})\nStatus: ${assignment.status}`,
       location: house ? house.name : `House #${visit?.house_id || 'Unknown'}`,
       client: client ? `${client.first_name} ${client.last_name}` : `Client #${visit?.client_id || 'Unknown'}`,
       month: scheduledStart.getMonth(),
-      day: scheduledStart.getDate()
+      day: scheduledStart.getDate(),
+      actualStart: checkIn ? checkIn.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null,
+      actualEnd: checkOut ? checkOut.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null
     }
 
     if (!employeeSchedules.has(assignment.employee_id)) {
@@ -279,13 +285,14 @@ onMounted(() => {
 // Helper functions
 function getScheduleBlock(staff: StaffMember, timeSlot: string): Schedule | null {
   const slotMinutes = convertTimeToMinutes(timeSlot);
+  const slotEndMinutes = slotMinutes + 60; // 1-hour slot
 
   for (const schedule of staff.schedules) {
     const startMinutes = convertTimeToMinutes(schedule.start);
     const endMinutes = convertTimeToMinutes(schedule.end);
 
-    // Check if current time slot falls within this schedule
-    if (slotMinutes >= startMinutes && slotMinutes < endMinutes) {
+    // Check if this schedule overlaps with the current slot
+    if (endMinutes > slotMinutes && startMinutes < slotEndMinutes) {
       return schedule;
     }
   }
@@ -296,26 +303,36 @@ function shouldRenderScheduleCell(staff: StaffMember, timeSlot: string): boolean
   const schedule = getScheduleBlock(staff, timeSlot);
   if (!schedule) return true;
 
-  // Only render at the start time of the schedule
-  return schedule.start === timeSlot;
+  // Only render at the first slot that overlaps with the schedule
+  const slotMinutes = convertTimeToMinutes(timeSlot);
+  const startMinutes = convertTimeToMinutes(schedule.start);
+  const slotEndMinutes = slotMinutes + 60;
+  // Render only if this slot contains the start of the schedule, or if the schedule starts within this slot
+  return (startMinutes >= slotMinutes && startMinutes < slotEndMinutes) || (slotMinutes === Math.floor(startMinutes / 60) * 60);
 }
 
 function getScheduleColspan(staff: StaffMember, timeSlot: string): number {
   const schedule = getScheduleBlock(staff, timeSlot);
-  if (!schedule || schedule.start !== timeSlot) return 1;
+  if (!schedule) return 1;
 
+  const slotMinutes = convertTimeToMinutes(timeSlot);
+  const slotEndMinutes = slotMinutes + 60;
   const startMinutes = convertTimeToMinutes(schedule.start);
   const endMinutes = convertTimeToMinutes(schedule.end);
-  const slotDuration = 60; // 1-hour intervals
 
-  const duration = endMinutes - startMinutes;
-  const colspan = Math.ceil(duration / slotDuration);
-
-  // Ensure the colspan doesn't extend beyond the last time slot
-  const lastSlotMinutes = convertTimeToMinutes(allTimeSlots.value[allTimeSlots.value.length - 1]);
-  const maxPossibleColspan = Math.ceil((lastSlotMinutes - startMinutes) / slotDuration);
-
-  return Math.min(colspan, maxPossibleColspan);
+  // Calculate how many slots (hours) this schedule spans, starting from this slot
+  let colspan = 0;
+  let current = slotMinutes;
+  while (current < endMinutes && current < slotEndMinutes * allTimeSlots.value.length) {
+    // If the schedule overlaps with this slot
+    if (endMinutes > current && startMinutes < current + 60) {
+      colspan++;
+    }
+    current += 60;
+  }
+  // But only allow colspan to extend to the end of the schedule or the end of the table
+  const maxColspan = Math.ceil((endMinutes - slotMinutes) / 60);
+  return Math.max(1, Math.min(colspan, maxColspan));
 }
 
 function getStaffColorClass(staffIdx: number) {
@@ -375,7 +392,7 @@ function getStaffColorClass(staffIdx: number) {
                 :style="{ width: employerColWidth + 'px' }">
                 <div class="flex items-center">
                   <div class="relative">
-                    <img :src="staff.img" alt="Staff photo" class="w-12 h-12 rounded-full mr-4 border-2 border-white shadow-sm" />
+                    <img :src="staff.img" alt="Staff photo" class="roster-avatar" />
                   </div>
                   <div class="flex flex-col">
                     <div class="text-sm font-semibold text-gray-900">{{ staff.name }}</div>
@@ -408,7 +425,7 @@ function getStaffColorClass(staffIdx: number) {
                         </div>
                         <!-- Schedule Content -->
                         <div class="space-y-1">
-                          <div class="font-bold text-sm leading-tight">
+                          <div class="font-bold text-sm leading-tight whitespace-pre-line">
                             {{ getScheduleBlock(staff, timeSlot)?.task }}
                           </div>
                           <div class="text-xs opacity-75 flex items-center gap-1">
@@ -417,6 +434,23 @@ function getStaffColorClass(staffIdx: number) {
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                             {{ getScheduleBlock(staff, timeSlot)?.location }}
+                          </div>
+                          <div class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span>Client: {{ getScheduleBlock(staff, timeSlot)?.client }}</span>
+                          </div>
+                          <div v-if="getScheduleBlock(staff, timeSlot)?.actualStart || getScheduleBlock(staff, timeSlot)?.actualEnd" class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                            <span>
+                              Actual:
+                              <span v-if="getScheduleBlock(staff, timeSlot)?.actualStart">Check-in: {{ getScheduleBlock(staff, timeSlot)?.actualStart }}</span>
+                              <span v-if="getScheduleBlock(staff, timeSlot)?.actualEnd"> | Check-out: {{ getScheduleBlock(staff, timeSlot)?.actualEnd }}</span>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -474,5 +508,18 @@ function getStaffColorClass(staffIdx: number) {
   </div>
 </template>
 
-
-// ...existing code above...
+<style scoped>
+.roster-avatar {
+  width: 3rem !important;
+  height: 3rem !important;
+  min-width: 3rem !important;
+  min-height: 3rem !important;
+  max-width: 3rem !important;
+  max-height: 3rem !important;
+  object-fit: cover !important;
+  border-radius: 9999px !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  margin-right: 1rem;
+}
+</style>

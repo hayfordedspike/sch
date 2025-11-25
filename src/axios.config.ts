@@ -28,16 +28,26 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('token')
 
-  // Skip attaching token for auth endpoints
-  const authEndpoints = ['auth/login', 'auth/register', 'auth/refresh']
-  const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint))
+  // Debug: log the token value
+  console.debug('[API] Token from localStorage:', token)
 
-  if (token && !isAuthEndpoint) {
-    config.headers.Authorization = `Bearer ${token}`
-    console.log('Added Authorization header for:', config.url)
-  } else if (!token && !isAuthEndpoint) {
-    console.warn('No token found for authenticated request to:', config.url)
+  // List of endpoints that do NOT require Authorization
+  const authEndpoints = ['auth/login', 'auth/register', 'auth/refresh']
+  // Normalize URL to ignore trailing slashes and query params for matching
+  const urlPath = config.url?.split('?')[0]?.replace(/\/$/, '') || ''
+  const isAuthEndpoint = authEndpoints.some(endpoint => urlPath.includes(endpoint))
+
+  if (!isAuthEndpoint) {
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+      console.log('[API] Forced Authorization header for:', config.url)
+    } else {
+      console.warn('[API] No token found for authenticated request to:', config.url)
+    }
   }
+
+  // Debug: log the final headers
+  console.debug('[API] Request headers:', config.headers)
 
   return config
 })

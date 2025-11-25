@@ -184,10 +184,21 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Card base styles */
+/* Card base styles */
 .client-card {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  height: 100%;
+  width: 100%;
+  max-width: 600px;
+  min-width: 260px;
+  box-sizing: border-box;
+  padding: 1.25rem 1rem 1rem 1rem;
+  margin: 0 auto 1.5rem auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .client-card:hover {
@@ -195,22 +206,17 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
-:deep(.p-card-header) {
-  padding: 0;
-}
-
-:deep(.p-card-content) {
-  padding: 0;
-}
-
+/* Card content spacing */
+:deep(.p-card-header),
+:deep(.p-card-content),
 :deep(.p-card-footer) {
-  padding: 0;
+  padding: 0.5rem 0;
 }
 
 /* Tag styling */
 :deep(.p-tag) {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  padding: 0.3rem 1rem;
   border-radius: 9999px;
   font-weight: 500;
   border: none;
@@ -219,12 +225,36 @@ onMounted(() => {
 /* Button spacing */
 :deep(.p-button-sm) {
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
 }
 
 :deep(.p-button-rounded) {
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   padding: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .client-card {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 0.75rem 0.5rem;
+  }
+  h3.text-xl {
+    font-size: 1.1rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  :deep(.p-tag) {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+/* Ensure long names/content wrap and don't overflow */
+h3.text-xl, .truncate, .client-card span {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 </style>

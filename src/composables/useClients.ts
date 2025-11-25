@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
+import { useToast } from 'primevue/usetoast'
 import type {
   Client,
   CreateClientRequest,
@@ -10,6 +11,7 @@ import type {
 
 export function useClients() {
   const { get, post, put, delete: del, loading, error } = useApi()
+  const toast = useToast()
 
   const clients = ref<Client[]>([])
   const currentClient = ref<Client | null>(null)
@@ -65,7 +67,7 @@ export function useClients() {
       if (params.city) queryParams.append('city', params.city)
       if (params.search) queryParams.append('search', params.search)
 
-      const url = `/clients/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `/clients/${queryParams.toString() ? '?' + queryParams.toString() : ''}`.replace('/clients?', '/clients/?')
       const response = await get<Client[]>(url, {
         showErrorToast: true
       })
@@ -76,7 +78,15 @@ export function useClients() {
       }
 
       return response
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error fetching clients:', err)
       return null
     }
@@ -88,7 +98,7 @@ export function useClients() {
       if (includeHouse) queryParams.append('include_house', 'true')
       if (includeVisits) queryParams.append('include_visits', 'true')
 
-      const url = `/clients/${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `/clients/${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`.replace(`/clients${id}?`, `/clients/${id}/?`)
       const response = await get<Client>(url, {
         showErrorToast: true
       })
@@ -98,7 +108,15 @@ export function useClients() {
       }
 
       return response
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error fetching client:', err)
       return null
     }
@@ -107,7 +125,7 @@ export function useClients() {
   const getClientByEmail = async (email: string) => {
     try {
       const encodedEmail = encodeURIComponent(email)
-      const response = await get<Client>(`/clients/email/${encodedEmail}`, {
+      const response = await get<Client>(`/clients/email/${encodedEmail}/`, {
         showErrorToast: true
       })
 
@@ -116,7 +134,15 @@ export function useClients() {
       }
 
       return response
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error fetching client by email:', err)
       return null
     }
@@ -124,9 +150,8 @@ export function useClients() {
 
   const createClient = async (clientData: CreateClientRequest) => {
     try {
-      const response = await post<Client>('/clients', clientData, {
-        showSuccessToast: true,
-        successMessage: 'Client created successfully',
+      const response = await post<Client>('/clients/', clientData, {
+        showSuccessToast: false,
         showErrorToast: true
       })
 
@@ -136,7 +161,15 @@ export function useClients() {
       }
 
       return { success: true, data: response }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error creating client:', err)
       return { success: false, data: null }
     }
@@ -144,9 +177,8 @@ export function useClients() {
 
   const updateClient = async (id: number, clientData: UpdateClientRequest) => {
     try {
-      const response = await put<Client>(`/clients/${id}`, clientData, {
-        showSuccessToast: true,
-        successMessage: 'Client updated successfully',
+      const response = await put<Client>(`/clients/${id}/`, clientData, {
+        showSuccessToast: false,
         showErrorToast: true
       })
 
@@ -159,7 +191,15 @@ export function useClients() {
       }
 
       return { success: true, data: response }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error updating client:', err)
       return { success: false, data: null }
     }
@@ -167,7 +207,7 @@ export function useClients() {
 
   const deleteClient = async (id: number) => {
     try {
-      const response = await del(`/clients/${id}`, {
+      const response = await del(`/clients/${id}/`, {
         showSuccessToast: true,
         successMessage: 'Client deleted successfully',
         showErrorToast: true
@@ -181,7 +221,15 @@ export function useClients() {
       totalClients.value = Math.max(0, totalClients.value - 1)
 
       return { success: true, data: response }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error deleting client:', err)
       return { success: false, data: null }
     }
@@ -189,7 +237,7 @@ export function useClients() {
 
   const activateClient = async (id: number) => {
     try {
-      const response = await post<Client>(`/clients/${id}/activate`, {}, {
+      const response = await post<Client>(`/clients/${id}/activate/`, {}, {
         showSuccessToast: true,
         successMessage: 'Client activated successfully',
         showErrorToast: true
@@ -206,7 +254,15 @@ export function useClients() {
       }
 
       return { success: true, data: response }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error activating client:', err)
       return { success: false, data: null }
     }
@@ -214,7 +270,7 @@ export function useClients() {
 
   const deactivateClient = async (id: number) => {
     try {
-      const response = await post<Client>(`/clients/${id}/deactivate`, {}, {
+      const response = await post<Client>(`/clients/${id}/deactivate/`, {}, {
         showSuccessToast: true,
         successMessage: 'Client deactivated successfully',
         showErrorToast: true
@@ -231,7 +287,15 @@ export function useClients() {
       }
 
       return { success: true, data: response }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.data?.detail === 'Not authenticated') {
+        toast.add({
+          severity: 'error',
+          summary: 'Authentication Error',
+          detail: 'You are not authenticated. Please sign in again.',
+          life: 4000
+        })
+      }
       console.error('Error deactivating client:', err)
       return { success: false, data: null }
     }

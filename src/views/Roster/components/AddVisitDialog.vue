@@ -36,7 +36,6 @@
             option-value="value"
             placeholder="Select a house"
             class="w-full"
-            :loading="housesLoading"
             :class="{ 'p-invalid': errors.house_id }"
           />
           <small v-if="errors.house_id" class="p-error">{{ errors.house_id }}</small>
@@ -138,6 +137,7 @@
 import { ref, computed, watch } from 'vue'
 import { useVisits } from '@/composables/useVisits'
 import { useEmployees } from '@/composables/useEmployees'
+import { useHouses } from '@/composables/useHouses'
 import Dialog from 'primevue/dialog'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
@@ -150,9 +150,7 @@ interface Props {
   visible: boolean
   visit: Visit | null
   clientOptions: Array<{ label: string; value: number }>
-  houseOptions: Array<{ label: string; value: number }>
   clientsLoading?: boolean
-  housesLoading?: boolean
 }
 
 const props = defineProps<Props>()
@@ -187,10 +185,20 @@ const errors = ref<Record<string, string>>({})
 const { createVisit, updateVisit } = useVisits()
 const { employees, loading: employeesLoading, getEmployees } = useEmployees()
 
+
 const employeeOptions = computed(() => {
   return employees.value.map(employee => ({
     label: `${employee.first_name} ${employee.last_name}`,
     value: employee.id
+  }))
+})
+
+// Active houses for house dropdown
+const { houses, fetchHouses } = useHouses()
+const houseOptions = computed(() => {
+  return houses.value.map(house => ({
+    label: `${house.name} (${house.address_line1}${house.city ? ', ' + house.city : ''})`,
+    value: house.id
   }))
 })
 
@@ -234,16 +242,18 @@ watch([startDateTime, endDateTime], () => {
   }
 })
 
-// Load employees on mount
-const loadEmployees = async () => {
+
+// Load employees and houses on mount
+const loadData = async () => {
   try {
     await getEmployees()
+    await fetchHouses({ is_active: true, limit: 100 })
   } catch (err) {
-    console.error('Failed to load employees:', err)
+    console.error('Failed to load employees or houses:', err)
   }
 }
 
-loadEmployees()
+loadData()
 
 const validateForm = () => {
   errors.value = {}
@@ -280,7 +290,9 @@ const handleCancel = () => {
 }
 
 const handleSave = async () => {
+  console.log('[AddVisitDialog] handleSave called', JSON.stringify(formData.value, null, 2))
   if (!validateForm()) {
+    console.warn('[AddVisitDialog] Validation failed', errors.value)
     return
   }
 
@@ -296,22 +308,25 @@ const handleSave = async () => {
         required_staff_count: formData.value.required_staff_count,
         notes: formData.value.notes
       }
-
+      console.log('[AddVisitDialog] Calling updateVisit', updateData)
       const result = await updateVisit(props.visit.id, updateData)
+      console.log('[AddVisitDialog] updateVisit result', result)
       if (result.success && result.data) {
         emit('visit-updated', result.data)
         handleCancel()
       }
     } else {
       // Create new visit
+      console.log('[AddVisitDialog] Calling createVisit', formData.value)
       const result = await createVisit(formData.value)
+      console.log('[AddVisitDialog] createVisit result', result)
       if (result.success && result.data) {
         emit('visit-added', result.data)
         handleCancel()
       }
     }
   } catch (err) {
-    console.error('Failed to save visit:', err)
+    console.error('[AddVisitDialog] Failed to save visit:', err)
   } finally {
     submitting.value = false
   }

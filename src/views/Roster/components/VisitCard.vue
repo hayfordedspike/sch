@@ -9,8 +9,7 @@
               <i class="pi pi-map-marker text-blue-600 text-lg"></i>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">{{ displayInfo.clientName }}</h3>
-              <p class="text-sm text-gray-600">{{ displayInfo.houseName }}</p>
+              <h3 class="text-lg font-semibold text-gray-900"></h3>
             </div>
           </div>
           <div class="flex space-x-1">
@@ -87,8 +86,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useVisits } from '@/composables/useVisits'
+import { useClients } from '@/composables/useClients'
+import { useHouses } from '@/composables/useHouses'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import type { Visit } from '@/views/Roster/types'
@@ -105,20 +106,58 @@ defineEmits<{
   'view-details': [visit: Visit]
 }>()
 
+
 const { getVisitDisplayInfo } = useVisits()
+const { getClient } = useClients()
+const { getHouse } = useHouses()
+
+const clientName = ref<string>('')
+const houseName = ref<string>('')
+
+async function fetchNames() {
+  if (props.visit?.client_id) {
+    const client = await getClient(props.visit.client_id)
+    clientName.value = client ? `${client.first_name} ${client.last_name}` : ''
+  }
+  if (props.visit?.house_id) {
+    const house = await getHouse(props.visit.house_id)
+    houseName.value = house ? house.name : ''
+  }
+}
+
+onMounted(fetchNames)
+watch(() => props.visit, fetchNames, { immediate: true })
 
 const displayInfo = computed(() => {
+  function getDuration(start: string | Date, end: string | Date): string {
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    const diffMs = endDate.getTime() - startDate.getTime()
+    if (diffMs <= 0) return '0 min'
+    const diffMins = Math.floor(diffMs / 60000)
+    const hours = Math.floor(diffMins / 60)
+    const mins = diffMins % 60
+    if (hours > 0 && mins > 0) return `${hours} hr${hours > 1 ? 's' : ''} ${mins} min${mins > 1 ? 's' : ''}`
+    if (hours > 0) return `${hours} hr${hours > 1 ? 's' : ''}`
+    return `${mins} min${mins > 1 ? 's' : ''}`
+  }
   try {
-    return getVisitDisplayInfo(props.visit)
+    const info = getVisitDisplayInfo(props.visit)
+    return {
+      ...info,
+      clientName: clientName.value || info.clientName,
+      houseName: houseName.value || info.houseName,
+      duration: getDuration(props.visit.start_at, props.visit.end_at)
+    }
   } catch (error) {
     console.error('Error getting visit display info:', error)
     return {
       id: props.visit.id,
-      clientName: `Client #${props.visit.client_id}`,
-      houseName: `House #${props.visit.house_id}`,
+      clientName: clientName.value || '',
+      houseName: houseName.value || '',
       startDate: new Date(props.visit.start_at).toLocaleDateString(),
       endDate: new Date(props.visit.end_at).toLocaleDateString(),
-      duration: 'Unknown',
+      duration: getDuration(props.visit.start_at, props.visit.end_at),
       requiredStaff: props.visit.required_staff_count,
       notes: props.visit.notes,
       status: 'scheduled' as const

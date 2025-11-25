@@ -91,15 +91,32 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref<boolean>(false)
   const error = ref<string | null>(null)
 
+  // Utility to sync Pinia state and localStorage
+  const syncSession = (newToken: string | null, newRefreshToken: string | null, newUser: User | null = null) => {
+    token.value = newToken
+    refreshToken.value = newRefreshToken
+    if (newUser !== undefined) user.value = newUser
+    if (newToken) localStorage.setItem('token', newToken)
+    else localStorage.removeItem('token')
+    if (newRefreshToken) localStorage.setItem('refreshToken', newRefreshToken)
+    else localStorage.removeItem('refreshToken')
+    if (newUser) localStorage.setItem('user', JSON.stringify(newUser))
+    else localStorage.removeItem('user')
+  }
+
   // Initialize authentication state on store creation
   const initializeAuth = async () => {
-    // Get tokens from localStorage (fallback if persistence fails)
+    // Get tokens and user from localStorage (fallback if persistence fails)
     const storedToken = localStorage.getItem('token') || token.value
     const storedRefreshToken = localStorage.getItem('refreshToken') || refreshToken.value
+    const storedUser = localStorage.getItem('user')
+    let parsedUser: User | null = null
+    if (storedUser) {
+      try { parsedUser = JSON.parse(storedUser) } catch { parsedUser = null }
+    }
 
     if (storedToken && storedRefreshToken) {
-      token.value = storedToken
-      refreshToken.value = storedRefreshToken
+      syncSession(storedToken, storedRefreshToken, parsedUser)
 
       // Check if token is still valid
       try {
@@ -227,20 +244,14 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Store token and user data from successful login
       const tokenData = response.data as TokenResponse
-      token.value = tokenData.access_token
-      refreshToken.value = tokenData.refresh_token
-
       // Extract user email from access token
-      const userEmail = getTokenSubject(token.value!) || credentials.email
+      const userEmail = getTokenSubject(tokenData.access_token) || credentials.email
 
       // Try to fetch full user profile, fallback to basic info from token
-      const userProfile = await fetchUserProfile()
-
-      if (userProfile) {
-        user.value = userProfile
-      } else {
+      let userProfile = await fetchUserProfile()
+      if (!userProfile) {
         // Fallback user data if profile fetch fails
-        user.value = {
+        userProfile = {
           id: 0,
           email: userEmail,
           first_name: '',
@@ -251,15 +262,10 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       isAuthenticated.value = true
-
-      // Store tokens in localStorage with error handling
-      try {
-        localStorage.setItem('token', token.value!)
-        localStorage.setItem('refreshToken', refreshToken.value!)
-      } catch (storageError) {
-        console.warn('Failed to store tokens in localStorage:', storageError)
-        // Continue anyway as the session will work until page refresh
-      }
+      syncSession(tokenData.access_token, tokenData.refresh_token, userProfile)
+      // Debug: log token values after setting
+      console.debug('[Auth] Token set after signIn:', localStorage.getItem('token'))
+      console.debug('[Auth] RefreshToken set after signIn:', localStorage.getItem('refreshToken'))
     } catch (err: unknown) {
       const errorMessage = handleApiError(err, 'Sign in failed')
       error.value = errorMessage
@@ -291,17 +297,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     // Clear local state regardless of API call result
-    user.value = null
-    token.value = null
-    refreshToken.value = null
+    syncSession(null, null, null)
     isAuthenticated.value = false
     error.value = null
-    
-    // Clear localStorage with error handling
+    // Clear Pinia persisted state
     try {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('auth') // Clear Pinia persisted state
+      localStorage.removeItem('auth')
     } catch (storageError) {
       console.warn('Failed to clear localStorage:', storageError)
     }
@@ -327,16 +328,17 @@ export const useAuthStore = defineStore('auth', () => {
       )
 
       const tokenData = response.data as TokenResponse
-      token.value = tokenData.access_token
-      refreshToken.value = tokenData.refresh_token
-
-      // Update localStorage with error handling
+      // Try to fetch user profile after refresh
+      let userProfile: User | null = null
       try {
-        localStorage.setItem('token', token.value!)
-        localStorage.setItem('refreshToken', refreshToken.value!)
-      } catch (storageError) {
-        console.warn('Failed to update tokens in localStorage:', storageError)
+        userProfile = await fetchUserProfile()
+      } catch (profileError) {
+        console.warn('Failed to fetch user profile after token refresh:', profileError)
       }
+      syncSession(tokenData.access_token, tokenData.refresh_token, userProfile)
+      // Debug: log token values after refresh
+      console.debug('[Auth] Token set after refresh:', localStorage.getItem('token'))
+      console.debug('[Auth] RefreshToken set after refresh:', localStorage.getItem('refreshToken'))
 
       // Ensure user profile is up to date after refresh
       try {

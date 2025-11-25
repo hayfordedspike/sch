@@ -80,32 +80,11 @@
           </div>
           <div class="flex items-center text-sm text-gray-600">
             <i class="pi pi-circle-fill mr-2 text-xs"
-               :class="getStatusColor(displayInfo.statusKey)"></i>
+               :class="'text-gray-500'">
+            </i>
             <span class="capitalize">{{ displayInfo.status.toLowerCase() }}</span>
           </div>
         </div>
-
-        <!-- Check-in/out Status -->
-        <div class="mb-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm">
-              <span v-if="displayInfo.isCheckedIn" class="text-green-600 font-medium">
-                <i class="pi pi-check-circle mr-1"></i>
-                Checked in: {{ displayInfo.checkInTime }}
-              </span>
-              <span v-else class="text-gray-500">
-                <i class="pi pi-clock mr-1"></i>
-                Not checked in
-              </span>
-            </div>
-            <div v-if="displayInfo.isCheckedOut" class="text-sm text-blue-600 font-medium">
-              <i class="pi pi-check-circle mr-1"></i>
-              Checked out: {{ displayInfo.checkOutTime }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer -->
         <div class="pt-3 border-t border-gray-200">
           <div class="flex items-center justify-between text-xs text-gray-500">
             <span>ID: {{ assignment.id }}</span>
@@ -118,7 +97,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
+import { useEmployees } from '@/composables/useEmployees'
+import { useVisits } from '@/composables/useVisits'
 import { useAssignments } from '@/composables/useAssignments'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
@@ -139,29 +120,54 @@ defineEmits<{
 }>()
 
 const { getAssignmentDisplayInfo } = useAssignments()
+const { getEmployee } = useEmployees()
+const { getVisit } = useVisits()
+const employeeName = ref('')
+const visitInfo = ref('')
+
+async function fetchNames() {
+  if (props.assignment?.employee_id) {
+    const emp = await getEmployee(props.assignment.employee_id)
+    employeeName.value = emp ? `${emp.first_name} ${emp.last_name}` : `Employee #${props.assignment.employee_id}`
+  }
+  if (props.assignment?.visit_id) {
+    const visit = await getVisit(props.assignment.visit_id)
+    visitInfo.value = visit ? `${visit.client_id ? 'Client #' + visit.client_id : ''} @ ${visit.house_id ? 'House #' + visit.house_id : ''}` : `Visit #${props.assignment.visit_id}`
+  }
+}
+
+onMounted(fetchNames)
+watch(() => props.assignment, fetchNames, { immediate: true })
+
+function getDuration(start: string | Date, end: string | Date): string {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  const diffMs = endDate.getTime() - startDate.getTime()
+  if (diffMs <= 0) return '0 min'
+  const diffMins = Math.floor(diffMs / 60000)
+  const hours = Math.floor(diffMins / 60)
+  const mins = diffMins % 60
+  if (hours > 0 && mins > 0) return `${hours} hr${hours > 1 ? 's' : ''} ${mins} min${mins > 1 ? 's' : ''}`
+  if (hours > 0) return `${hours} hr${hours > 1 ? 's' : ''}`
+  return `${mins} min${mins > 1 ? 's' : ''}`
+}
 
 const displayInfo = computed(() => {
-  try {
-    return getAssignmentDisplayInfo(props.assignment)
-  } catch (error) {
-    console.error('Error getting assignment display info:', error)
-    return {
-      id: props.assignment.id,
-      employeeName: `Employee #${props.assignment.employee_id}`,
-      visitInfo: `Visit #${props.assignment.visit_id}`,
-      role: props.assignment.role_on_visit,
-      status: props.assignment.status,
-      statusKey: props.assignment.status,
-      statusColor: 'text-gray-500',
-      scheduledStart: new Date(props.assignment.scheduled_start_at).toLocaleString(),
-      scheduledEnd: new Date(props.assignment.scheduled_end_at).toLocaleString(),
-      duration: 'Unknown',
-      assignedAt: new Date(props.assignment.assigned_at).toLocaleDateString(),
-      checkInTime: props.assignment.check_in_at ? new Date(props.assignment.check_in_at).toLocaleString() : null,
-      checkOutTime: props.assignment.check_out_at ? new Date(props.assignment.check_out_at).toLocaleString() : null,
-      isCheckedIn: !!props.assignment.check_in_at,
-      isCheckedOut: !!props.assignment.check_out_at
-    }
+  return {
+    id: props.assignment.id,
+    employeeName: employeeName.value || `Employee #${props.assignment.employee_id}`,
+    visitInfo: visitInfo.value || `Visit #${props.assignment.visit_id}`,
+    role: props.assignment.role_on_visit,
+    status: props.assignment.status,
+    scheduledStart: new Date(props.assignment.scheduled_start_at).toLocaleString(),
+    scheduledEnd: new Date(props.assignment.scheduled_end_at).toLocaleString(),
+    duration: getDuration(props.assignment.scheduled_start_at, props.assignment.scheduled_end_at),
+    assignedAt: new Date(props.assignment.assigned_at).toLocaleDateString(),
+    assignedById: props.assignment.assigned_by_id,
+    checkInTime: props.assignment.check_in_at ? new Date(props.assignment.check_in_at).toLocaleString() : null,
+    checkOutTime: props.assignment.check_out_at ? new Date(props.assignment.check_out_at).toLocaleString() : null,
+    isCheckedIn: !!props.assignment.check_in_at,
+    isCheckedOut: !!props.assignment.check_out_at
   }
 })
 
