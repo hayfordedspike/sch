@@ -12,6 +12,14 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs } from 'vue'
 
+interface Props {
+  loading?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  loading: false
+})
+
 const attrs = useAttrs()
 const inputRef = ref()
 
@@ -21,7 +29,7 @@ const hasError = computed(() => {
 })
 
 const hasRequiredError = computed(() => {
-  return attrs.required && inputRef.value && !inputRef.value.value
+  return !props.loading && attrs.required && inputRef.value && !inputRef.value.value
 })
 
 const fieldColor = computed(() => {

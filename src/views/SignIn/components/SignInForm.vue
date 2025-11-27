@@ -10,6 +10,7 @@
           autocomplete="email"
           required
           :error-messages="errors.email"
+          :loading="loading"
           placeholder="Enter your email"
         />
       </div>
@@ -22,6 +23,7 @@
           type="password"
           required
           :error-messages="errors.password"
+          :loading="loading"
           placeholder="Enter your password"
         />
       </div>
@@ -40,13 +42,6 @@
       </GlobalButton>
     </div>
 
-    <!-- Horizontal line and copyright - HIDDEN -->
-    <!-- <div class="pt-4">
-      <hr class="border-gray-200" />
-      <p class="mt-4 text-center text-xs text-gray-500">
-        © {{ currentYear }} All rights reserved
-      </p>
-    </div> -->
   </form>
 </template>
 
@@ -71,6 +66,7 @@ const toast = useToast()
 const authStore = useAuthStore()
 
 const loading = ref(false)
+const currentYear = new Date().getFullYear()
 
 const formData = reactive<SignInFormData>({
   email: '',
