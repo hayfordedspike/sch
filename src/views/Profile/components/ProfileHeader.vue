@@ -21,17 +21,22 @@
           </div>
         </div>
 
-        <!-- Edit Profile Button -->
-        <div class="flex-shrink-0">
-          <div v-if="!editing" class="flex flex-col gap-2">
+        <!-- Edit Profile & Change Password Buttons -->
+        <div class="flex-shrink-0 flex flex-col gap-2">
+          <div v-if="!editing" class="flex flex-row gap-2">
             <Button
               @click="$emit('edit')"
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
               label="Edit Profile"
               icon="pi pi-user-edit"
             />
+            <Button
+              @click="$emit('change-password')"
+              class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
+              label="Change Password"
+              icon="pi pi-key"
+            />
           </div>
-          
           <div v-else class="flex flex-col sm:flex-row gap-2">
             <Button
               @click="$emit('cancel')"

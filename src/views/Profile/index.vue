@@ -9,7 +9,25 @@
           @edit="handleEditProfile"
           @save="handleSaveProfile"
           @cancel="handleCancelEdit"
+          @change-password="showChangePasswordDialog = true"
         />
+          <!-- Change Password Modal -->
+          <Dialog v-model:visible="showChangePasswordDialog" modal header="Change Password" :style="{ width: '400px' }">
+            <form @submit.prevent="handleChangePassword">
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                <InputText v-model="changePasswordForm.current_password" type="password" class="w-full" required />
+              </div>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                <InputText v-model="changePasswordForm.new_password" type="password" class="w-full" required />
+              </div>
+              <div class="flex justify-end gap-2 mt-6">
+                <Button label="Cancel" @click="showChangePasswordDialog = false" severity="secondary" outlined />
+                <Button label="Change Password" type="submit" class="bg-orange-500 text-white" />
+              </div>
+            </form>
+          </Dialog>
       </div>
     </div>
 
@@ -64,6 +82,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
+import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useProfile } from '@/composables/useProfile'
@@ -94,13 +115,31 @@ const {
 const editingProfile = ref(false)
 const showAddCertificateDialog = ref(false)
 const editingCertificate = ref<Certificate | undefined>(undefined)
-const profileData = ref<ProfileData>({
-  fullName: '',
-  address: '',
-  dateOfBirth: '',
-  phone: '',
-  email: ''
+const showChangePasswordDialog = ref(false)
+const changePasswordForm = ref({
+  current_password: '',
+  new_password: ''
 })
+const { user } = useAuth()
+// Change Password handler
+const handleChangePassword = async () => {
+  try {
+    const res = await fetch('/auth/change-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(changePasswordForm.value)
+    })
+    if (!res.ok) throw new Error('Failed to change password')
+    toast.add({ severity: 'success', summary: 'Password Changed', detail: 'Your password has been updated.', life: 3000 })
+    showChangePasswordDialog.value = false
+    changePasswordForm.value.current_password = ''
+    changePasswordForm.value.new_password = ''
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: err.message || 'Could not change password.', life: 4000 })
+  }
+}
 
 // Mock user certifications - replace with actual API call
 const userCertifications = ref<UserCertification[]>([])

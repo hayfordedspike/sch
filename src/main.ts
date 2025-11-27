@@ -10,6 +10,7 @@ import '../styles.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { ToastService, ConfirmationService } from 'primevue'
 import { useAuthStore } from './stores/auth'
+import vuetify from './plugins/vuetify'
 
 const app = createApp(App)
 
@@ -23,6 +24,7 @@ app.use(VueQueryPlugin, {
 })
 app.use(pinia)
 app.use(router)
+app.use(vuetify)
 app.use(PrimeVue, {
   ripple: true,
   theme: {
