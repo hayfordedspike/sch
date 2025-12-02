@@ -23,12 +23,10 @@ const handleAddCertificate = (data: unknown) => {
 </script>
 
 <template>
-  <div class="p-4">
-    <!-- Authentication Debug (Temporary) -->
-  
+  <!-- Dynamic Greeting Card -->
+  <GreetingCard class="mb-6" />
 
-    <!-- Dynamic Greeting Card -->
-    <GreetingCard class="mb-6" />
+  <div class="px-12 md:px-6 py-6 max-w-7xl mx-auto">
         <!-- Certificate Warning Banner -->
     <CertificateWarningBanner class="mb-6" @add-certificate="showAddCertificateDialog = true" />
 

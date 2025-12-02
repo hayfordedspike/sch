@@ -47,10 +47,13 @@ export function useVisits() {
 
     const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)) // hours
 
+    const clientLabel = visit.client_id ? `Client #${visit.client_id}` : 'No client assigned'
+    const houseLabel = visit.house_id ? `House #${visit.house_id}` : 'No house assigned'
+
     return {
       id: visit.id,
-      clientName: `Client #${visit.client_id}`, // TODO: Get actual client name
-      houseName: `House #${visit.house_id}`, // TODO: Get actual house name
+      clientName: clientLabel,
+      houseName: houseLabel,
       startDate: startDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',

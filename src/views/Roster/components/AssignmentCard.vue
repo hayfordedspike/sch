@@ -132,7 +132,17 @@ async function fetchNames() {
   }
   if (props.assignment?.visit_id) {
     const visit = await getVisit(props.assignment.visit_id)
-    visitInfo.value = visit ? `${visit.client_id ? 'Client #' + visit.client_id : ''} @ ${visit.house_id ? 'House #' + visit.house_id : ''}` : `Visit #${props.assignment.visit_id}`
+    if (visit) {
+      const clientLabel = visit.client_id ? `Client #${visit.client_id}` : null
+      const houseLabel = visit.house_id ? `House #${visit.house_id}` : null
+      if (clientLabel && houseLabel) {
+        visitInfo.value = `${clientLabel} @ ${houseLabel}`
+      } else {
+        visitInfo.value = clientLabel || houseLabel || `Visit #${props.assignment.visit_id}`
+      }
+    } else {
+      visitInfo.value = `Visit #${props.assignment.visit_id}`
+    }
   }
 }
 

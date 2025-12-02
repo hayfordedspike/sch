@@ -1,7 +1,7 @@
 export interface Visit {
   id: number
-  client_id: number
-  house_id: number
+  client_id: number | null
+  house_id: number | null
   start_at: string
   end_at: string
   required_staff_count: number
@@ -11,8 +11,8 @@ export interface Visit {
 }
 
 export interface CreateVisitRequest {
-  client_id: number
-  house_id: number
+  client_id?: number | null
+  house_id?: number | null
   start_at: string
   end_at: string
   required_staff_count: number
@@ -21,8 +21,8 @@ export interface CreateVisitRequest {
 }
 
 export interface UpdateVisitRequest {
-  client_id?: number
-  house_id?: number
+  client_id?: number | null
+  house_id?: number | null
   start_at?: string
   end_at?: string
   required_staff_count?: number

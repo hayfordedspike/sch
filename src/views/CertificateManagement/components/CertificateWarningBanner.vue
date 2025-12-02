@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useCertificates } from '@/composables/useCertificates'
 import type { Certificate } from '../types'
 import Card from 'primevue/card'
@@ -65,7 +65,11 @@ interface Emits {
 
 defineEmits<Emits>()
 
-const { certificates } = useCertificates()
+const { certificates, fetchActiveCertificates } = useCertificates()
+
+onMounted(() => {
+  fetchActiveCertificates()
+})
 
 const expiringSoon = computed(() => 
   certificates.value.filter(cert => {

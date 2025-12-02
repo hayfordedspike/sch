@@ -738,22 +738,5 @@ onMounted(async () => {
   border-radius: 8px;
 }
 
-/* Grid responsive adjustments */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1025px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* Grid responsive adjustments are handled via Tailwind classes */
 </style>

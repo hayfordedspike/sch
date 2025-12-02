@@ -1,47 +1,44 @@
 <template>
   <form class="mt-8 space-y-6" novalidate @submit.prevent="onSubmit">
-    <div class="space-y-4">
+    <div class="space-y-5">
       <div>
-        <GlobalTextField
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+        <input
           id="email"
           v-model="formData.email"
-          label="Email address"
           type="email"
           autocomplete="email"
           required
-          :error-messages="errors.email"
-          :loading="loading"
+          :class="inputClasses('email')"
           placeholder="Enter your email"
         />
+        <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
       </div>
 
       <div>
-        <GlobalTextField
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input
           id="password"
           v-model="formData.password"
-          label="Password"
           type="password"
           required
-          :error-messages="errors.password"
-          :loading="loading"
+          :class="inputClasses('password')"
           placeholder="Enter your password"
         />
+        <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
       </div>
     </div>
 
-  
+    <p v-if="errors.api" class="text-sm text-red-600">{{ errors.api }}</p>
 
-    <div>
-      <GlobalButton
-        @click="onSubmit"
-        :loading="loading"
-        block
-        size="large"
-      >
-        Sign in
-      </GlobalButton>
-    </div>
-
+    <button
+      type="submit"
+      class="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 px-4 text-white font-semibold shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+      :disabled="loading"
+    >
+      <i v-if="loading" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      <span>Sign in</span>
+    </button>
   </form>
 </template>
 
@@ -52,7 +49,6 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/auth'
-import { GlobalTextField, GlobalButton } from '@/components'
 import type { SignInFormData } from '../types'
 
 interface FormErrors {
@@ -66,7 +62,6 @@ const toast = useToast()
 const authStore = useAuthStore()
 
 const loading = ref(false)
-const currentYear = new Date().getFullYear()
 
 const formData = reactive<SignInFormData>({
   email: '',
@@ -75,6 +70,16 @@ const formData = reactive<SignInFormData>({
 })
 
 const errors = reactive<FormErrors>({})
+
+const baseInputClasses = 'block w-full rounded-lg border px-3 py-2 shadow-sm focus:outline-none transition-colors duration-200 text-gray-900 placeholder-gray-400'
+const inputClasses = (field: keyof FormErrors) => {
+  const hasError = Boolean(errors[field])
+  const stateClasses = hasError
+    ? 'border-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+    : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+
+  return `${baseInputClasses} ${stateClasses}`
+}
 
 const validateForm = (): boolean => {
   // Clear previous errors
@@ -86,25 +91,25 @@ const validateForm = (): boolean => {
 
   // Email validation
   if (!formData.email) {
-    errors.email = ' '
+    errors.email = 'Email is required.'
     isValid = false
   } else if (!formData.email.includes('@')) {
-    errors.email = ' '
+    errors.email = 'Please enter a valid email address.'
     isValid = false
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    errors.email = ' '
+    errors.email = 'Please enter a valid email address.'
     isValid = false
   }
 
   // Password validation
   if (!formData.password) {
-    errors.password = ' '
+    errors.password = 'Password is required.'
     isValid = false
   } else if (formData.password.length < 6) {
-    errors.password = ' '
+    errors.password = 'Password must be at least 6 characters.'
     isValid = false
   } else if (!/\d/.test(formData.password)) {
-    errors.password = ' '
+    errors.password = 'Password must contain at least one number.'
     isValid = false
   }
 
@@ -158,7 +163,3 @@ const onSubmit = async () => {
   }
 }
 </script>
-
-<style scoped>
-/* Vuetify components handle their own styling, no additional CSS needed */
-</style>

@@ -1,54 +1,56 @@
 <template>
   <Card class="profile-header-card w-full">
     <template #content>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <!-- Profile Image and Name -->
-        <div class="flex items-center space-x-6">
+        <div class="flex w-full items-center gap-4 sm:gap-6">
           <!-- Profile Image -->
-          <div>
+          <div class="shrink-0">
             <img
               :src="defaultAvatarUrl"
               :alt="displayName"
-              class="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:profile-image-pc rounded-full object-cover shadow-lg"
+              class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:profile-image-pc rounded-full object-cover shadow-lg"
             />
           </div>
 
           <!-- User Name -->
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-600">
+          <div class="flex flex-col text-left">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-700">
               {{ displayName }}
             </h1>
           </div>
         </div>
 
         <!-- Edit Profile & Change Password Buttons -->
-        <div class="flex-shrink-0 flex flex-col gap-2">
-          <div v-if="!editing" class="flex flex-row gap-2">
+        <div class="flex w-full md:w-auto flex-col gap-2">
+          <div v-if="!editing" class="flex flex-col md:flex-row gap-2">
             <Button
               @click="$emit('edit')"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
+              class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
               label="Edit Profile"
               icon="pi pi-user-edit"
             />
             <Button
               @click="$emit('change-password')"
-              class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
+              class="w-full md:w-auto font-semibold py-3 px-6"
               label="Change Password"
               icon="pi pi-key"
+              severity="secondary"
+              outlined
             />
           </div>
-          <div v-else class="flex flex-col sm:flex-row gap-2">
+          <div v-else class="flex flex-col md:flex-row gap-2">
             <Button
               @click="$emit('cancel')"
               outlined
-              class="border-2 border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
+              class="w-full border-2 border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
               label="Cancel"
               icon="pi pi-times"
               severity="secondary"
             />
             <Button
               @click="$emit('save')"
-              class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
               label="Save"
               icon="pi pi-check"
             />
@@ -76,6 +78,7 @@ defineEmits<{
   edit: []
   save: []
   cancel: []
+  'change-password': []
 }>()
 
 // Default avatar URL

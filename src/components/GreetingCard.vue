@@ -14,13 +14,13 @@
               {{ greetingMessage }}
             </h1>
             <p class="text-black">
-              Here is your overview for {{ formattedDate }}
+              Here is your overview for <br class="md:hidden">{{ formattedDate }}
             </p>
           </div>
         </div>
         
         <!-- Additional info or actions -->
-        <div class="text-right">
+        <div class="text-right flex-shrink-0">
           <div class="text-sm text-black mb-1">{{ currentTimeString }}</div>
           <div class="text-xs text-black">{{ dayOfWeek }}</div>
         </div>

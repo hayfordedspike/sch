@@ -278,8 +278,8 @@ const displayInfo = computed(() => {
   } catch (error) {
     console.error('Error getting visit display info:', error)
     return {
-      clientName: clientName.value || `Client #${props.visit?.client_id}`,
-      houseName: houseName.value || `House #${props.visit?.house_id}`,
+      clientName: clientName.value || (props.visit?.client_id ? `Client #${props.visit.client_id}` : 'No client assigned'),
+      houseName: houseName.value || (props.visit?.house_id ? `House #${props.visit.house_id}` : 'No house assigned'),
       startDate: props.visit ? new Date(props.visit.start_at).toLocaleDateString() : '',
       endDate: props.visit ? new Date(props.visit.end_at).toLocaleDateString() : '',
       duration: props.visit ? getDuration(props.visit.start_at, props.visit.end_at) : '',

@@ -110,8 +110,8 @@ const transformAssignmentsToSchedules = (assignments: Assignment[], employees: E
     const checkIn = assignment.check_in_at ? new Date(assignment.check_in_at) : null
     const checkOut = assignment.check_out_at ? new Date(assignment.check_out_at) : null
 
-    const client = visit ? clientMap.get(visit.client_id) : null
-    const house = visit ? houseMap.get(visit.house_id) : null
+    const client = visit?.client_id ? clientMap.get(visit.client_id) : null
+    const house = visit?.house_id ? houseMap.get(visit.house_id) : null
 
     // Compose a rich schedule block with all relevant info
     // Always use visit.name if present, otherwise fallback to visit ID
@@ -130,9 +130,9 @@ const transformAssignmentsToSchedules = (assignments: Assignment[], employees: E
       // Task: show visit name if present, otherwise fallback to Visit #ID
       task: `${visitName ? visitName : `Visit #${assignment.visit_id}`} (${assignment.role_on_visit})\nStatus: ${assignment.status}`,
       // Location: house name
-      location: house ? house.name : `House #${visit?.house_id || 'Unknown'}`,
+      location: house ? house.name : visit?.house_id ? `House #${visit.house_id}` : 'No house assigned',
       // Client name
-      client: client ? `${client.first_name} ${client.last_name}` : `Client #${visit?.client_id || 'Unknown'}`,
+      client: client ? `${client.first_name} ${client.last_name}` : visit?.client_id ? `Client #${visit.client_id}` : 'No client assigned',
       month: scheduledStart.getMonth(),
       // Add actual times if present
       actualStart: checkIn ? checkIn.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null,
@@ -192,6 +192,21 @@ const staffSchedules = computed(() => {
   })
 
   return sorted
+})
+
+const mobileStaffGroups = computed(() => {
+  return staffSchedules.value.map((staff, idx) => {
+    const color = STAFF_COLORS[idx % STAFF_COLORS.length]
+
+    return {
+      id: `${staff.name}-${idx}`,
+      name: staff.name,
+      position: staff.position,
+      img: staff.img || DEFAULT_USER_IMG,
+      schedules: staff.schedules,
+      color,
+    }
+  })
 })
 
 // Time slots: hourly intervals from 6am to 11:59pm
@@ -315,159 +330,225 @@ function getStaffColorClass(staffIdx: number) {
 </script>
 
 <template>
-  <!-- Filter Controls removed; filtering is now via props -->
-<div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6">
-
-
-  <!-- Schedule Grid -->
-  <div class="overflow-x-auto">
-      <div class="relative min-w-max">
-        <!-- Current Time Indicator removed as requested -->
-
-
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6">
+    <!-- Mobile Schedule Cards -->
+    <div class="md:hidden flex flex-col gap-6">
+      <template v-if="mobileStaffGroups.length">
         <div
-          class="absolute top-0 bottom-0 w-px bg-blue-500"
-          :style="{ left: employerColWidth + 'px', zIndex: 1 }"
-        ></div>
+          v-for="group in mobileStaffGroups"
+          :key="group.id"
+          class="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 flex flex-col gap-4"
+        >
+          <div class="flex items-center gap-3">
+            <img :src="group.img" alt="Staff photo" class="w-12 h-12 rounded-full border border-white shadow-sm object-cover" />
+            <div>
+              <div class="text-base font-semibold text-gray-900 leading-tight">
+                {{ group.name }}
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                {{ group.position }}
+              </div>
+            </div>
+          </div>
 
-        <!-- Main Table -->
-        <table class="min-w-full border-separate border-spacing-0">
-          <thead>
-            <tr>
-              <th
-                class="bg-gray-200 text-left px-6 py-4 font-semibold text-gray-700 border-b border-gray-200 rounded-tl-lg sticky left-0 z-10 cursor-pointer select-none flex items-center gap-2"
-                @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
-              >
-                <span>Employee Name</span>
-                <span>
-                  <svg v-if="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                  </svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </span>
-              </th>
-              <th
-                v-for="timeSlot in allTimeSlots"
-                :key="timeSlot"
-                class="bg-gray-200 px-3 py-4 font-semibold text-gray-700 border-b border-gray-200 text-center min-w-[90px]"
-                :class="{
-                  'bg-blue-50': true,
-                  'rounded-tr-lg': timeSlot === allTimeSlots[allTimeSlots.length - 1]
-                }"
-              >
-                <div class="flex flex-col items-center">
-                  <span class="text-xs font-bold text-gray-700">
-                    {{ timeSlot.split(':')[0] }} {{ timeSlot.split(' ')[1] }}
-                  </span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(staff, staffIdx) in staffSchedules"
-              :key="staff.name"
-              :class="staffIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+          <div v-if="group.schedules.length" class="flex flex-col gap-3">
+            <div
+              v-for="(schedule, scheduleIdx) in group.schedules"
+              :key="`${group.id}-${scheduleIdx}`"
+              class="rounded-xl border px-4 py-3 shadow-sm"
+              :class="[group.color.bg, group.color.border]"
             >
-              <!-- Staff Info Column -->
-              <td
-                class="px-6 py-4 border-b border-gray-100 font-medium text-gray-900 whitespace-nowrap employer-cell sticky left-0 z-10 bg-inherit"
-                :style="{ width: employerColWidth + 'px' }"
-              >
-                <div class="flex items-center">
-                  <div class="relative">
-                    <img :src="staff.img" alt="Staff photo" class="roster-avatar w-12 h-12 rounded-full mr-4 border-2 border-white shadow-sm" />
-
-                  </div>
-                  <div class="flex flex-col">
-                    <div class="text-sm font-semibold text-gray-900">{{ staff.name }}</div>
-                    <div class="text-xs text-gray-500 mt-0.5">{{ staff.email }}</div>
-                    <div
-                      class="text-xs mt-2 px-3 py-1 rounded-full font-semibold inline-block max-w-fit"
-                      :class="staff.schedules.length > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'"
-                    >
-                      {{ staff.position }}
-
-                    </div>
-                  </div>
+              <div class="flex items-center justify-between gap-3">
+                <div class="text-sm font-semibold text-gray-900">
+                  {{ group.name }}
                 </div>
-              </td>
+                <div class="flex items-center gap-1 text-xs text-gray-700 max-w-[55%] justify-end">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <span class="font-medium leading-tight text-right truncate">{{ schedule.location }}</span>
+                </div>
+              </div>
 
-              <!-- Time Slot Columns -->
-              <template v-for="timeSlot in allTimeSlots" :key="timeSlot">
-                <template v-if="shouldRenderScheduleCell(staff, timeSlot)">
-                  <td
-                    :colspan="getScheduleColspan(staff, timeSlot)"
-                    class="px-2 py-2 border-b border-gray-100 text-center align-top"
-                  >
-                    <div
-                      v-if="getScheduleBlock(staff, timeSlot)"
-                      :class="[
-                        getStaffColorClass(staffIdx),
-                        'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm'
-                      ]"
-                    >
-                      <!-- Schedule Header -->
-                      <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-1.5">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
-                          </svg>
-                          <span class="font-semibold text-xs">
-                            {{ getScheduleBlock(staff, timeSlot)?.start }} - {{ getScheduleBlock(staff, timeSlot)?.end }}
-                          </span>
-                        </div>
-                      </div>
+              <div class="flex items-center justify-between gap-3 text-xs text-gray-600 mt-1">
+                <div class="flex items-center gap-1 max-w-[60%]">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                  </svg>
+                  <span class="font-medium leading-tight truncate">{{ schedule.client }}</span>
+                </div>
+                <span class="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                  {{ group.position }}
+                </span>
+              </div>
 
-                      <!-- Schedule Content -->
-                      <div class="space-y-1">
-                        <div class="font-bold text-sm leading-tight whitespace-pre-line">
-                          {{ getScheduleBlock(staff, timeSlot)?.task }}
-                        </div>
-                        <div class="text-xs opacity-75 flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                          </svg>
-                          {{ getScheduleBlock(staff, timeSlot)?.location }}
-                        </div>
-                        <div class="text-xs opacity-75 flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
-                          </svg>
-                          <span>Client: {{ getScheduleBlock(staff, timeSlot)?.client }}</span>
-                        </div>
-                        <div v-if="getScheduleBlock(staff, timeSlot)?.actualStart || getScheduleBlock(staff, timeSlot)?.actualEnd" class="text-xs opacity-75 flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                          </svg>
-                          <span>
-                            Actual:
-                            <span v-if="getScheduleBlock(staff, timeSlot)?.actualStart">Check-in: {{ getScheduleBlock(staff, timeSlot)?.actualStart }}</span>
-                            <span v-if="getScheduleBlock(staff, timeSlot)?.actualEnd"> | Check-out: {{ getScheduleBlock(staff, timeSlot)?.actualEnd }}</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+              <div class="text-sm text-gray-800 whitespace-pre-line mt-3">
+                {{ schedule.task }}
+              </div>
 
-                    <!-- Empty State -->
-                    <div v-else class="flex items-center justify-center h-full min-h-[80px]">
-                      <span class="text-gray-400 text-xs italic">No Schedule</span>
-                    </div>
-                  </td>
-                </template>
-              </template>
-            </tr>
-          </tbody>
-        </table>
+              <div class="text-sm font-semibold text-gray-900 mt-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l3 2"/>
+                </svg>
+                <span>{{ schedule.start }} - {{ schedule.end }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="text-sm text-gray-500 text-center py-4 border border-dashed rounded-xl">
+            No schedules for this member.
+          </div>
+        </div>
+      </template>
+      <div v-else class="text-center text-gray-500 text-sm py-6 border border-dashed rounded-2xl">
+        No schedules available for this period.
       </div>
     </div>
 
-    <!-- Legend removed as requested -->
+    <!-- Desktop Schedule Grid -->
+    <div class="hidden md:block">
+      <div class="overflow-x-auto">
+        <div class="relative min-w-max">
+          <div
+            class="absolute top-0 bottom-0 w-px bg-blue-500"
+            :style="{ left: employerColWidth + 'px', zIndex: 1 }"
+          ></div>
+
+          <table class="min-w-full border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th
+                  class="bg-gray-200 text-left px-6 py-4 font-semibold text-gray-700 border-b border-gray-200 rounded-tl-lg sticky left-0 z-10 cursor-pointer select-none flex items-center gap-2"
+                  @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                >
+                  <span>Employee Name</span>
+                  <span>
+                    <svg v-if="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </th>
+                <th
+                  v-for="timeSlot in allTimeSlots"
+                  :key="timeSlot"
+                  class="bg-gray-200 px-3 py-4 font-semibold text-gray-700 border-b border-gray-200 text-center min-w-[90px]"
+                  :class="{
+                    'bg-blue-50': true,
+                    'rounded-tr-lg': timeSlot === allTimeSlots[allTimeSlots.length - 1]
+                  }"
+                >
+                  <div class="flex flex-col items-center">
+                    <span class="text-xs font-bold text-gray-700">
+                      {{ timeSlot.split(':')[0] }} {{ timeSlot.split(' ')[1] }}
+                    </span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(staff, staffIdx) in staffSchedules"
+                :key="staff.name"
+                :class="staffIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+              >
+                <td
+                  class="px-6 py-4 border-b border-gray-100 font-medium text-gray-900 whitespace-nowrap employer-cell sticky left-0 z-10 bg-inherit"
+                  :style="{ width: employerColWidth + 'px' }"
+                >
+                  <div class="flex items-center">
+                    <div class="relative">
+                      <img :src="staff.img" alt="Staff photo" class="roster-avatar w-12 h-12 rounded-full mr-4 border-2 border-white shadow-sm" />
+                    </div>
+                    <div class="flex flex-col">
+                      <div class="text-sm font-semibold text-gray-900">{{ staff.name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">{{ staff.email }}</div>
+                      <div
+                        class="text-xs mt-2 px-3 py-1 rounded-full font-semibold inline-block max-w-fit"
+                        :class="staff.schedules.length > 0 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'"
+                      >
+                        {{ staff.position }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <template v-for="timeSlot in allTimeSlots" :key="timeSlot">
+                  <template v-if="shouldRenderScheduleCell(staff, timeSlot)">
+                    <td
+                      :colspan="getScheduleColspan(staff, timeSlot)"
+                      class="px-2 py-2 border-b border-gray-100 text-center align-top"
+                    >
+                      <div
+                        v-if="getScheduleBlock(staff, timeSlot)"
+                        :class="[
+                          getStaffColorClass(staffIdx),
+                          'rounded-lg px-3 py-3 border text-left h-full flex flex-col justify-between shadow-sm'
+                        ]"
+                      >
+                        <div class="flex items-center justify-between mb-2">
+                          <div class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span class="font-semibold text-xs">
+                              {{ getScheduleBlock(staff, timeSlot)?.start }} - {{ getScheduleBlock(staff, timeSlot)?.end }}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div class="space-y-1">
+                          <div class="font-bold text-sm leading-tight whitespace-pre-line">
+                            {{ getScheduleBlock(staff, timeSlot)?.task }}
+                          </div>
+                          <div class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {{ getScheduleBlock(staff, timeSlot)?.location }}
+                          </div>
+                          <div class="text-xs opacity-75 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span>Client: {{ getScheduleBlock(staff, timeSlot)?.client }}</span>
+                          </div>
+                          <div
+                            v-if="getScheduleBlock(staff, timeSlot)?.actualStart || getScheduleBlock(staff, timeSlot)?.actualEnd"
+                            class="text-xs opacity-75 flex items-center gap-1"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                            <span>
+                              Actual:
+                              <span v-if="getScheduleBlock(staff, timeSlot)?.actualStart">Check-in: {{ getScheduleBlock(staff, timeSlot)?.actualStart }}</span>
+                              <span v-if="getScheduleBlock(staff, timeSlot)?.actualEnd"> | Check-out: {{ getScheduleBlock(staff, timeSlot)?.actualEnd }}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else class="flex items-center justify-center h-full min-h-[80px]">
+                        <span class="text-gray-400 text-xs italic">No Schedule</span>
+                      </div>
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

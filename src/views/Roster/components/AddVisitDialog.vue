@@ -8,8 +8,28 @@
   >
     <div class="p-fluid">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="field md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Visit For</label>
+          <div class="flex gap-3">
+            <Button
+              label="Client"
+              type="button"
+              :severity="visitAssignmentType === 'client' ? 'primary' : 'secondary'"
+              :outlined="visitAssignmentType !== 'client'"
+              @click="visitAssignmentType = 'client'"
+            />
+            <Button
+              label="House"
+              type="button"
+              :severity="visitAssignmentType === 'house' ? 'primary' : 'secondary'"
+              :outlined="visitAssignmentType !== 'house'"
+              @click="visitAssignmentType = 'house'"
+            />
+          </div>
+        </div>
+
         <!-- Client Selection -->
-        <div class="field">
+        <div v-if="visitAssignmentType === 'client'" class="field">
           <label for="clientSelect" class="block text-sm font-medium text-gray-700 mb-2">Client *</label>
           <Dropdown
             id="clientSelect"
@@ -26,7 +46,7 @@
         </div>
 
         <!-- House Selection -->
-        <div class="field">
+        <div v-else class="field">
           <label for="houseSelect" class="block text-sm font-medium text-gray-700 mb-2">House *</label>
           <Dropdown
             id="houseSelect"
@@ -167,8 +187,8 @@ const dialogVisible = computed({
 })
 
 const formData = ref<CreateVisitRequest>({
-  client_id: 0,
-  house_id: 0,
+  client_id: null,
+  house_id: null,
   start_at: '',
   end_at: '',
   required_staff_count: 1,
@@ -176,6 +196,7 @@ const formData = ref<CreateVisitRequest>({
   created_by_id: 0
 })
 
+const visitAssignmentType = ref<'client' | 'house'>('client')
 const startDateTime = ref<Date | null>(null)
 const endDateTime = ref<Date | null>(null)
 const submitting = ref(false)
@@ -214,12 +235,13 @@ watch(() => props.visit, (newVisit) => {
       notes: newVisit.notes,
       created_by_id: newVisit.created_by_id
     }
+    visitAssignmentType.value = newVisit.client_id ? 'client' : 'house'
     startDateTime.value = new Date(newVisit.start_at)
     endDateTime.value = new Date(newVisit.end_at)
   } else {
     formData.value = {
-      client_id: 0,
-      house_id: 0,
+      client_id: null,
+      house_id: null,
       start_at: '',
       end_at: '',
       required_staff_count: 1,
@@ -228,9 +250,24 @@ watch(() => props.visit, (newVisit) => {
     }
     startDateTime.value = null
     endDateTime.value = null
+    visitAssignmentType.value = 'client'
   }
   errors.value = {}
 }, { immediate: true })
+
+watch(visitAssignmentType, (type) => {
+  if (type === 'client') {
+    formData.value.house_id = null
+  } else {
+    formData.value.client_id = null
+  }
+  if (type === 'client' && errors.value.house_id) {
+    delete errors.value.house_id
+  }
+  if (type === 'house' && errors.value.client_id) {
+    delete errors.value.client_id
+  }
+})
 
 // Watch for date/time changes
 watch([startDateTime, endDateTime], () => {
@@ -258,10 +295,11 @@ loadData()
 const validateForm = () => {
   errors.value = {}
 
-  if (!formData.value.client_id) {
-    errors.value.client_id = 'Client is required'
-  }
-  if (!formData.value.house_id) {
+  if (visitAssignmentType.value === 'client') {
+    if (!formData.value.client_id) {
+      errors.value.client_id = 'Client is required'
+    }
+  } else if (!formData.value.house_id) {
     errors.value.house_id = 'House is required'
   }
   if (!formData.value.start_at) {
@@ -301,8 +339,8 @@ const handleSave = async () => {
     if (props.visit) {
       // Update existing visit
       const updateData: UpdateVisitRequest = {
-        client_id: formData.value.client_id,
-        house_id: formData.value.house_id,
+        client_id: visitAssignmentType.value === 'client' ? formData.value.client_id : null,
+        house_id: visitAssignmentType.value === 'house' ? formData.value.house_id : null,
         start_at: formData.value.start_at,
         end_at: formData.value.end_at,
         required_staff_count: formData.value.required_staff_count,
@@ -318,7 +356,12 @@ const handleSave = async () => {
     } else {
       // Create new visit
       console.log('[AddVisitDialog] Calling createVisit', formData.value)
-      const result = await createVisit(formData.value)
+      const payload: CreateVisitRequest = {
+        ...formData.value,
+        client_id: visitAssignmentType.value === 'client' ? formData.value.client_id ?? null : null,
+        house_id: visitAssignmentType.value === 'house' ? formData.value.house_id ?? null : null
+      }
+      const result = await createVisit(payload)
       console.log('[AddVisitDialog] createVisit result', result)
       if (result.success && result.data) {
         emit('visit-added', result.data)

@@ -6,7 +6,7 @@ export interface Client {
   last_name: string
   email: string
   phone: string
-  house_id: number
+  house_id: number | null
   address_line_1: string
   address_line_2?: string
   city: string
@@ -29,7 +29,7 @@ export interface CreateClientRequest {
   last_name: string
   email: string
   phone: string
-  house_id: number
+  house_id?: number | null
   address_line_1: string
   address_line_2?: string
   city: string
@@ -49,7 +49,7 @@ export interface UpdateClientRequest {
   last_name?: string
   email?: string
   phone?: string
-  house_id?: number
+  house_id?: number | null
   address_line_1?: string
   address_line_2?: string
   city?: string

@@ -87,7 +87,17 @@
 
           <!-- House Selection -->
           <div class="flex flex-col gap-2 md:col-span-2">
-            <label class="font-semibold">Select House *</label>
+            <div class="flex items-center justify-between">
+              <label class="font-semibold">Select House (optional)</label>
+              <Button
+                v-if="formData.house_id"
+                label="Clear"
+                severity="secondary"
+                text
+                size="small"
+                @click="clearHouseSelection"
+              />
+            </div>
 
             <!-- Loading State -->
             <div v-if="housesLoading" class="flex items-center justify-center py-8">
@@ -128,8 +138,6 @@
               <i class="pi pi-home text-gray-300 text-2xl mb-2"></i>
               <p class="text-gray-600 text-sm">No houses available</p>
             </div>
-
-            <small v-if="errors.house_id" class="text-red-500">{{ errors.house_id }}</small>
           </div>
         </div>
       </div>
@@ -351,7 +359,7 @@ const formData = ref<CreateClientRequest>({
   last_name: '',
   email: '',
   phone: '',
-  house_id: 1,
+  house_id: null,
   address_line_1: '',
   address_line_2: '',
   city: '',
@@ -408,7 +416,7 @@ const resetForm = () => {
     last_name: '',
     email: '',
     phone: '',
-    house_id: 0,
+    house_id: null,
     address_line_1: '',
     address_line_2: '',
     city: '',
@@ -435,7 +443,7 @@ watch(
         last_name: newClient.last_name,
         email: newClient.email,
         phone: newClient.phone,
-        house_id: newClient.house_id,
+        house_id: newClient.house_id ?? null,
         address_line_1: newClient.address_line_1,
         address_line_2: newClient.address_line_2 || '',
         city: newClient.city,
@@ -468,11 +476,11 @@ watch(dateOfBirth, (newDate) => {
 
 // House selection methods
 const selectHouse = (house: House) => {
-  formData.value.house_id = house.id
-  // Clear any house selection errors
-  if (errors.value.house_id) {
-    delete errors.value.house_id
-  }
+  formData.value.house_id = formData.value.house_id === house.id ? null : house.id
+}
+
+const clearHouseSelection = () => {
+  formData.value.house_id = null
 }
 
 const validateForm = (): boolean => {

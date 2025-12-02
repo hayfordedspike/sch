@@ -24,7 +24,14 @@
               </div>
               <div class="flex justify-end gap-2 mt-6">
                 <Button label="Cancel" @click="showChangePasswordDialog = false" severity="secondary" outlined />
-                <Button label="Change Password" type="submit" class="bg-orange-500 text-white" />
+                <Button
+                  label="Change Password"
+                  type="submit"
+                  severity="secondary"
+                  class="font-semibold"
+                  :loading="changePasswordLoading"
+                  :disabled="changePasswordLoading"
+                />
               </div>
             </form>
           </Dialog>
@@ -84,10 +91,10 @@
 import { ref, computed, onMounted } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useProfile } from '@/composables/useProfile'
+import { useChangePassword } from '@/composables/useChangePassword'
 import { useCertificates } from '@/composables/useCertificates'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
@@ -104,6 +111,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 const { profile, fetchProfile, updateProfile } = useProfile()
+const { changePassword, loading: changePasswordLoading } = useChangePassword()
 const {
   fetchActiveCertificates,
   getCertificate,
@@ -120,24 +128,21 @@ const changePasswordForm = ref({
   current_password: '',
   new_password: ''
 })
-const { user } = useAuth()
+const profileData = ref<ProfileData>({
+  fullName: '',
+  address: '',
+  dateOfBirth: '',
+  phone: '',
+  email: ''
+})
 // Change Password handler
 const handleChangePassword = async () => {
-  try {
-    const res = await fetch('/auth/change-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(changePasswordForm.value)
-    })
-    if (!res.ok) throw new Error('Failed to change password')
-    toast.add({ severity: 'success', summary: 'Password Changed', detail: 'Your password has been updated.', life: 3000 })
+  const success = await changePassword({ ...changePasswordForm.value })
+
+  if (success) {
     showChangePasswordDialog.value = false
     changePasswordForm.value.current_password = ''
     changePasswordForm.value.new_password = ''
-  } catch (err) {
-    toast.add({ severity: 'error', summary: 'Error', detail: err.message || 'Could not change password.', life: 4000 })
   }
 }
 
