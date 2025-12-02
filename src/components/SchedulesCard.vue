@@ -28,9 +28,9 @@ const completed = ref<Schedule[]>([
 </script>
 
 <template>
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="schedule-cards">
     <!-- Today's Schedule Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
+    <div class="schedule-card bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
       <div class="flex items-center mb-4 pl-2">
         <div class="bg-blue-50 border border-blue-200 rounded-none p-2 mr-6 mt-1 w-10 h-10 flex items-center justify-center">
           <i class="pi pi-calendar text-blue-600 text-xl"></i>
@@ -41,7 +41,7 @@ const completed = ref<Schedule[]>([
     </div>
 
     <!-- Upcoming Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
+    <div class="schedule-card bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
       <div class="flex items-center mb-4 pl-2">
         <div class="bg-orange-50 border border-orange-200 rounded-none p-2 mr-6 mt-1 w-10 h-10 flex items-center justify-center">
           <i class="pi pi-clock text-orange-600 text-xl"></i>
@@ -52,7 +52,7 @@ const completed = ref<Schedule[]>([
     </div>
 
     <!-- In Progress Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
+    <div class="schedule-card bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
       <div class="flex items-center mb-4 pl-2">
         <div class="bg-purple-50 border border-purple-200 rounded-none p-2 mr-6 mt-1 w-10 h-10 flex items-center justify-center">
           <i class="pi pi-play-circle text-purple-600 text-xl"></i>
@@ -63,7 +63,7 @@ const completed = ref<Schedule[]>([
     </div>
 
     <!-- Completed Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
+    <div class="schedule-card bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex flex-col gap-4">
       <div class="flex items-center mb-4 pl-2">
         <div class="bg-green-50 border border-green-200 rounded-none p-2 mr-6 mt-1 w-10 h-10 flex items-center justify-center">
           <i class="pi pi-check-circle text-green-600 text-xl"></i>
@@ -74,3 +74,42 @@ const completed = ref<Schedule[]>([
     </div>
   </div>
 </template>
+
+<style scoped>
+.schedule-cards {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x proximity;
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.schedule-cards::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.schedule-card {
+  min-width: 16rem;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .schedule-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .schedule-card {
+    min-width: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .schedule-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+</style>

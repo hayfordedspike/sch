@@ -4,10 +4,11 @@ import NotificationDrawer from '@/components/NotificationDrawer.vue';
 import { useNotifications } from '@/composables/useNotifications';
 // ...existing code...
 const notificationDrawerVisible = ref(false);
-const { notifications } = useNotifications();
-const notificationCount = computed(() => notifications.value.length);
+const { notifications, loading: notificationsLoading, fetchNotifications } = useNotifications();
+const notificationCount = computed(() => notifications.value.filter(notification => !notification.is_read).length);
 
-function openNotificationDrawer() {
+async function openNotificationDrawer() {
+  await fetchNotifications();
   notificationDrawerVisible.value = true;
 }
 function closeNotificationDrawer() {
@@ -40,6 +41,7 @@ const updateIsMobile = () => {
 onMounted(() => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
+  fetchNotifications()
 })
 
 onUnmounted(() => {
@@ -226,7 +228,12 @@ const handleLogout = async () => {
             </div>
           </div>
         </div>
-        <NotificationDrawer :visible="notificationDrawerVisible" :notifications="notifications" @close="closeNotificationDrawer" />
+        <NotificationDrawer
+          :visible="notificationDrawerVisible"
+          :notifications="notifications"
+          :loading="notificationsLoading"
+          @close="closeNotificationDrawer"
+        />
       </div>
     </div>
         <div v-if="!isMobile" class="flex items-center gap-3 w-full md:w-auto justify-end md:ml-8">
