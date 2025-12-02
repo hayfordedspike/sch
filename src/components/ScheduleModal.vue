@@ -9,7 +9,14 @@
       <div class="mb-4 flex gap-4">
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Assign To</label>
-          <Dropdown v-model="form.assignedTo" :options="assignToOptions" optionLabel="name" optionValue="email" class="w-full" placeholder="Select staff" />
+          <Dropdown
+            v-model="form.assignedTo"
+            :options="assignToOptions"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            placeholder="Select staff"
+          />
         </div>
       </div>
       <div class="mb-4 flex gap-2">
@@ -58,7 +65,7 @@ import { useClients } from '@/composables/useClients'
 
 // Use active clients for client dropdown
 const { clients, fetchClients, activeClients } = useClients()
-const clientOptions = ref<{ label: string, value: string }[]>([])
+const clientOptions = ref<{ label: string; value: number }[]>([])
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits(['update:visible'])
@@ -69,11 +76,11 @@ watch(() => props.visible, v => visible.value = v)
 
 const form = ref({
   title: '',
-  assignedTo: '',
-  date: null,
+  assignedTo: null as number | null,
+  date: null as Date | null,
   startTime: '',
   endTime: '',
-  client: '',
+  client: null as number | null,
   location: '',
   note: ''
 })
@@ -93,14 +100,20 @@ const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
 
 // Use active employees for assign-to dropdown
 const { employees, fetchEmployees, activeEmployees } = useEmployees()
-const assignToOptions = ref<{ name: string, email: string }[]>([])
+const assignToOptions = ref<{ label: string; value: number }[]>([])
 
 onMounted(async () => {
   await fetchEmployees({ status: 'ACTIVE', limit: 100 })
-  assignToOptions.value = activeEmployees.value.map(e => ({ name: `${e.first_name} ${e.last_name}`, email: e.email }))
+  assignToOptions.value = activeEmployees.value.map(e => ({
+    label: `${e.first_name} ${e.last_name}`,
+    value: e.id
+  }))
 
   await fetchClients({ is_active: true, limit: 100 })
-  clientOptions.value = activeClients.value.map(c => ({ label: `${c.first_name} ${c.last_name}`, value: c.id }))
+  clientOptions.value = activeClients.value.map(c => ({
+    label: `${c.first_name} ${c.last_name}`,
+    value: c.id
+  }))
 })
 
 function close() {
@@ -131,10 +144,11 @@ async function handleSubmit() {
       })
     }
   } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to create schedule.'
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: err?.message || 'Failed to create schedule.',
+      detail: message,
       life: 4000
     })
   }

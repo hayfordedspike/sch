@@ -7,6 +7,7 @@ export interface Employee {
   first_name: string
   last_name: string
   phone: string
+  email?: string | null
   status: EmployeeStatus
   hire_date: string
   user_id: number

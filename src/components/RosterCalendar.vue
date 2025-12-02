@@ -27,6 +27,8 @@ interface Schedule {
   client: string;
   month?: number;
   day?: number; // Add day property for week view
+  actualStart?: string | null;
+  actualEnd?: string | null;
 }
 
 interface StaffMember {
@@ -109,8 +111,8 @@ const transformAssignmentsToSchedules = (assignments: Assignment[], employees: E
     const checkIn = assignment.check_in_at ? new Date(assignment.check_in_at) : null
     const checkOut = assignment.check_out_at ? new Date(assignment.check_out_at) : null
 
-    const client = visit ? clientMap.get(visit.client_id) : null
-    const house = visit ? houseMap.get(visit.house_id) : null
+    const client = visit && visit.client_id ? clientMap.get(visit.client_id) : null
+    const house = visit && visit.house_id ? houseMap.get(visit.house_id) : null
 
     // Always use visit.name if present, otherwise fallback to visit ID
     let visitName = visit && typeof visit.name === 'string' && visit.name.trim() !== '' ? visit.name : null;

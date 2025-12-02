@@ -8,6 +8,10 @@ export interface Visit {
   notes: string
   created_by_id: number
   created_at: string
+  updated_at?: string
+  name?: string | null
+  assigned_by_id?: number | null
+  status?: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | string
 }
 
 export interface CreateVisitRequest {

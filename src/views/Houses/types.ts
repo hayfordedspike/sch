@@ -56,6 +56,7 @@ export interface HouseSearchParams {
   region?: string
   skip?: number
   limit?: number
+  is_active?: boolean
 }
 
 // Computed house properties for display

@@ -151,9 +151,12 @@ const showDetailsDialog = ref(false)
 const displayInfo = computed(() => getClientDisplayInfo(props.client))
 
 // Get house name by ID
-const getHouseName = (houseId: number) => {
+const getHouseName = (houseId: number | null | undefined) => {
+  if (!houseId) {
+    return 'No house assigned'
+  }
   const house = houses.value.find(h => h.id === houseId)
-  return house ? house.name : 'Unknown House'
+  return house ? house.name : `House #${houseId}`
 }
 
 // Methods

@@ -256,6 +256,8 @@ import { computed, watch, ref, onMounted } from 'vue'
 import { useAssignments } from '@/composables/useAssignments'
 import { useEmployees } from '@/composables/useEmployees'
 import { useVisits } from '@/composables/useVisits'
+import { useClients } from '@/composables/useClients'
+import { useHouses } from '@/composables/useHouses'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -288,6 +290,8 @@ const isVisible = computed<boolean>({
 
 const { getEmployee } = useEmployees()
 const { getVisit } = useVisits()
+const { getClient } = useClients()
+const { getHouse } = useHouses()
 
 const employeeName = ref('')
 const visitInfo = ref('')
@@ -302,13 +306,18 @@ async function fetchNames() {
   }
   if (props.assignment?.visit_id) {
     const visit = await getVisit(props.assignment.visit_id)
+    visitInfo.value = visit?.name ? visit.name : `Visit #${props.assignment.visit_id}`
     if (visit?.client_id) {
-      const client = await getEmployee(visit.client_id)
-      clientName.value = client ? `${client.first_name} ${client.last_name}` : ''
+      const client = await getClient(visit.client_id)
+      clientName.value = client ? `${client.first_name} ${client.last_name}` : `Client #${visit.client_id}`
+    } else {
+      clientName.value = visit?.client_id ? `Client #${visit.client_id}` : 'No client assigned'
     }
     if (visit?.house_id) {
       const house = await getHouse(visit.house_id)
-      houseName.value = house ? house.name : ''
+      houseName.value = house ? house.name : `House #${visit.house_id}`
+    } else {
+      houseName.value = 'No house assigned'
     }
   }
   if (props.assignment?.assigned_by_id) {
@@ -335,12 +344,20 @@ function getDuration(start: string | Date, end: string | Date): string {
 
 const displayInfo = computed(() => {
   if (!props.assignment) return null
+  const statusSeverity: Record<Assignment['status'], string> = {
+    TENTATIVE: 'warning',
+    CONFIRMED: 'info',
+    IN_PROGRESS: 'success',
+    COMPLETED: 'success',
+    CANCELLED: 'danger'
+  }
   return {
     id: props.assignment.id,
     employeeName: employeeName.value || `Employee #${props.assignment.employee_id}`,
     visitInfo: visitInfo.value || `Visit #${props.assignment.visit_id}`,
     role: props.assignment.role_on_visit,
     status: props.assignment.status,
+    statusColor: statusSeverity[props.assignment.status] || 'secondary',
     scheduledStart: new Date(props.assignment.scheduled_start_at).toLocaleString(),
     scheduledEnd: new Date(props.assignment.scheduled_end_at).toLocaleString(),
     duration: getDuration(props.assignment.scheduled_start_at, props.assignment.scheduled_end_at),

@@ -25,7 +25,16 @@ const inputRef = ref()
 
 const hasError = computed(() => {
   const errorMessages = attrs['error-messages']
-  return errorMessages && (Array.isArray(errorMessages) ? errorMessages.length > 0 : errorMessages.trim().length > 0)
+
+  if (Array.isArray(errorMessages)) {
+    return errorMessages.length > 0
+  }
+
+  if (typeof errorMessages === 'string') {
+    return errorMessages.trim().length > 0
+  }
+
+  return false
 })
 
 const hasRequiredError = computed(() => {
