@@ -138,7 +138,8 @@ export function useVisits() {
       const queryParams = new URLSearchParams()
       if (includeRelationships) queryParams.append('include_relationships', 'true')
 
-      const url = `${VISITS_BASE}${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const detailBase = `${VISITS_BASE}${id}/`
+      const url = `${detailBase}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
       const response = await get<Visit>(url, {
         showErrorToast: true
@@ -186,7 +187,7 @@ export function useVisits() {
 
   const updateVisit = async (id: number, visitData: UpdateVisitRequest) => {
     try {
-      const response = await put<Visit>(`${VISITS_BASE}${id}`, visitData, {
+      const response = await put<Visit>(`${VISITS_BASE}${id}/`, visitData, {
         showSuccessToast: true,
         successMessage: 'Visit updated successfully',
         showErrorToast: true
@@ -209,7 +210,7 @@ export function useVisits() {
 
   const deleteVisit = async (id: number) => {
     try {
-      const response = await del(`${VISITS_BASE}${id}`, {
+      const response = await del(`${VISITS_BASE}${id}/`, {
         showSuccessToast: true,
         successMessage: 'Visit deleted successfully',
         showErrorToast: true

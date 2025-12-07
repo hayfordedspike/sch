@@ -266,7 +266,8 @@ const {
 const clientOptions = computed(() => {
   return clients.value.map(client => ({
     label: `${client.first_name} ${client.last_name}`,
-    value: client.id
+    value: client.id,
+    houseId: client.house_id ?? null
   }))
 })
 

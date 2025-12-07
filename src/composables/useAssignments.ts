@@ -134,7 +134,8 @@ export function useAssignments() {
       const queryParams = new URLSearchParams()
       if (includeRelationships) queryParams.append('include_relationships', 'true')
 
-      const url = `${ASSIGNMENTS_BASE}${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const detailBase = `${ASSIGNMENTS_BASE}${id}/`
+      const url = `${detailBase}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
       const response = await get<Assignment>(url, {
         showErrorToast: true
@@ -173,7 +174,7 @@ export function useAssignments() {
 
   const updateAssignment = async (id: number, assignmentData: UpdateAssignmentRequest) => {
     try {
-      const response = await put<Assignment>(`${ASSIGNMENTS_BASE}${id}`, assignmentData, {
+      const response = await put<Assignment>(`${ASSIGNMENTS_BASE}${id}/`, assignmentData, {
         showSuccessToast: true,
         successMessage: 'Assignment updated successfully',
         showErrorToast: true
@@ -196,7 +197,7 @@ export function useAssignments() {
 
   const deleteAssignment = async (id: number) => {
     try {
-      const response = await del(`${ASSIGNMENTS_BASE}${id}`, {
+      const response = await del(`${ASSIGNMENTS_BASE}${id}/`, {
         showSuccessToast: true,
         successMessage: 'Assignment deleted successfully',
         showErrorToast: true
@@ -218,7 +219,7 @@ export function useAssignments() {
 
   const checkInAssignment = async (id: number, checkInData: CheckInRequest) => {
     try {
-      const response = await post<Assignment>(`${ASSIGNMENTS_BASE}${id}/check-in`, checkInData, {
+      const response = await post<Assignment>(`${ASSIGNMENTS_BASE}${id}/check-in/`, checkInData, {
         showSuccessToast: true,
         successMessage: 'Checked in successfully',
         showErrorToast: true
@@ -241,7 +242,7 @@ export function useAssignments() {
 
   const checkOutAssignment = async (id: number, checkOutData: CheckOutRequest) => {
     try {
-      const response = await post<Assignment>(`${ASSIGNMENTS_BASE}${id}/check-out`, checkOutData, {
+      const response = await post<Assignment>(`${ASSIGNMENTS_BASE}${id}/check-out/`, checkOutData, {
         showSuccessToast: true,
         successMessage: 'Checked out successfully',
         showErrorToast: true

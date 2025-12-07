@@ -33,7 +33,7 @@
           <label for="clientSelect" class="block text-sm font-medium text-gray-700 mb-2">Client *</label>
           <Dropdown
             id="clientSelect"
-            v-model="formData.client_id"
+            v-model="selectedClientId"
             :options="clientOptions"
             option-label="label"
             option-value="value"
@@ -50,7 +50,7 @@
           <label for="houseSelect" class="block text-sm font-medium text-gray-700 mb-2">House *</label>
           <Dropdown
             id="houseSelect"
-            v-model="formData.house_id"
+            v-model="selectedHouseId"
             :options="houseOptions"
             option-label="label"
             option-value="value"
@@ -153,14 +153,28 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import type { Visit, CreateVisitRequest, UpdateVisitRequest } from '@/views/Roster/types'
 
+interface ClientOption {
+  label: string
+  value: number
+  houseId?: number | null
+}
+
 interface Props {
   visible: boolean
   visit: Visit | null
-  clientOptions: Array<{ label: string; value: number }>
+  clientOptions: ClientOption[]
   clientsLoading?: boolean
 }
 
 const props = defineProps<Props>()
+
+const getClientHouseId = (clientId: number | null | undefined) => {
+  if (!clientId) {
+    return null
+  }
+  const option = props.clientOptions.find(option => option.value === clientId)
+  return option?.houseId ?? null
+}
 
 const emit = defineEmits<{
   'update:visible': [value: boolean]
@@ -186,6 +200,8 @@ const formData = ref<CreateVisitRequest>({
   notes: '',
   created_by_id: defaultCreatedById.value
 })
+const selectedClientId = ref<number | null>(null)
+const selectedHouseId = ref<number | null>(null)
 
 const visitAssignmentType = ref<'client' | 'house'>('client')
 const startDateTime = ref<Date | null>(null)
@@ -217,6 +233,8 @@ watch(() => props.visit, (newVisit) => {
       notes: newVisit.notes,
       created_by_id: newVisit.created_by_id
     }
+    selectedClientId.value = newVisit.client_id ?? null
+    selectedHouseId.value = newVisit.house_id ?? null
     visitAssignmentType.value = newVisit.client_id ? 'client' : 'house'
     startDateTime.value = new Date(newVisit.start_at)
     endDateTime.value = new Date(newVisit.end_at)
@@ -230,6 +248,8 @@ watch(() => props.visit, (newVisit) => {
       notes: '',
       created_by_id: defaultCreatedById.value
     }
+    selectedClientId.value = null
+    selectedHouseId.value = null
     startDateTime.value = null
     endDateTime.value = null
     visitAssignmentType.value = 'client'
@@ -239,8 +259,10 @@ watch(() => props.visit, (newVisit) => {
 
 watch(visitAssignmentType, (type) => {
   if (type === 'client') {
-    formData.value.house_id = null
+    selectedHouseId.value = null
+    formData.value.house_id = getClientHouseId(selectedClientId.value)
   } else {
+    selectedClientId.value = null
     formData.value.client_id = null
   }
   if (type === 'client' && errors.value.house_id) {
@@ -248,6 +270,25 @@ watch(visitAssignmentType, (type) => {
   }
   if (type === 'house' && errors.value.client_id) {
     delete errors.value.client_id
+  }
+})
+
+watch(selectedClientId, (id) => {
+  if (visitAssignmentType.value === 'client') {
+    formData.value.client_id = id ?? null
+    formData.value.house_id = getClientHouseId(id)
+  }
+})
+
+watch(selectedHouseId, (id) => {
+  if (visitAssignmentType.value === 'house') {
+    formData.value.house_id = id ?? null
+  }
+})
+
+watch(() => props.clientOptions, () => {
+  if (visitAssignmentType.value === 'client' && selectedClientId.value) {
+    formData.value.house_id = getClientHouseId(selectedClientId.value)
   }
 })
 
@@ -283,10 +324,10 @@ const validateForm = () => {
   errors.value = {}
 
   if (visitAssignmentType.value === 'client') {
-    if (!formData.value.client_id) {
+    if (!selectedClientId.value) {
       errors.value.client_id = 'Client is required'
     }
-  } else if (!formData.value.house_id) {
+  } else if (!selectedHouseId.value) {
     errors.value.house_id = 'House is required'
   }
   if (!formData.value.start_at) {
@@ -314,6 +355,16 @@ const handleCancel = () => {
   errors.value = {}
 }
 
+const prepareAssignmentTargets = () => {
+  const clientId = visitAssignmentType.value === 'client' ? selectedClientId.value : null
+  const houseId = visitAssignmentType.value === 'house'
+    ? selectedHouseId.value
+    : getClientHouseId(selectedClientId.value)
+  formData.value.client_id = clientId
+  formData.value.house_id = houseId ?? null
+  return { clientId, houseId }
+}
+
 const handleSave = async () => {
   console.log('[AddVisitDialog] handleSave called', JSON.stringify(formData.value, null, 2))
   if (!validateForm()) {
@@ -321,13 +372,15 @@ const handleSave = async () => {
     return
   }
 
+  const { clientId, houseId } = prepareAssignmentTargets()
+
   submitting.value = true
   try {
     if (props.visit) {
       // Update existing visit
       const updateData: UpdateVisitRequest = {
-        client_id: visitAssignmentType.value === 'client' ? formData.value.client_id : null,
-        house_id: visitAssignmentType.value === 'house' ? formData.value.house_id : null,
+        client_id: clientId,
+        house_id: houseId,
         start_at: formData.value.start_at,
         end_at: formData.value.end_at,
         required_staff_count: formData.value.required_staff_count,
@@ -346,8 +399,8 @@ const handleSave = async () => {
       const payload: CreateVisitRequest = {
         ...formData.value,
         created_by_id: defaultCreatedById.value,
-        client_id: visitAssignmentType.value === 'client' ? formData.value.client_id ?? null : null,
-        house_id: visitAssignmentType.value === 'house' ? formData.value.house_id ?? null : null
+        client_id: clientId ?? null,
+        house_id: houseId ?? null
       }
       const result = await createVisit(payload)
       console.log('[AddVisitDialog] createVisit result', result)
