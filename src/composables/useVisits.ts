@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
+import { useCurrentUser } from './useCurrentUser'
 import type {
   Visit,
   CreateVisitRequest,
@@ -10,6 +11,7 @@ import type {
 
 export function useVisits() {
   const { get, post, put, delete: del, loading, error } = useApi()
+  const { currentUser, fetchCurrentUser } = useCurrentUser()
 
   const visits = ref<Visit[]>([])
   const currentVisit = ref<Visit | null>(null)
@@ -73,6 +75,20 @@ export function useVisits() {
       notes: visit.notes,
       status,
       statusLabel
+    }
+  }
+
+  const resolveCreatorId = async (): Promise<number | null> => {
+    if (currentUser.value?.id) {
+      return currentUser.value.id
+    }
+
+    try {
+      const fetched = await fetchCurrentUser()
+      return fetched?.id ?? null
+    } catch (err) {
+      console.error('Failed to fetch current user for visit creation:', err)
+      return null
     }
   }
 
@@ -140,7 +156,16 @@ export function useVisits() {
 
   const createVisit = async (visitData: CreateVisitRequest) => {
     try {
-      const response = await post<Visit>('/visits/', visitData, {
+      const payload: CreateVisitRequest = { ...visitData }
+      if (!payload.created_by_id || payload.created_by_id <= 0) {
+        const creatorId = await resolveCreatorId()
+        if (!creatorId) {
+          throw new Error('Unable to determine current user for visit creation')
+        }
+        payload.created_by_id = creatorId
+      }
+
+      const response = await post<Visit>('/visits/', payload, {
         showSuccessToast: true,
         successMessage: 'Visit created successfully',
         showErrorToast: true
