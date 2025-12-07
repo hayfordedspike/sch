@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import api from '../axios.config'
-import type { AxiosResponse } from 'axios'
+import type { AxiosResponse, AxiosRequestConfig } from 'axios'
 import { AxiosError } from 'axios'
 
 export interface ApiState {
@@ -108,7 +108,7 @@ export function useApi() {
   }
 
   const makeRequest = async <T>(
-    requestFn: () => Promise<AxiosResponse<T>>,
+    requestFn: (authToken?: string) => Promise<AxiosResponse<T>>,
     options: {
       showSuccessToast?: boolean
       successMessage?: string
@@ -129,12 +129,14 @@ export function useApi() {
     error.value = null
 
     try {
+      let authToken: string | undefined
+
       // Ensure we have a valid token before making the request
       if (!skipAuth) {
-        await ensureValidToken()
+        authToken = await ensureValidToken()
       }
 
-      const response = await requestFn()
+      const response = await requestFn(authToken)
       
       if (showSuccessToast) {
         toast.add({
@@ -171,24 +173,36 @@ export function useApi() {
     }
   }
 
+  const buildAuthConfig = (token?: string): AxiosRequestConfig | undefined => {
+    if (!token) {
+      return undefined
+    }
+
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  }
+
   const get = <T>(url: string, options = {}) => {
-    return makeRequest<T>(() => api.get(url), options)
+    return makeRequest<T>((token) => api.get(url, buildAuthConfig(token)), options)
   }
 
   const post = <T>(url: string, data?: unknown, options = {}) => {
-    return makeRequest<T>(() => api.post(url, data), options)
+    return makeRequest<T>((token) => api.post(url, data, buildAuthConfig(token)), options)
   }
 
   const put = <T>(url: string, data?: unknown, options = {}) => {
-    return makeRequest<T>(() => api.put(url, data), options)
+    return makeRequest<T>((token) => api.put(url, data, buildAuthConfig(token)), options)
   }
 
   const del = <T>(url: string, options = {}) => {
-    return makeRequest<T>(() => api.delete(url), options)
+    return makeRequest<T>((token) => api.delete(url, buildAuthConfig(token)), options)
   }
 
   const patch = <T>(url: string, data?: unknown, options = {}) => {
-    return makeRequest<T>(() => api.patch(url, data), options)
+    return makeRequest<T>((token) => api.patch(url, data, buildAuthConfig(token)), options)
   }
 
   return {

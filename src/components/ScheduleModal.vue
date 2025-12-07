@@ -87,7 +87,7 @@
 
 import { ref, watch, onMounted, defineProps, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import api from '@/axios.config'
+import { useApi } from '@/composables/useApi'
 import { useEmployees } from '@/composables/useEmployees'
 import { useClients } from '@/composables/useClients'
 import type { Client } from '@/views/Clients/types'
@@ -115,6 +115,7 @@ const form = ref({
 })
 
 const locationLocked = ref(false)
+const { post } = useApi()
 
 // Generate 24-hour time options in 15-minute intervals, AM/PM format
 const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
@@ -191,8 +192,11 @@ async function handleSubmit() {
   try {
     // You may want to validate form here
     const payload = { ...form.value }
-    const response = await api.post('/schedules', payload)
-    if (response?.data) {
+    const response = await post('/schedules/', payload, {
+      showErrorToast: false,
+      showSuccessToast: false
+    })
+    if (response) {
       toast.add({
         severity: 'success',
         summary: 'Schedule Created',

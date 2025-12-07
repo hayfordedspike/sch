@@ -12,6 +12,7 @@ import type {
 export function useVisits() {
   const { get, post, put, delete: del, loading, error } = useApi()
   const { currentUser, fetchCurrentUser } = useCurrentUser()
+  const VISITS_BASE = '/visits/'
 
   const visits = ref<Visit[]>([])
   const currentVisit = ref<Visit | null>(null)
@@ -104,7 +105,7 @@ export function useVisits() {
       if (params.skip !== undefined) queryParams.append('skip', params.skip.toString())
       if (params.limit !== undefined) queryParams.append('limit', params.limit.toString())
 
-      const url = `/visits/${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `${VISITS_BASE}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
       const response = await get<Visit[] | { data: Visit[] }>(url, {
         showErrorToast: true
@@ -137,7 +138,7 @@ export function useVisits() {
       const queryParams = new URLSearchParams()
       if (includeRelationships) queryParams.append('include_relationships', 'true')
 
-      const url = `/visits/${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+      const url = `${VISITS_BASE}${id}${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
       const response = await get<Visit>(url, {
         showErrorToast: true
@@ -165,7 +166,7 @@ export function useVisits() {
         payload.created_by_id = creatorId
       }
 
-      const response = await post<Visit>('/visits/', payload, {
+      const response = await post<Visit>(VISITS_BASE, payload, {
         showSuccessToast: true,
         successMessage: 'Visit created successfully',
         showErrorToast: true
@@ -185,7 +186,7 @@ export function useVisits() {
 
   const updateVisit = async (id: number, visitData: UpdateVisitRequest) => {
     try {
-      const response = await put<Visit>(`/visits/${id}`, visitData, {
+      const response = await put<Visit>(`${VISITS_BASE}${id}`, visitData, {
         showSuccessToast: true,
         successMessage: 'Visit updated successfully',
         showErrorToast: true
@@ -208,7 +209,7 @@ export function useVisits() {
 
   const deleteVisit = async (id: number) => {
     try {
-      const response = await del(`/visits/${id}`, {
+      const response = await del(`${VISITS_BASE}${id}`, {
         showSuccessToast: true,
         successMessage: 'Visit deleted successfully',
         showErrorToast: true
