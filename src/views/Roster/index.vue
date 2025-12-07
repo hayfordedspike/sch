@@ -201,16 +201,7 @@ onMounted(async () => {
               </p>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-3">
-              <Button
-                v-if="activeTab === 'schedule'"
-                @click="handleAddNewSchedlue"
-                icon="pi pi-plus"
-                label="Create New Schedule"
-                class="bg-blue-600 hover:bg-blue-700 border-0 text-white"
-              />
-            </div>
+            <!-- Action Buttons intentionally hidden for now -->
           </div>
         </div>
       </div>

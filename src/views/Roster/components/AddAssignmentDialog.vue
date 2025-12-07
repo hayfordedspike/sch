@@ -123,11 +123,6 @@
         </div>
 
       </div>
-      <div class="mt-4 rounded border border-gray-200 bg-gray-50 p-3">
-        <p class="text-sm font-medium text-gray-700">Assigning user</p>
-        <p class="text-sm text-gray-600">{{ assignedByDisplay }}</p>
-        <small v-if="errors.assigned_by_id" class="p-error block mt-1">{{ errors.assigned_by_id }}</small>
-      </div>
     </div>
 
     <template #footer>
