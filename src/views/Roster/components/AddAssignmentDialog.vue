@@ -98,8 +98,8 @@
             class="w-full"
             show-time
             show-icon
-            :minDate="visitDateBounds?.start ?? null"
-            :maxDate="visitDateBounds?.end ?? null"
+            :minDate="visitDateBounds?.start ?? undefined"
+            :maxDate="visitDateBounds?.end ?? undefined"
             :class="{ 'p-invalid': errors.scheduled_start_at }"
           />
           <small v-if="errors.scheduled_start_at" class="p-error">{{ errors.scheduled_start_at }}</small>
@@ -115,8 +115,8 @@
             class="w-full"
             show-time
             show-icon
-            :minDate="visitDateBounds?.start ?? null"
-            :maxDate="visitDateBounds?.end ?? null"
+            :minDate="visitDateBounds?.start ?? undefined"
+            :maxDate="visitDateBounds?.end ?? undefined"
             :class="{ 'p-invalid': errors.scheduled_end_at }"
           />
           <small v-if="errors.scheduled_end_at" class="p-error">{{ errors.scheduled_end_at }}</small>

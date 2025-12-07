@@ -36,7 +36,7 @@ export function useApi() {
 
   // Ensure we have a valid token before making requests
   const ensureValidToken = async (): Promise<string> => {
-    let token = localStorage.getItem('token')
+    let token: string | null = localStorage.getItem('token')
     const refreshToken = localStorage.getItem('refreshToken')
 
     // If no token, redirect to login
@@ -69,9 +69,11 @@ export function useApi() {
       }
     }
 
-    if (token) {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`
+    if (!token) {
+      throw new Error('Unable to obtain authentication token')
     }
+
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
 
     return token
   }
