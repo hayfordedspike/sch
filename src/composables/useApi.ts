@@ -1,7 +1,8 @@
 import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import api from '../axios.config'
-import type { AxiosResponse, AxiosError } from 'axios'
+import type { AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
 
 export interface ApiState {
   loading: boolean
@@ -34,8 +35,8 @@ export function useApi() {
   }
 
   // Ensure we have a valid token before making requests
-  const ensureValidToken = async (): Promise<void> => {
-    const token = localStorage.getItem('token')
+  const ensureValidToken = async (): Promise<string> => {
+    let token = localStorage.getItem('token')
     const refreshToken = localStorage.getItem('refreshToken')
 
     // If no token, redirect to login
@@ -58,6 +59,7 @@ export function useApi() {
 
         localStorage.setItem('token', access_token)
         localStorage.setItem('refreshToken', newRefreshToken)
+        token = access_token
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError)
         localStorage.removeItem('token')
@@ -66,9 +68,39 @@ export function useApi() {
         throw new Error('Failed to refresh token')
       }
     }
+
+    if (token) {
+      api.defaults.headers.common.Authorization = `Bearer ${token}`
+    }
+
+    return token
   }
 
   const handleApiError = (err: unknown): string => {
+    if (err instanceof AxiosError) {
+      const data = err.response?.data as { detail?: unknown }
+      const detail = data?.detail
+      if (typeof detail === 'string') {
+        return detail
+      }
+      if (Array.isArray(detail)) {
+        const msgs = detail
+          .map(item => {
+            if (typeof item === 'string') return item
+            if (item && typeof item === 'object' && 'msg' in item) {
+              return String((item as { msg?: unknown }).msg ?? '')
+            }
+            return JSON.stringify(item)
+          })
+          .filter(Boolean)
+        if (msgs.length) {
+          return msgs.join(', ')
+        }
+      }
+      if (err.message) {
+        return err.message
+      }
+    }
     if (err instanceof Error) {
       return err.message
     }

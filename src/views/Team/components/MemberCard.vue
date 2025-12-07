@@ -43,7 +43,7 @@
           </div>
           <div class="flex items-center text-sm text-gray-600">
             <i class="pi pi-phone mr-2 text-gray-400"></i>
-            <span>{{ employee?.phone || 'No phone number' }}</span>
+            <span>{{ formattedPhone }}</span>
           </div>
           <div class="flex items-center text-sm text-gray-600">
             <i class="pi pi-circle-fill mr-2 text-xs" :class="memberStatus === 'active' ? 'text-green-500' : 'text-red-500'"></i>
@@ -85,6 +85,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { formatInternationalPhone } from '@/lib/phone'
 import { useTeams } from '@/composables/useTeams'
 import { useEmployees } from '@/composables/useEmployees'
 import type { TeamMember } from '@/composables/useTeamMembers'
@@ -125,6 +126,13 @@ const teamName = computed(() => {
 
 const memberStatus = computed(() => {
   return employee.value?.status === 'ACTIVE' ? 'active' : 'inactive'
+})
+
+const formattedPhone = computed(() => {
+  if (!employee.value?.phone) {
+    return 'No phone number'
+  }
+  return formatInternationalPhone(employee.value.phone) || 'No phone number'
 })
 
 // Load team and employee details

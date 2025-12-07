@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
+import { formatInternationalPhone } from '@/lib/phone'
 import type {
   Employee,
   CreateEmployeeRequest,
@@ -174,9 +175,26 @@ export function useEmployees() {
     }
   }
 
+  const getEmployeeByUserId = async (userId: number) => {
+    try {
+      const response = await get<Employee>(`/employees/by_user_id/${userId}`, {
+        showErrorToast: true
+      })
+
+      if (response) {
+        currentEmployee.value = response
+      }
+
+      return response
+    } catch (err) {
+      console.error('Error fetching employee by user id:', err)
+      return null
+    }
+  }
+
   const createEmployee = async (employeeData: CreateEmployeeRequest) => {
     try {
-      const response = await post<Employee>('/employees', employeeData, {
+      const response = await post<Employee>('/employees/', employeeData, {
         showSuccessToast: true,
         successMessage: 'Employee created successfully',
         showErrorToast: true
@@ -187,12 +205,18 @@ export function useEmployees() {
         totalEmployees.value += 1
         // Refresh stats after creating employee
         await refreshEmployeeStats()
+        return { success: true, data: response, error: null }
       }
 
-      return { success: true, data: response }
+      return {
+        success: false,
+        data: null,
+        error: error.value || 'Failed to create employee'
+      }
     } catch (err) {
       console.error('Error creating employee:', err)
-      return { success: false, data: null }
+      const message = err instanceof Error ? err.message : 'Failed to create employee'
+      return { success: false, data: null, error: message }
     }
   }
 
@@ -210,12 +234,18 @@ export function useEmployees() {
           employees.value[index] = response
         }
         currentEmployee.value = response
+        return { success: true, data: response, error: null }
       }
 
-      return { success: true, data: response }
+      return {
+        success: false,
+        data: null,
+        error: error.value || 'Failed to update employee'
+      }
     } catch (err) {
       console.error('Error updating employee:', err)
-      return { success: false, data: null }
+      const message = err instanceof Error ? err.message : 'Failed to update employee'
+      return { success: false, data: null, error: message }
     }
   }
 
@@ -325,12 +355,7 @@ export function useEmployees() {
   }
 
   const formatEmployeePhone = (phone: string) => {
-    // Basic phone formatting - can be enhanced based on requirements
-    const cleaned = phone.replace(/\D/g, '')
-    if (cleaned.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
-    }
-    return phone
+    return formatInternationalPhone(phone)
   }
 
   const getEmployeeStatusSeverity = (status: EmployeeStatus) => {
@@ -387,6 +412,7 @@ export function useEmployees() {
     countEmployees,
     fetchEmployeeStats,
     refreshEmployeeStats,
+    getEmployeeByUserId,
 
     // Utilities
     getEmployeeDisplayInfo,

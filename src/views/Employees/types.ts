@@ -18,6 +18,7 @@ export interface Employee {
 export interface CreateEmployeeRequest {
   first_name: string
   last_name: string
+  email: string
   phone: string
   status: EmployeeStatus
   hire_date: string
@@ -27,6 +28,7 @@ export interface CreateEmployeeRequest {
 export interface UpdateEmployeeRequest {
   first_name?: string
   last_name?: string
+  email?: string
   phone?: string
   status?: EmployeeStatus
   hire_date?: string

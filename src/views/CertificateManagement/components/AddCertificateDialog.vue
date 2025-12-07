@@ -224,7 +224,17 @@ function removeFile(idx: number) {
   filePreviews.value.splice(idx, 1);
 }
 
-const { certificateIdOptions, fetchActiveCertificates } = useCertificates();
+const certificatesApi = useCertificates();
+const {
+  certificateIdOptions,
+  fetchActiveCertificates,
+  initCertificateUpload,
+  updateEmployeeCertificate,
+  createEmployeeCertificate,
+  ensureEmployeeId,
+  loading
+} = certificatesApi;
+
 onMounted(() => {
   fetchActiveCertificates();
 });
@@ -243,10 +253,10 @@ interface InitUploadData {
   file_name: string;
 }
 
-const { initCertificateUpload, updateEmployeeCertificate, createEmployeeCertificate, loading } = useCertificates();
-
-// TODO: Replace with actual employee ID source (e.g., from props, store, or context)
-const employee_id = ref(0); // Replace 0 with the actual employee ID number as needed
+// Ensure we resolve employee id as soon as dialog mounts
+ensureEmployeeId().catch((err) => {
+  console.error('Failed to resolve employee ID:', err);
+});
 
 watch(
   () => props.certificate,
@@ -313,7 +323,10 @@ const handleSubmit = async () => {
       return;
     }
 
-    const employeeId = employee_id.value;
+    const employeeId = await ensureEmployeeId();
+    if (!employeeId) {
+      throw new Error('No employee record linked to the current user.');
+    }
     const certificateId = Number(formData.value.certificate_id);
     const contentType = "application/pdf"; // Default content type
 
@@ -339,7 +352,7 @@ const handleSubmit = async () => {
         ? new Date(formData.value.expiry_date).toISOString() // full ISO string with timezone
         : new Date().toISOString(),
       status: formData.value.status,
-      s3_key: "certificates/34/1/aa62a707-659f-4342-b2d2-66d8cc457362.pdf", // Use file_name directly as s3_key
+      s3_key: initUploadData.file_name,
       content_type: contentType,
       created_at: new Date().toISOString(),
       note: formData.value.note

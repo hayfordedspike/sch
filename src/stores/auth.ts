@@ -92,16 +92,20 @@ export const useAuthStore = defineStore('auth', () => {
   const error = ref<string | null>(null)
 
   // Utility to sync Pinia state and localStorage
-  const syncSession = (newToken: string | null, newRefreshToken: string | null, newUser: User | null = null) => {
+  const syncSession = (newToken: string | null, newRefreshToken: string | null, newUser?: User | null) => {
     token.value = newToken
     refreshToken.value = newRefreshToken
-    if (newUser !== undefined) user.value = newUser
+    if (newUser !== undefined) {
+      user.value = newUser
+    }
     if (newToken) localStorage.setItem('token', newToken)
     else localStorage.removeItem('token')
     if (newRefreshToken) localStorage.setItem('refreshToken', newRefreshToken)
     else localStorage.removeItem('refreshToken')
-    if (newUser) localStorage.setItem('user', JSON.stringify(newUser))
-    else localStorage.removeItem('user')
+    if (newUser !== undefined) {
+      if (newUser) localStorage.setItem('user', JSON.stringify(newUser))
+      else localStorage.removeItem('user')
+    }
   }
 
   // Initialize authentication state on store creation
@@ -210,6 +214,8 @@ export const useAuthStore = defineStore('auth', () => {
         last_login: userData.last_login
       }
 
+      syncSession(token.value, refreshToken.value, user.value)
+
       return user.value
     } catch (err: unknown) {
       console.error('Failed to fetch user profile:', err)
@@ -247,6 +253,9 @@ export const useAuthStore = defineStore('auth', () => {
       // Extract user email from access token
       const userEmail = getTokenSubject(tokenData.access_token) || credentials.email
 
+      // Store tokens immediately so subsequent profile fetch can use them
+      syncSession(tokenData.access_token, tokenData.refresh_token)
+
       // Try to fetch full user profile, fallback to basic info from token
       let userProfile = await fetchUserProfile()
       if (!userProfile) {
@@ -259,10 +268,11 @@ export const useAuthStore = defineStore('auth', () => {
           is_active: true,
           is_superuser: false
         }
+
+        syncSession(tokenData.access_token, tokenData.refresh_token, userProfile)
       }
 
       isAuthenticated.value = true
-      syncSession(tokenData.access_token, tokenData.refresh_token, userProfile)
       // Debug: log token values after setting
       console.debug('[Auth] Token set after signIn:', localStorage.getItem('token'))
       console.debug('[Auth] RefreshToken set after signIn:', localStorage.getItem('refreshToken'))

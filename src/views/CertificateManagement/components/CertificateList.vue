@@ -156,7 +156,7 @@ function isDownloadUrlResponse(val: unknown): val is DownloadUrlResponse {
 
 // --- Fetch certificates on mount ---
 onMounted(async () => {
-  const employeeId = getEmployeeId()
+  const employeeId = await getEmployeeId()
   if (employeeId) {
     const res = await fetchEmployeeCertificates(employeeId)
     if (isEmployeeCertificateArray(res)) {

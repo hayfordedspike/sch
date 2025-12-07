@@ -4,9 +4,11 @@ export interface House {
   id: number
   name: string
   address_line1: string
+  address_line2?: string | null
   city: string
   region: string
   postal_code: string
+  country?: string
   note: string
   created_at?: string
   updated_at?: string
@@ -15,18 +17,22 @@ export interface House {
 export interface CreateHouseRequest {
   name: string
   address_line1: string
+  address_line2?: string | null
   city: string
   region: string
   postal_code: string
+  country?: string
   note: string
 }
 
 export interface UpdateHouseRequest {
   name?: string
   address_line1?: string
+  address_line2?: string | null
   city?: string
   region?: string
   postal_code?: string
+  country?: string
   note?: string
 }
 

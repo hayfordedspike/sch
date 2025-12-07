@@ -14,6 +14,7 @@ declare module 'vue' {
     Card: typeof import('primevue/card')['default']
     CheckInOutSidebar: typeof import('./src/components/layout/CheckInOutSidebar.vue')['default']
     ClientCard: typeof import('./src/components/ClientCard.vue')['default']
+    CountryPhoneInput: typeof import('./src/components/shared/CountryPhoneInput.vue')['default']
     DashboardCalendar: typeof import('./src/components/DashboardCalendar.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
     Dialog: typeof import('primevue/dialog')['default']

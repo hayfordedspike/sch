@@ -106,20 +106,6 @@
           <small v-if="errors.required_staff_count" class="p-error">{{ errors.required_staff_count }}</small>
         </div>
 
-        <!-- Created By (only for new visits) -->
-        <div v-if="!visit" class="field">
-          <label for="createdBy" class="block text-sm font-medium text-gray-700 mb-2">Created By</label>
-          <Dropdown
-            id="createdBy"
-            v-model="formData.created_by_id"
-            :options="employeeOptions"
-            option-label="label"
-            option-value="value"
-            placeholder="Select creator"
-            class="w-full"
-            :loading="employeesLoading"
-          />
-        </div>
       </div>
 
       <!-- Notes -->
@@ -155,9 +141,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useVisits } from '@/composables/useVisits'
-import { useEmployees } from '@/composables/useEmployees'
 import { useHouses } from '@/composables/useHouses'
+import { useAuthStore } from '@/stores/auth'
 import Dialog from 'primevue/dialog'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
@@ -186,6 +173,10 @@ const dialogVisible = computed({
   set: (value: boolean) => emit('update:visible', value)
 })
 
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
+const defaultCreatedById = computed(() => user.value?.id ?? 0)
+
 const formData = ref<CreateVisitRequest>({
   client_id: null,
   house_id: null,
@@ -193,7 +184,7 @@ const formData = ref<CreateVisitRequest>({
   end_at: '',
   required_staff_count: 1,
   notes: '',
-  created_by_id: 0
+  created_by_id: defaultCreatedById.value
 })
 
 const visitAssignmentType = ref<'client' | 'house'>('client')
@@ -204,15 +195,6 @@ const errors = ref<Record<string, string>>({})
 
 // Hooks
 const { createVisit, updateVisit } = useVisits()
-const { employees, loading: employeesLoading, getEmployees } = useEmployees()
-
-
-const employeeOptions = computed(() => {
-  return employees.value.map(employee => ({
-    label: `${employee.first_name} ${employee.last_name}`,
-    value: employee.id
-  }))
-})
 
 // Active houses for house dropdown
 const { houses, fetchHouses } = useHouses()
@@ -246,7 +228,7 @@ watch(() => props.visit, (newVisit) => {
       end_at: '',
       required_staff_count: 1,
       notes: '',
-      created_by_id: 0
+      created_by_id: defaultCreatedById.value
     }
     startDateTime.value = null
     endDateTime.value = null
@@ -279,14 +261,19 @@ watch([startDateTime, endDateTime], () => {
   }
 })
 
+watch(defaultCreatedById, (newId) => {
+  if (!props.visit) {
+    formData.value.created_by_id = newId
+  }
+})
 
-// Load employees and houses on mount
+
+// Load houses on mount
 const loadData = async () => {
   try {
-    await getEmployees()
     await fetchHouses({ is_active: true, limit: 100 })
   } catch (err) {
-    console.error('Failed to load employees or houses:', err)
+    console.error('Failed to load houses:', err)
   }
 }
 
@@ -358,6 +345,7 @@ const handleSave = async () => {
       console.log('[AddVisitDialog] Calling createVisit', formData.value)
       const payload: CreateVisitRequest = {
         ...formData.value,
+        created_by_id: defaultCreatedById.value,
         client_id: visitAssignmentType.value === 'client' ? formData.value.client_id ?? null : null,
         house_id: visitAssignmentType.value === 'house' ? formData.value.house_id ?? null : null
       }

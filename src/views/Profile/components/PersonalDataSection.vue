@@ -34,7 +34,7 @@
             <div class="lg:pl-6">
               <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
               <div class="text-lg font-semibold text-gray-600 break-words">
-                {{ profileData.phone || 'Not provided' }}
+                {{ formattedPhone }}
               </div>
             </div>
 
@@ -87,13 +87,10 @@
               <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
               </label>
-              <InputText
-                id="phone"
-                :model-value="profileData.phone"
-                @update:model-value="updateField('phone', $event)"
+              <CountryPhoneInput
+                v-model="phoneLocalNumber"
+                v-model:countryDialCode="phoneDialCode"
                 placeholder="Enter your phone number"
-                type="tel"
-                class="w-full"
               />
             </div>
 
@@ -141,10 +138,14 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, computed } from 'vue'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Calendar from 'primevue/calendar'
+import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
+import { COUNTRY_BY_NAME, DEFAULT_COUNTRY_NAME } from '@/constants/countries'
+import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode, formatInternationalPhone } from '@/lib/phone'
 import type { User } from '@/stores/auth'
 import type { ProfileData } from '../types'
 
@@ -158,8 +159,36 @@ interface Emits {
   (e: 'update', field: string, value: string): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const defaultDialCode = sanitizeDialCode(
+  COUNTRY_BY_NAME.get(DEFAULT_COUNTRY_NAME.toLowerCase())?.dial_code
+)
+const phoneDialCode = ref(defaultDialCode)
+const phoneLocalNumber = ref('')
+
+watch(
+  () => props.profileData.phone,
+  (newPhone) => {
+    const parts = splitPhoneNumber(newPhone)
+    phoneDialCode.value = parts.dialCode
+    phoneLocalNumber.value = parts.nationalNumber
+  },
+  { immediate: true }
+)
+
+watch([phoneDialCode, phoneLocalNumber], ([dialCode, localNumber]) => {
+  const combined = localNumber ? combineDialCodeAndNumber(dialCode, localNumber) : ''
+  if ((props.profileData.phone || '') !== combined) {
+    emit('update', 'phone', combined)
+  }
+})
+
+const formattedPhone = computed(() => {
+  const formatted = formatInternationalPhone(props.profileData.phone)
+  return formatted || 'Not provided'
+})
 
 // const displayFullName = computed(() => {
 //   const user = props.user

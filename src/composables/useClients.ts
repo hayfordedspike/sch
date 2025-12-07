@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { useApi } from './useApi'
 import { useToast } from 'primevue/usetoast'
+import { formatInternationalPhone } from '@/lib/phone'
 import type {
   Client,
   CreateClientRequest,
@@ -311,12 +312,7 @@ export function useClients() {
   }
 
   const formatClientPhone = (phone: string) => {
-    // Basic phone formatting - can be enhanced based on requirements
-    const cleaned = phone.replace(/\D/g, '')
-    if (cleaned.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
-    }
-    return phone
+    return formatInternationalPhone(phone)
   }
 
   const getClientStatusSeverity = (isActive: boolean) => {

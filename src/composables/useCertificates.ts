@@ -2,12 +2,11 @@
 
 
 
-// Utility to get employee_id from auth store or composable
-import { useAuth } from '@/composables/useAuth';
-import { useToast } from 'primevue/usetoast';
-
 import { ref, computed } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { useApi } from './useApi'
+import { useCurrentUser } from '@/composables/useCurrentUser'
+import { useEmployees } from '@/composables/useEmployees'
 import type {
   Certificate,
   CreateCertificateRequest,
@@ -16,6 +15,8 @@ import type {
 
 export function useCertificates() {
   const toast = useToast();
+  const { currentUser, fetchCurrentUser } = useCurrentUser()
+  const { getEmployeeByUserId } = useEmployees()
   // --- Types ---
   interface CreateEmployeeCertificatePayload {
     employee_id: number;
@@ -40,34 +41,69 @@ export function useCertificates() {
   // --- State ---
   const certificates = ref<Certificate[]>([])
   const currentCertificate = ref<Certificate | null>(null)
+  const employeeId = ref<number | null>(null)
+  const employeeIdLoading = ref(false)
+  const employeeIdError = ref<string | null>(null)
 
   // --- API Methods ---
   const { get, post, put, patch, delete: del, loading, error } = useApi()
 
+  const ensureEmployeeId = async (): Promise<number | null> => {
+    if (employeeId.value) {
+      return employeeId.value
+    }
+
+    employeeIdLoading.value = true
+    employeeIdError.value = null
+
+    try {
+      let user = currentUser.value
+      if (!user) {
+        user = await fetchCurrentUser()
+      }
+
+      if (!user) {
+        throw new Error('Unable to determine current user')
+      }
+
+      const employee = await getEmployeeByUserId(user.id)
+      if (!employee) {
+        throw new Error('No employee record found for the current user')
+      }
+
+      employeeId.value = employee.id
+      return employeeId.value
+    } catch (err) {
+      employeeIdError.value = err instanceof Error ? err.message : 'Failed to load employee information'
+      return null
+    } finally {
+      employeeIdLoading.value = false
+    }
+  }
+
   // --- Employee Certificate Methods ---
   const createEmployeeCertificate = async (payload: CreateEmployeeCertificatePayload) => {
     try {
-      const payloadWithHardcodedId = { ...payload, employee_id: 34 };
-      const response = await post(`/employee-certificate/34/certificates`, payloadWithHardcodedId, {
+      const resolvedEmployeeId = await ensureEmployeeId()
+      if (!resolvedEmployeeId) {
+        throw new Error('Unable to determine employee ID for certificate creation')
+      }
+
+      const response = await post(`/employee-certificate/${resolvedEmployeeId}/certificates`, { ...payload, employee_id: resolvedEmployeeId }, {
         showSuccessToast: true,
         successMessage: 'Certificate created successfully',
         showErrorToast: true
       })
       return response;
     } catch (err) {
-      // Check for specific backend error detail
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       if (detail === 'Employee already has an active certificate of this type') {
-        if (toast) {
-          toast.add({ severity: 'error', summary: 'Error', detail, life: 4000 });
-        } else {
-          console.error(detail);
-        }
+        toast?.add({ severity: 'error', summary: 'Error', detail, life: 4000 });
       } else {
-        if (toast) {
-          toast.add({ severity: 'error', summary: 'Error', detail: 'Error creating employee certificate', life: 4000 });
-        } else {
-          console.error('Error creating employee certificate:', err);
+        const fallback = err instanceof Error ? err.message : 'Error creating employee certificate'
+        toast?.add({ severity: 'error', summary: 'Error', detail: fallback, life: 4000 })
+        if (!toast) {
+          console.error('Error creating employee certificate:', err)
         }
       }
       return null;
@@ -94,13 +130,18 @@ export function useCertificates() {
 
   // --- Upload/Init Methods ---
   const initCertificateUpload = async (
-    employee_id: number,
+    employee_id: number | undefined,
     certificate_id: number,
     content_type: string
   ): Promise<InitCertificateUploadResponse | null> => {
     try {
+      const resolvedEmployeeId = employee_id ?? await ensureEmployeeId()
+      if (!resolvedEmployeeId) {
+        throw new Error('Unable to determine employee ID for upload')
+      }
+
       const response = await post(`/employee-certificate/init-upload`, {
-        employee_id: 34,
+        employee_id: resolvedEmployeeId,
         certificate_id,
         content_type
       })
@@ -336,9 +377,15 @@ export function useCertificates() {
     certificate_id: number,
     file: File,
     content_type: string,
-    patchPayload: Partial<CreateEmployeeCertificatePayload>
+    patchPayload: Partial<CreateEmployeeCertificatePayload>,
+    employee_id?: number
   ) {
-    const initRes = await initCertificateUpload(34, certificate_id, content_type);
+    const resolvedEmployeeId = employee_id ?? await ensureEmployeeId()
+    if (!resolvedEmployeeId) {
+      throw new Error('Unable to determine employee ID for certificate upload')
+    }
+
+    const initRes = await initCertificateUpload(resolvedEmployeeId, certificate_id, content_type);
     if (!initRes || typeof initRes.upload_url !== 'string' || typeof initRes.file_name !== 'string') {
       throw new Error('Failed to initialize certificate upload');
     }
@@ -346,7 +393,7 @@ export function useCertificates() {
     if (!putRes) {
       throw new Error('File upload failed');
     }
-    const patchRes = await updateEmployeeCertificate(34, certificate_id, {
+    const patchRes = await updateEmployeeCertificate(resolvedEmployeeId, certificate_id, {
       ...patchPayload,
       s3_key: initRes.file_name
     }, employee_cert_id);
@@ -357,14 +404,9 @@ export function useCertificates() {
   }
 
   // --- Utility: Get employee_id from user session ---
-  const getEmployeeId = () => {
-    try {
-      const { user } = useAuth();
-      return user?.value?.id || null;
-    } catch {
-      return null;
-    }
-  };
+  const getEmployeeId = async () => {
+    return await ensureEmployeeId()
+  }
 
   return {
     // State
@@ -394,6 +436,10 @@ export function useCertificates() {
     fetchEmployeeCertificates,
     fetchEmployeeCertificateDownloadUrl,
     uploadAndPatchEmployeeCertificate,
+    employeeId,
+    employeeIdLoading,
+    employeeIdError,
+    ensureEmployeeId,
 
     // Utilities
     getCertificateStatusSeverity,

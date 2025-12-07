@@ -46,13 +46,12 @@
           <label for="phone" class="block text-sm font-semibold text-gray-700">
             Phone Number
           </label>
-          <InputText
-            id="phone"
-            v-model="formData.phone"
+          <CountryPhoneInput
+            v-model="phoneLocalNumber"
+            v-model:countryDialCode="phoneDialCode"
             placeholder="Enter phone number"
-            :class="{ 'p-invalid': errors.phone }"
+            :error="errors.phone"
           />
-          <small v-if="errors.phone" class="text-red-500 text-xs">{{ errors.phone }}</small>
         </div>
 
         <div class="space-y-2">
@@ -135,6 +134,9 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
+import { COUNTRY_BY_NAME, DEFAULT_COUNTRY_NAME } from '@/constants/countries'
+import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/lib/phone'
 
 interface MemberFormData {
   name: string
@@ -176,6 +178,11 @@ const daysOfWeek = [
 // Form state
 const loading = ref(false)
 const errors = ref<Record<string, string>>({})
+const defaultDialCode = sanitizeDialCode(
+  COUNTRY_BY_NAME.get(DEFAULT_COUNTRY_NAME.toLowerCase())?.dial_code
+)
+const phoneDialCode = ref(defaultDialCode)
+const phoneLocalNumber = ref('')
 
 // Initial form data
 const initialFormData: MemberFormData = {
@@ -206,15 +213,29 @@ watch(
       if (props.member) {
         // Pre-fill form with existing member data
         formData.value = { ...props.member }
+        if (props.member.phone) {
+          const phoneParts = splitPhoneNumber(props.member.phone)
+          phoneDialCode.value = phoneParts.dialCode
+          phoneLocalNumber.value = phoneParts.nationalNumber
+        }
+      } else {
+        phoneDialCode.value = defaultDialCode
+        phoneLocalNumber.value = ''
       }
     }
   }
 )
 
+watch([phoneDialCode, phoneLocalNumber], ([dialCode, localNumber]) => {
+  formData.value.phone = localNumber ? combineDialCodeAndNumber(dialCode, localNumber) : ''
+}, { immediate: true })
+
 // Methods
 const resetForm = () => {
   formData.value = { ...initialFormData }
   errors.value = {}
+  phoneDialCode.value = defaultDialCode
+  phoneLocalNumber.value = ''
 }
 
 const toggleDay = (day: string) => {
@@ -250,9 +271,12 @@ const validateForm = (): boolean => {
   }
 
   // Optional phone validation
-  if (formData.value.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.value.phone.replace(/[\s\-\(\)]/g, ''))) {
-    errors.value.phone = 'Please enter a valid phone number'
-    isValid = false
+  if (phoneLocalNumber.value) {
+    const combinedPhone = combineDialCodeAndNumber(phoneDialCode.value, phoneLocalNumber.value)
+    if (!/^\+[1-9]\d{3,14}$/.test(combinedPhone)) {
+      errors.value.phone = 'Please enter a valid phone number'
+      isValid = false
+    }
   }
 
   return isValid

@@ -13,6 +13,70 @@
     </template>
 
     <div class="flex flex-col gap-6 py-4">
+      <div v-if="submissionError" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ submissionError }}
+      </div>
+
+      <!-- User Assignment Section -->
+      <div class="border border-gray-200 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="pi pi-user-plus mr-2 text-indigo-500"></i>
+          Assign User Account
+        </h3>
+
+        <div class="grid grid-cols-1 gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="userSearchEmail" class="font-semibold">Search by Email *</label>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <InputText
+                id="userSearchEmail"
+                v-model.trim="userSearchEmail"
+                placeholder="Enter user email"
+                :class="{ 'p-invalid': !!userLookupError || errors.email }"
+              />
+              <div class="flex gap-2">
+                <Button
+                  label="Lookup"
+                  icon="pi pi-search"
+                  @click="lookupUserByEmail"
+                  :loading="userLookupLoading"
+                  type="button"
+                  :disabled="!userSearchEmail || userLookupLoading"
+                />
+                <Button
+                  v-if="selectedUser"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  text
+                  type="button"
+                  @click="clearSelectedUser"
+                />
+              </div>
+            </div>
+            <small v-if="userLookupError" class="text-red-500">{{ userLookupError }}</small>
+            <small v-else-if="errors.user_id" class="text-red-500">{{ errors.user_id }}</small>
+            <small v-else-if="errors.email" class="text-red-500">{{ errors.email }}</small>
+          </div>
+
+          <div v-if="userLookupResults.length" class="flex flex-col gap-2">
+            <span class="font-semibold text-sm text-gray-700">Select Matching User</span>
+            <div class="flex flex-col gap-2">
+              <button
+                v-for="user in userLookupResults"
+                :key="user.id"
+                type="button"
+                class="w-full border rounded-lg px-4 py-3 text-left transition"
+                :class="selectedUser?.id === user.id ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-gray-200 hover:border-indigo-300'"
+                @click="handleUserResultSelection(user)"
+              >
+                <p class="font-semibold text-gray-900">{{ user.first_name }} {{ user.last_name }}</p>
+                <p class="text-sm text-gray-600">{{ user.email }}</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Personal Information Section -->
       <div class="border border-gray-200 rounded-lg p-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -48,16 +112,13 @@
           <!-- Phone -->
           <div class="flex flex-col gap-2">
             <label for="phone" class="font-semibold">Phone Number *</label>
-            <InputText
-              id="phone"
-              v-model="formData.phone"
+            <CountryPhoneInput
+              v-model="phoneLocalNumber"
+              v-model:countryDialCode="phoneDialCode"
               placeholder="Enter phone number"
-              :class="{ 'p-invalid': errors.phone }"
+              :error="errors.phone"
             />
-            <small v-if="errors.phone" class="text-red-500">{{ errors.phone }}</small>
           </div>
-
-         
 
           <!-- Hire Date -->
           <div class="flex flex-col gap-2">
@@ -109,7 +170,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useEmployees } from '@/composables/useEmployees'
+import { useUsers } from '@/composables/useUsers'
+import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
+import { COUNTRY_BY_NAME, DEFAULT_COUNTRY_NAME } from '@/constants/countries'
+import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/lib/phone'
 import type { CreateEmployeeRequest, Employee } from '@/views/Employees/types'
+import type { User } from '@/stores/auth'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -135,10 +201,16 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const { createEmployee, updateEmployee, loading } = useEmployees()
+const { fetchUserByField, loading: userLookupLoading } = useUsers()
+
+const defaultDialCode = sanitizeDialCode(
+  COUNTRY_BY_NAME.get(DEFAULT_COUNTRY_NAME.toLowerCase())?.dial_code
+)
 
 const formData = ref<CreateEmployeeRequest>({
   first_name: '',
   last_name: '',
+  email: '',
   phone: '',
   status: 'ACTIVE',
   hire_date: '',
@@ -147,6 +219,9 @@ const formData = ref<CreateEmployeeRequest>({
 
 const hireDate = ref<Date | null>(null)
 const errors = ref<Record<string, string>>({})
+const submissionError = ref<string | null>(null)
+const phoneDialCode = ref(defaultDialCode)
+const phoneLocalNumber = ref('')
 
 // Status options
 const statusOptions = [
@@ -165,17 +240,89 @@ const isVisible = computed({
 
 const editMode = computed(() => !!props.employee)
 
+const userSearchEmail = ref('')
+const selectedUser = ref<User | null>(null)
+const userLookupError = ref<string | null>(null)
+const userLookupResults = ref<User[]>([])
+
+const setSelectedUser = (user: User | null) => {
+  selectedUser.value = user
+  if (user) {
+    formData.value.user_id = user.id
+    formData.value.email = user.email || ''
+    if (!formData.value.first_name) {
+      formData.value.first_name = user.first_name
+    }
+    if (!formData.value.last_name) {
+      formData.value.last_name = user.last_name
+    }
+  } else {
+    formData.value.user_id = 0
+    formData.value.email = ''
+  }
+}
+
+const lookupUserByEmail = async () => {
+  userLookupError.value = null
+  const email = userSearchEmail.value.trim()
+
+  if (!email) {
+    userLookupError.value = 'Please enter an email to lookup'
+    setSelectedUser(null)
+    userLookupResults.value = []
+    return
+  }
+
+  const users = await fetchUserByField('email', email)
+  userLookupResults.value = users
+
+  if (users && users.length > 0) {
+    if (users.length === 1) {
+      setSelectedUser(users[0])
+      userSearchEmail.value = users[0].email || email
+    } else {
+      setSelectedUser(null)
+      userLookupError.value = 'Multiple users found. Please select one below.'
+    }
+  } else {
+    userLookupError.value = 'No user found with that email'
+    setSelectedUser(null)
+    userLookupResults.value = []
+  }
+}
+
+const handleUserResultSelection = (user: User) => {
+  setSelectedUser(user)
+  userLookupError.value = null
+  userSearchEmail.value = user.email || userSearchEmail.value
+}
+
+const clearSelectedUser = () => {
+  setSelectedUser(null)
+  userSearchEmail.value = ''
+  userLookupError.value = null
+  userLookupResults.value = []
+}
+
 // Define resetForm function before it's used
 const resetForm = () => {
   formData.value = {
     first_name: '',
     last_name: '',
+    email: '',
     phone: '',
     status: 'ACTIVE',
     hire_date: '',
     user_id: 0
   }
   hireDate.value = null
+  phoneDialCode.value = defaultDialCode
+  phoneLocalNumber.value = ''
+  userSearchEmail.value = ''
+  userLookupError.value = null
+  submissionError.value = null
+  setSelectedUser(null)
+  userLookupResults.value = []
 }
 
 // Watch for employee changes to populate form in edit mode
@@ -186,17 +333,42 @@ watch(
       formData.value = {
         first_name: newEmployee.first_name,
         last_name: newEmployee.last_name,
+        email: newEmployee.email || '',
         phone: newEmployee.phone,
         status: newEmployee.status,
         hire_date: newEmployee.hire_date,
         user_id: newEmployee.user_id
       }
       hireDate.value = new Date(newEmployee.hire_date)
+      const phoneParts = splitPhoneNumber(newEmployee.phone)
+      phoneDialCode.value = phoneParts.dialCode
+      phoneLocalNumber.value = phoneParts.nationalNumber
+      userSearchEmail.value = newEmployee.email || ''
+      if (newEmployee.user_id && newEmployee.email) {
+        const derivedUser: User = {
+          id: newEmployee.user_id,
+          email: newEmployee.email,
+          first_name: newEmployee.first_name,
+          last_name: newEmployee.last_name,
+          is_active: true,
+          is_superuser: false,
+          created_at: newEmployee.created_at,
+          updated_at: newEmployee.updated_at,
+          last_login: undefined
+        }
+        setSelectedUser(derivedUser)
+        userLookupResults.value = [derivedUser]
+      } else {
+        setSelectedUser(null)
+        userLookupResults.value = []
+      }
     } else {
       // Reset form for add mode
       resetForm()
     }
     errors.value = {}
+    userLookupError.value = null
+    submissionError.value = null
   },
   { immediate: true }
 )
@@ -208,6 +380,10 @@ watch(hireDate, (newDate) => {
   }
 })
 
+watch([phoneDialCode, phoneLocalNumber], ([dialCode, localNumber]) => {
+  formData.value.phone = combineDialCodeAndNumber(dialCode, localNumber)
+}, { immediate: true })
+
 const validateForm = (): boolean => {
   errors.value = {}
   let isValid = true
@@ -216,8 +392,15 @@ const validateForm = (): boolean => {
   const requiredFields = [
     'first_name',
     'last_name',
-    'phone'
+    'email'
   ]
+  if (formData.value.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.value.email)) {
+      errors.value.email = 'Please enter a valid email address'
+      isValid = false
+    }
+  }
 
   requiredFields.forEach(field => {
     if (!formData.value[field as keyof CreateEmployeeRequest] ||
@@ -236,9 +419,8 @@ const validateForm = (): boolean => {
     isValid = false
   }
 
-  // User ID validation
-  if (!formData.value.user_id || formData.value.user_id <= 0) {
-    errors.value.user_id = 'Valid user ID is required'
+  if (!phoneLocalNumber.value) {
+    errors.value.phone = 'Phone number is required'
     isValid = false
   }
 
@@ -248,33 +430,44 @@ const validateForm = (): boolean => {
     isValid = false
   }
 
+  if (!formData.value.user_id || formData.value.user_id <= 0) {
+    errors.value.user_id = 'Employee must be associated with a user account'
+    isValid = false
+  }
+
   return isValid
 }
 
 const handleSubmit = async () => {
+  submissionError.value = null
   if (!validateForm()) {
     return
   }
 
   try {
-    let result
     if (editMode.value && props.employee) {
-      // Update existing employee
-      result = await updateEmployee(props.employee.id, formData.value)
+      const result = await updateEmployee(props.employee.id, formData.value)
       if (result?.success) {
+        submissionError.value = null
         emit('employee-updated')
         handleClose()
+        return
       }
-    } else {
-      // Create new employee
-      result = await createEmployee(formData.value)
-      if (result?.success) {
-        emit('employee-added')
-        handleClose()
-      }
+      submissionError.value = result?.error || 'Unable to update employee'
+      return
     }
+
+    const result = await createEmployee(formData.value)
+    if (result?.success) {
+      submissionError.value = null
+      emit('employee-added')
+      handleClose()
+      return
+    }
+    submissionError.value = result?.error || 'Unable to create employee'
   } catch (error) {
     console.error('Error in handleSubmit:', error)
+    submissionError.value = error instanceof Error ? error.message : 'Failed to submit form'
   }
 }
 

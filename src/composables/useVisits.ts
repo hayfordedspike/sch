@@ -140,7 +140,7 @@ export function useVisits() {
 
   const createVisit = async (visitData: CreateVisitRequest) => {
     try {
-      const response = await post<Visit>('/visits', visitData, {
+      const response = await post<Visit>('/visits/', visitData, {
         showSuccessToast: true,
         successMessage: 'Visit created successfully',
         showErrorToast: true

@@ -61,13 +61,12 @@
           <!-- Phone -->
           <div class="flex flex-col gap-2">
             <label for="phone" class="font-semibold">Phone Number *</label>
-            <InputText
-              id="phone"
-              v-model="formData.phone"
+            <CountryPhoneInput
+              v-model="phoneLocalNumber"
+              v-model:countryDialCode="phoneDialCode"
               placeholder="Enter phone number"
-              :class="{ 'p-invalid': errors.phone }"
+              :error="errors.phone"
             />
-            <small v-if="errors.phone" class="text-red-500">{{ errors.phone }}</small>
           </div>
 
           <!-- Date of Birth -->
@@ -148,6 +147,7 @@
           <i class="pi pi-map-marker mr-2 text-green-500"></i>
           Address Information
         </h3>
+        
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Address Line 1 -->
@@ -158,6 +158,7 @@
               v-model="formData.address_line_1"
               placeholder="Enter street address"
               :class="{ 'p-invalid': errors.address_line_1 }"
+              :disabled="isAddressLocked"
             />
             <small v-if="errors.address_line_1" class="text-red-500">{{ errors.address_line_1 }}</small>
           </div>
@@ -180,6 +181,7 @@
               v-model="formData.city"
               placeholder="Enter city"
               :class="{ 'p-invalid': errors.city }"
+              :disabled="isAddressLocked"
             />
             <small v-if="errors.city" class="text-red-500">{{ errors.city }}</small>
           </div>
@@ -192,6 +194,7 @@
               v-model="formData.state"
               placeholder="Enter state"
               :class="{ 'p-invalid': errors.state }"
+              :disabled="isAddressLocked"
             />
             <small v-if="errors.state" class="text-red-500">{{ errors.state }}</small>
           </div>
@@ -204,6 +207,7 @@
               v-model="formData.postal_code"
               placeholder="Enter postal code"
               :class="{ 'p-invalid': errors.postal_code }"
+              :disabled="isAddressLocked"
             />
             <small v-if="errors.postal_code" class="text-red-500">{{ errors.postal_code }}</small>
           </div>
@@ -215,9 +219,12 @@
               id="country"
               v-model="formData.country"
               :options="countryOptions"
+              optionLabel="label"
+              optionValue="value"
               placeholder="Select country"
               :class="{ 'p-invalid': errors.country }"
               filter
+              :disabled="isAddressLocked"
             />
             <small v-if="errors.country" class="text-red-500">{{ errors.country }}</small>
           </div>
@@ -247,13 +254,13 @@
           <!-- Emergency Contact Phone -->
           <div class="flex flex-col gap-2">
             <label for="emergencyContactPhone" class="font-semibold">Contact Phone *</label>
-            <InputText
+            <CountryPhoneInput
               id="emergencyContactPhone"
-              v-model="formData.emergency_contact_phone"
+              v-model="emergencyLocalNumber"
+              v-model:countryDialCode="emergencyDialCode"
               placeholder="Enter emergency contact phone"
-              :class="{ 'p-invalid': errors.emergency_contact_phone }"
+              :error="errors.emergency_contact_phone"
             />
-            <small v-if="errors.emergency_contact_phone" class="text-red-500">{{ errors.emergency_contact_phone }}</small>
           </div>
         </div>
       </div>
@@ -324,6 +331,13 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
+import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
+import {
+  COUNTRY_DROPDOWN_OPTIONS,
+  COUNTRY_BY_NAME,
+  DEFAULT_COUNTRY_NAME
+} from '@/constants/countries'
+import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/lib/phone'
 import type { CreateClientRequest, Client } from '@/views/Clients/types'
 import type { House } from '@/views/Houses/types'
 import Dialog from 'primevue/dialog'
@@ -354,6 +368,10 @@ const emit = defineEmits<Emits>()
 const { createClient, updateClient, loading } = useClients()
 const { houses, fetchHouses, loading: housesLoading } = useHouses()
 
+const defaultDialCode = sanitizeDialCode(
+  COUNTRY_BY_NAME.get(DEFAULT_COUNTRY_NAME.toLowerCase())?.dial_code
+)
+
 const formData = ref<CreateClientRequest>({
   first_name: '',
   last_name: '',
@@ -376,25 +394,22 @@ const formData = ref<CreateClientRequest>({
 
 const dateOfBirth = ref<Date | null>(null)
 const errors = ref<Record<string, string>>({})
+const phoneDialCode = ref(defaultDialCode)
+const phoneLocalNumber = ref('')
+const emergencyDialCode = ref(defaultDialCode)
+const emergencyLocalNumber = ref('')
+
+const selectedHouse = computed<House | null>(() => {
+  if (!formData.value.house_id) {
+    return null
+  }
+  return houses.value.find(house => house.id === formData.value.house_id) ?? null
+})
+
+const isAddressLocked = computed(() => !!selectedHouse.value)
 
 // Country options
-const countryOptions = [
-  'Australia',
-  'United States',
-  'Canada',
-  'United Kingdom',
-  'New Zealand',
-  'Germany',
-  'France',
-  'Italy',
-  'Spain',
-  'Japan',
-  'China',
-  'India',
-  'Brazil',
-  'Mexico',
-  'South Africa'
-]
+const countryOptions = COUNTRY_DROPDOWN_OPTIONS
 
 // Status options
 const statusOptions = [
@@ -431,6 +446,10 @@ const resetForm = () => {
     is_active: true
   }
   dateOfBirth.value = null
+  phoneDialCode.value = defaultDialCode
+  phoneLocalNumber.value = ''
+  emergencyDialCode.value = defaultDialCode
+  emergencyLocalNumber.value = ''
 }
 
 // Watch for client changes to populate form in edit mode
@@ -458,6 +477,12 @@ watch(
         is_active: newClient.is_active
       }
       dateOfBirth.value = new Date(newClient.date_of_birth)
+      const phoneParts = splitPhoneNumber(newClient.phone)
+      phoneDialCode.value = phoneParts.dialCode
+      phoneLocalNumber.value = phoneParts.nationalNumber
+      const emergencyParts = splitPhoneNumber(newClient.emergency_contact_phone)
+      emergencyDialCode.value = emergencyParts.dialCode
+      emergencyLocalNumber.value = emergencyParts.nationalNumber
     } else {
       // Reset form for add mode
       resetForm()
@@ -474,9 +499,39 @@ watch(dateOfBirth, (newDate) => {
   }
 })
 
+const syncAddressWithHouse = (house: House) => {
+  formData.value.address_line_1 = house.address_line1
+  formData.value.city = house.city
+  formData.value.state = house.region
+  formData.value.postal_code = house.postal_code
+  if (house.country) {
+    formData.value.country = house.country
+  }
+}
+
+watch(selectedHouse, (newHouse) => {
+  if (newHouse) {
+    syncAddressWithHouse(newHouse)
+  }
+})
+
+watch([phoneDialCode, phoneLocalNumber], ([dialCode, localNumber]) => {
+  formData.value.phone = combineDialCodeAndNumber(dialCode, localNumber)
+}, { immediate: true })
+
+watch([emergencyDialCode, emergencyLocalNumber], ([dialCode, localNumber]) => {
+  formData.value.emergency_contact_phone = combineDialCodeAndNumber(dialCode, localNumber)
+}, { immediate: true })
+
 // House selection methods
 const selectHouse = (house: House) => {
-  formData.value.house_id = formData.value.house_id === house.id ? null : house.id
+  if (formData.value.house_id === house.id) {
+    clearHouseSelection()
+    return
+  }
+
+  formData.value.house_id = house.id
+  syncAddressWithHouse(house)
 }
 
 const clearHouseSelection = () => {
@@ -492,14 +547,12 @@ const validateForm = (): boolean => {
     'first_name',
     'last_name',
     'email',
-    'phone',
     'address_line_1',
     'city',
     'state',
     'postal_code',
     'country',
-    'emergency_contact_name',
-    'emergency_contact_phone'
+    'emergency_contact_name'
   ]
 
   requiredFields.forEach(field => {
@@ -528,10 +581,41 @@ const validateForm = (): boolean => {
     }
   }
 
+  if (!phoneLocalNumber.value) {
+    errors.value.phone = 'Phone number is required'
+    isValid = false
+  }
+
+  if (!emergencyLocalNumber.value) {
+    errors.value.emergency_contact_phone = 'Emergency contact phone is required'
+    isValid = false
+  }
+
   // Status validation
   if (formData.value.is_active === null || formData.value.is_active === undefined) {
     errors.value.is_active = 'Client status is required'
     isValid = false
+  }
+
+  // Ensure address matches selected house
+  if (formData.value.house_id) {
+    const house = houses.value.find(h => h.id === formData.value.house_id)
+    if (house) {
+      const mismatchFields: Array<keyof CreateClientRequest> = []
+
+      if (formData.value.address_line_1 !== house.address_line1) mismatchFields.push('address_line_1')
+      if (formData.value.city !== house.city) mismatchFields.push('city')
+      if (formData.value.state !== house.region) mismatchFields.push('state')
+      if (formData.value.postal_code !== house.postal_code) mismatchFields.push('postal_code')
+      if (house.country && formData.value.country !== house.country) mismatchFields.push('country')
+
+      if (mismatchFields.length > 0) {
+        mismatchFields.forEach(field => {
+          errors.value[field] = 'Address must match the selected house'
+        })
+        isValid = false
+      }
+    }
   }
 
   return isValid
