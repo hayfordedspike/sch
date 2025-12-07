@@ -73,9 +73,11 @@ export function useApi() {
       throw new Error('Unable to obtain authentication token')
     }
 
-    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    const ensuredToken: string = token
 
-    return token
+    api.defaults.headers.common.Authorization = `Bearer ${ensuredToken}`
+
+    return ensuredToken
   }
 
   const handleApiError = (err: unknown): string => {
