@@ -710,16 +710,17 @@ onMounted(async () => {
 
 <style scoped>
 .team-page {
-  --team-bg-start: #f8fafc;
-  --team-bg-end: #e0f2fe;
+  --team-bg-start: var(--app-background);
+  --team-bg-end: var(--app-surface-muted);
   background: linear-gradient(160deg, var(--team-bg-start), var(--team-bg-end));
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease;
+  color: var(--app-text);
 }
 
 :global(html.theme-dark) .team-page,
 :global(.theme-dark) .team-page {
-  --team-bg-start: #030915;
-  --team-bg-end: #0d1b36;
+  --team-bg-start: #040b18;
+  --team-bg-end: #0f203f;
 }
 
 .team-hero-card {
