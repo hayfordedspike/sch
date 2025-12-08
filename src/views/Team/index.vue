@@ -47,23 +47,23 @@
     <!-- Tabs Navigation -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="team-tab-shell">
-          <div class="team-tab-rail">
+        <div class="team-tab-card">
+          <div class="team-tab-inline">
             <button
               @click="activeTabIndex = 0"
-              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 0 }]"
+              :class="['team-tab-button', activeTabIndex === 0 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
             >
               My Teams
             </button>
             <button
               @click="activeTabIndex = 1"
-              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 1 }]"
+              :class="['team-tab-button', activeTabIndex === 1 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
             >
               Members
             </button>
             <button
               @click="activeTabIndex = 2"
-              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 2 }]"
+              :class="['team-tab-button', activeTabIndex === 2 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
             >
               Grouped Teams
             </button>
@@ -743,50 +743,56 @@ onMounted(async () => {
   color: var(--app-accent);
 }
 
-.team-tab-shell {
+.team-tab-card {
+  --team-tab-border: rgba(59, 130, 246, 0.35);
   background: var(--app-surface);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   padding: 1rem;
   border: 1px solid var(--app-border);
   box-shadow: var(--app-card-shadow);
 }
 
-.team-tab-rail {
+.team-tab-inline {
   display: inline-flex;
-  border-bottom: 2px solid var(--team-tab-border, var(--app-border));
-  background: var(--team-tab-track, var(--app-surface));
+  border-bottom: 2px solid var(--team-tab-border);
+  gap: 0.25rem;
 }
 
-.team-tab-pill {
-  padding: 0.85rem 1.4rem;
+.team-tab-button {
+  padding: 0.85rem 1.5rem;
   font-weight: 600;
-  color: var(--app-text-muted);
   border-top-left-radius: 0.85rem;
   border-top-right-radius: 0.85rem;
   border: 2px solid transparent;
   border-bottom: none;
   background: transparent;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  color: var(--app-text-muted);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-.team-tab-pill:hover {
+.team-tab-button--inactive:hover {
   color: var(--app-text);
   background: var(--app-surface-muted);
 }
 
-.team-tab-pill--active {
+.team-tab-button--active {
   color: var(--app-text);
   background: var(--app-surface);
-  border-color: var(--app-border);
-  border-bottom: none;
+  border-color: var(--team-tab-border);
+  border-bottom: 2px solid var(--app-surface);
   margin-bottom: -2px;
   font-weight: 700;
   box-shadow: var(--app-card-shadow);
 }
 
+:global(html.theme-dark) .team-tab-card,
+:global(.theme-dark) .team-tab-card {
+  --team-tab-border: rgba(96, 165, 250, 0.55);
+}
+
 .team-panel {
   background: var(--app-surface);
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   border: 1px solid var(--app-border);
   box-shadow: var(--app-card-shadow);
 }

@@ -1,26 +1,26 @@
 <template>
   <div v-if="showBanner" class="mb-6">
-    <Card class="warning-banner">
+    <Card class="warning-banner" :data-state="bannerState">
       <template #content>
         <div class="flex items-center justify-between">
           <div class="flex items-start gap-4">
             <i class="pi pi-exclamation-triangle text-amber-500 text-2xl mt-1"></i>
             <div>
-              <h3 class="text-lg font-semibold text-black mb-1">{{ bannerTitle }}</h3>
-              <p class="text-black text-sm">{{ bannerMessage }}</p>
+              <h3 class="banner-title text-lg font-semibold mb-1">{{ bannerTitle }}</h3>
+              <p class="banner-message text-sm">{{ bannerMessage }}</p>
               <div v-if="expiringSoon.length > 0" class="mt-2">
-                <div class="text-xs text-gray-600 mb-1">Certificates expiring soon:</div>
+                <div class="banner-subtitle text-xs mb-1">Certificates expiring soon:</div>
                 <div class="flex flex-wrap gap-1">
                   <span 
                     v-for="cert in expiringSoon.slice(0, 3)" 
                     :key="cert.id"
-                    class="inline-flex items-center px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full"
+                    class="inline-flex items-center px-2 py-1 text-xs rounded-full banner-chip"
                   >
                     {{ cert.name }}
                   </span>
                   <span 
                     v-if="expiringSoon.length > 3"
-                    class="inline-flex items-center px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full"
+                    class="inline-flex items-center px-2 py-1 text-xs rounded-full banner-chip"
                   >
                     +{{ expiringSoon.length - 3 }} more
                   </span>
@@ -99,8 +99,15 @@ const getExpiryDate = (certificate: Certificate) => {
   return expiryDate
 }
 
+const bannerState = computed(() => {
+  if (certificates.value.length === 0) return 'empty'
+  if (expiredCertificates.value.length > 0) return 'expired'
+  if (expiringSoon.value.length > 0) return 'warning'
+  return 'info'
+})
+
 const showBanner = computed(() => {
-  return certificates.value.length === 0
+  return certificates.value.length === 0 || expiredCertificates.value.length > 0 || expiringSoon.value.length > 0
 })
 
 const bannerTitle = computed(() => {
@@ -135,22 +142,90 @@ const showViewAllButton = computed(() => {
 </script>
 
 <style scoped>
-:deep(.warning-banner .p-card) {
-  background-color: #fef3c7;
-  border: 1px solid #fde68a;
+:deep(.warning-banner) {
+  --banner-bg: rgba(251, 191, 36, 0.18);
+  --banner-border: rgba(251, 191, 36, 0.4);
+  --banner-chip-bg: rgba(251, 191, 36, 0.18);
+  --banner-chip-border: rgba(251, 191, 36, 0.35);
+  --banner-chip-text: #92400e;
+}
+
+:deep(.warning-banner.p-card) {
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
+  box-shadow: var(--app-card-shadow);
 }
 
 :deep(.warning-banner .p-card-content) {
   padding: 1rem 1.5rem;
 }
 
-.warning-banner[data-expired="true"] :deep(.p-card) {
-  background-color: #fee2e2;
-  border: 1px solid #fecaca;
+:deep(.warning-banner[data-state='empty']) {
+  --banner-bg: rgba(14, 165, 233, 0.15);
+  --banner-border: rgba(14, 165, 233, 0.45);
+  --banner-chip-bg: rgba(14, 165, 233, 0.18);
+  --banner-chip-border: rgba(14, 165, 233, 0.4);
+  --banner-chip-text: #0f5e85;
 }
 
-.warning-banner[data-no-certs="true"] :deep(.p-card) {
-  background-color: #e0f2fe;
-  border: 1px solid #b3e5fc;
+:deep(.warning-banner[data-state='expired']) {
+  --banner-bg: rgba(248, 113, 113, 0.15);
+  --banner-border: rgba(239, 68, 68, 0.45);
+  --banner-chip-bg: rgba(248, 113, 113, 0.18);
+  --banner-chip-border: rgba(239, 68, 68, 0.4);
+  --banner-chip-text: #7f1d1d;
+}
+
+:deep(.warning-banner[data-state='warning']) {
+  --banner-bg: rgba(251, 191, 36, 0.18);
+  --banner-border: rgba(245, 158, 11, 0.45);
+  --banner-chip-bg: rgba(251, 191, 36, 0.2);
+  --banner-chip-border: rgba(251, 191, 36, 0.45);
+  --banner-chip-text: #92400e;
+}
+
+:global(html.theme-dark) :deep(.warning-banner),
+:global(.theme-dark) :deep(.warning-banner) {
+  --banner-bg: rgba(251, 191, 36, 0.12);
+  --banner-border: rgba(251, 191, 36, 0.35);
+  --banner-chip-bg: rgba(251, 191, 36, 0.15);
+  --banner-chip-border: rgba(251, 191, 36, 0.35);
+  --banner-chip-text: #fbbf24;
+}
+
+:global(html.theme-dark) :deep(.warning-banner[data-state='empty']),
+:global(.theme-dark) :deep(.warning-banner[data-state='empty']) {
+  --banner-bg: rgba(56, 189, 248, 0.12);
+  --banner-border: rgba(56, 189, 248, 0.35);
+  --banner-chip-bg: rgba(56, 189, 248, 0.16);
+  --banner-chip-border: rgba(56, 189, 248, 0.35);
+  --banner-chip-text: #7dd3fc;
+}
+
+:global(html.theme-dark) :deep(.warning-banner[data-state='expired']),
+:global(.theme-dark) :deep(.warning-banner[data-state='expired']) {
+  --banner-bg: rgba(248, 113, 113, 0.12);
+  --banner-border: rgba(239, 68, 68, 0.35);
+  --banner-chip-bg: rgba(248, 113, 113, 0.15);
+  --banner-chip-border: rgba(239, 68, 68, 0.35);
+  --banner-chip-text: #fecaca;
+}
+
+.banner-title {
+  color: var(--app-text);
+}
+
+.banner-message {
+  color: var(--app-text);
+}
+
+.banner-subtitle {
+  color: var(--app-text-muted);
+}
+
+.banner-chip {
+  background: var(--banner-chip-bg);
+  color: var(--banner-chip-text);
+  border: 1px solid var(--banner-chip-border);
 }
 </style>
