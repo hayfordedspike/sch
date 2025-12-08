@@ -122,8 +122,9 @@
       <GlobalButton
         type="submit"
         :loading="loading"
-        class="w-full bg-primary hover:bg-primary-dark"
         label="Create Account"
+        severity="primary"
+        block
       />
     </div>
 

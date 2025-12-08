@@ -31,14 +31,13 @@
 
     <p v-if="errors.api" class="text-sm text-red-600">{{ errors.api }}</p>
 
-    <button
+    <GlobalButton
       type="submit"
-      class="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 px-4 text-white font-semibold shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-      :disabled="loading"
-    >
-      <i v-if="loading" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
-      <span>Sign in</span>
-    </button>
+      label="Sign In"
+      severity="primary"
+      :loading="loading"
+      block
+    />
   </form>
 </template>
 
@@ -49,6 +48,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/auth'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { SignInFormData } from '../types'
 
 interface FormErrors {
