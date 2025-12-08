@@ -9,13 +9,13 @@
   >
     <div v-if="team" class="space-y-6">
       <!-- Team Header -->
-      <div class="border-b border-gray-200 pb-4">
+      <div class="manage-dialog__header">
         <h3 class="text-lg font-semibold text-gray-900">{{ team.name }}</h3>
-        <p class="text-sm text-gray-600">Add or remove team members</p>
+        <p class="text-sm text-muted">Add or remove team members</p>
       </div>
 
       <!-- Add New Member -->
-      <div class="bg-gray-50 p-4 rounded-lg">
+      <div class="manage-dialog__panel">
         <h4 class="text-md font-medium text-gray-900 mb-3">Add New Member</h4>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <InputNumber
@@ -37,7 +37,7 @@
               inputId="primary"
               :binary="true"
             />
-            <label for="primary" class="ml-2 text-sm">Primary</label>
+            <label for="primary" class="ml-2 text-sm text-muted">Primary</label>
           </div>
           <Button
             label="Add"
@@ -55,31 +55,31 @@
       <div>
         <h4 class="text-md font-medium text-gray-900 mb-3">Current Members ({{ currentMembers.length }})</h4>
         
-        <div v-if="currentMembers.length === 0" class="text-center py-8">
+        <div v-if="currentMembers.length === 0" class="manage-dialog__empty">
           <i class="pi pi-users text-gray-300 text-4xl mb-3"></i>
-          <p class="text-gray-600">No members in this team yet.</p>
+          <p class="text-muted">No members in this team yet.</p>
         </div>
 
         <div v-else class="space-y-3 max-h-64 overflow-y-auto">
           <div
             v-for="member in currentMembers"
             :key="member.id"
-            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+            class="manage-dialog__member-row"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <i class="pi pi-user text-purple-600 text-sm"></i>
+              <div class="manage-dialog__avatar">
+                <i class="pi pi-user text-white text-sm"></i>
               </div>
               <div>
                 <div class="font-medium text-gray-900">Employee #{{ member.employee_id }}</div>
-                <div class="text-sm text-gray-600 flex items-center space-x-2">
+                <div class="text-sm text-muted flex items-center space-x-2">
                   <Tag
                     :value="member.role"
                     :severity="member.role === 'MANAGER' ? 'info' : 'secondary'"
                     class="text-xs"
                   />
                   <span v-if="member.is_primary" class="text-xs text-green-600">Primary</span>
-                  <span class="text-xs text-gray-500">
+                  <span class="text-xs text-muted">
                     Joined {{ formatDate(member.joined_at) }}
                   </span>
                 </div>
@@ -267,18 +267,57 @@ const handleDone = () => {
 
 <style scoped>
 :deep(.p-dialog .p-dialog-header) {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border);
 }
 
 :deep(.p-dialog .p-dialog-content) {
   padding: 2rem;
+  background: var(--app-surface);
 }
 
 :deep(.p-dialog .p-dialog-footer) {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
   padding: 1rem 2rem;
+}
+
+.manage-dialog__header {
+  border-bottom: 1px solid var(--app-border);
+  padding-bottom: 1rem;
+}
+
+.manage-dialog__panel {
+  background: var(--app-surface-muted);
+  border-radius: 1rem;
+  border: 1px solid var(--app-border);
+  padding: 1.25rem;
+}
+
+.manage-dialog__empty {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.manage-dialog__member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  background: var(--app-surface);
+}
+
+.manage-dialog__avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
 }
 
 /* Scrollbar styling */
@@ -287,16 +326,16 @@ const handleDone = () => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--app-surface-muted);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--app-border);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--app-accent);
 }
 </style>

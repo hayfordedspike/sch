@@ -8,7 +8,7 @@
   >
     <div class="p-fluid">
       <div class="field mb-4">
-        <label for="myTeamName" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+        <label for="myTeamName" class="block text-sm font-medium text-muted mb-2">Name</label>
         <InputText
           id="myTeamName"
           v-model="formData.name"
@@ -17,7 +17,7 @@
         />
       </div>
       <div class="field mb-4">
-        <label for="myTeamDescription" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <label for="myTeamDescription" class="block text-sm font-medium text-muted mb-2">Description</label>
         <Textarea
           id="myTeamDescription"
           v-model="formData.description"
@@ -27,7 +27,7 @@
         />
       </div>
       <div class="field mb-4">
-        <label for="myTeamManagerId" class="block text-sm font-medium text-gray-700 mb-2">Manager</label>
+        <label for="myTeamManagerId" class="block text-sm font-medium text-muted mb-2">Manager</label>
         <Dropdown
           id="myTeamManagerId"
           v-model="selectedManager"
@@ -149,3 +149,32 @@ const handleSave = () => {
   }
 }
 </script>
+
+<style scoped>
+:deep(.p-dialog .p-dialog-header) {
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border);
+}
+
+:deep(.p-dialog .p-dialog-content) {
+  background: var(--app-surface);
+}
+
+:deep(.p-dialog .p-dialog-footer) {
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
+}
+
+:deep(.p-inputtext),
+:deep(.p-dropdown) {
+  background: var(--app-input-bg);
+  border-color: var(--app-input-border);
+  color: var(--app-text);
+}
+
+:deep(.p-inputtext:focus),
+:deep(.p-dropdown:focus-within) {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+}
+</style>

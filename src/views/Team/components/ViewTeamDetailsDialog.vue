@@ -9,11 +9,11 @@
   >
     <div v-if="team" class="space-y-6">
       <!-- Team Header -->
-      <div class="border-b border-gray-200 pb-4">
+      <div class="team-details__header">
         <div class="flex items-start justify-between">
           <div>
             <h2 class="text-2xl font-bold text-gray-900">{{ team.name }}</h2>
-            <p class="text-gray-600 mt-2">{{ team.description }}</p>
+            <p class="text-muted mt-2">{{ team.description }}</p>
           </div>
           <Tag
             :value="'Active'"
@@ -77,9 +77,9 @@
           />
         </div>
         
-        <div v-if="membersList.length === 0" class="text-center py-8">
+        <div v-if="membersList.length === 0" class="team-details__empty">
           <i class="pi pi-users text-gray-300 text-4xl mb-3"></i>
-          <p class="text-gray-600">No members assigned to this team yet.</p>
+          <p class="text-muted">No members assigned to this team yet.</p>
           <Button
             label="Add First Member"
             icon="pi pi-plus"
@@ -93,15 +93,15 @@
           <div
             v-for="member in membersList"
             :key="member.id"
-            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            class="team-details__member-row"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <i class="pi pi-user text-purple-600 text-sm"></i>
+              <div class="team-details__avatar">
+                <i class="pi pi-user text-white text-sm"></i>
               </div>
               <div>
                 <div class="font-medium text-gray-900">Employee #{{ member.employee_id }}</div>
-                <div class="text-sm text-gray-600 flex items-center space-x-2">
+                <div class="text-sm text-muted flex items-center space-x-2">
                   <Tag
                     :value="member.role"
                     :severity="member.role === 'MANAGER' ? 'info' : 'secondary'"
@@ -111,7 +111,7 @@
                 </div>
               </div>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm text-muted">
               Joined {{ formatDate(member.joined_at) }}
             </div>
           </div>
@@ -122,18 +122,18 @@
       <div class="field-column">
         <h3 class="field-header">Recent Activity</h3>
         <div class="space-y-3">
-          <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-            <i class="pi pi-plus-circle text-blue-600"></i>
+          <div class="team-details__activity-card team-details__activity-card--info">
+            <i class="pi pi-plus-circle"></i>
             <div>
               <div class="text-sm font-medium">Team created</div>
-              <div class="text-xs text-gray-600">{{ formatDate(team.created_at) }}</div>
+              <div class="text-xs text-muted">{{ formatDate(team.created_at) }}</div>
             </div>
           </div>
-          <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-            <i class="pi pi-users text-green-600"></i>
+          <div class="team-details__activity-card team-details__activity-card--success">
+            <i class="pi pi-users"></i>
             <div>
               <div class="text-sm font-medium">{{ activeMembers }} members active</div>
-              <div class="text-xs text-gray-600">Current team size</div>
+              <div class="text-xs text-muted">Current team size</div>
             </div>
           </div>
         </div>
@@ -247,6 +247,11 @@ const handleClose = () => {
 </script>
 
 <style scoped>
+.team-details__header {
+  border-bottom: 1px solid var(--app-border);
+  padding-bottom: 1rem;
+}
+
 .field-column {
   display: flex;
   flex-direction: column;
@@ -256,34 +261,83 @@ const handleClose = () => {
 .field-header {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--app-text);
+  border-bottom: 1px solid var(--app-border);
   padding-bottom: 0.5rem;
 }
 
 .field-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--app-text-muted);
 }
 
 .field-content {
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--app-text);
+}
+
+.team-details__empty {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.team-details__member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+}
+
+.team-details__avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-details__activity-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+}
+
+.team-details__activity-card--info i {
+  color: #38bdf8;
+}
+
+.team-details__activity-card--success i {
+  color: #34d399;
+}
+
+.team-details__member-row i,
+.team-details__activity-card i {
+  font-size: 1rem;
 }
 
 :deep(.p-dialog .p-dialog-header) {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border);
 }
 
 :deep(.p-dialog .p-dialog-content) {
   padding: 2rem;
+  background: var(--app-surface);
 }
 
 :deep(.p-dialog .p-dialog-footer) {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
   padding: 1rem 2rem;
 }
 
@@ -293,16 +347,16 @@ const handleClose = () => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--app-surface-muted);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--app-border);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--app-accent);
 }
 </style>

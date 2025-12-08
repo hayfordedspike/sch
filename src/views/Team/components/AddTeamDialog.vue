@@ -11,7 +11,7 @@
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Group Name -->
       <div class="field">
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="name" class="block text-sm font-medium text-muted mb-2">
           Group Name <span class="text-red-500">*</span>
         </label>
         <InputText
@@ -26,28 +26,28 @@
       </div>
 
       <!-- Team Members Card List -->
-      <div class="rounded-lg p-4 mb-4 border border-gray-200">
+      <div class="team-dialog-panel">
         <div class="font-semibold text-gray-900 mb-2">Team Members</div>
         <div v-for="member in allMembers" :key="member.id" class="flex items-center justify-between py-2">
           <div class="flex items-center space-x-3">
             <!-- Checkbox -->
             <input type="checkbox" v-model="selectedMemberIds" :value="member.id" class="form-checkbox h-5 w-5 text-blue-600" />
             <!-- User Icon -->
-            <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-              <i class="pi pi-user text-gray-500 text-sm"></i>
+            <div class="team-dialog-avatar">
+              <i class="pi pi-user text-muted text-sm"></i>
             </div>
             <!-- Full Name -->
             <div class="font-medium text-gray-900">{{ member.name }}</div>
           </div>
           <!-- Position -->
-          <div class="inline-block text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-semibold">{{ member.position }}</div>
+          <div class="team-dialog-chip">{{ member.position }}</div>
         </div>
       </div>
 
       <!-- Assign Team Lead Dropdown -->
       <div class="field">
-        <label for="teamLead" class="block text-sm font-medium text-gray-700 mb-2">Assign Team Lead (Optional)</label>
-        <select id="teamLead" v-model="selectedTeamLeadId" class="w-full rounded-lg border-gray-300">
+        <label for="teamLead" class="block text-sm font-medium text-muted mb-2">Assign Team Lead (Optional)</label>
+        <select id="teamLead" v-model="selectedTeamLeadId" class="team-select">
           <option value="" disabled>Select team lead</option>
           <option v-for="member in selectedMembers.length ? selectedMembers : allMembers" :key="member.id" :value="member.id">{{ member.name }}</option>
         </select>
@@ -67,7 +67,7 @@
           icon="pi pi-check"
           @click="handleSubmit"
           :loading="loading"
-          class="bg-purple-600 hover:bg-purple-700 border-0 text-white"
+          class="team-primary-action"
         />
       </div>
     </template>
@@ -204,17 +204,63 @@ watch(
 }
 
 :deep(.p-dialog .p-dialog-header) {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border);
 }
 
 :deep(.p-dialog .p-dialog-content) {
   padding: 2rem;
+  background: var(--app-surface);
 }
 
 :deep(.p-dialog .p-dialog-footer) {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
   padding: 1rem 2rem;
+}
+
+.team-dialog-panel {
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  background: var(--app-surface-muted);
+}
+
+.team-dialog-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-dialog-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
+}
+
+.team-select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--app-input-border);
+  background: var(--app-input-bg);
+  color: var(--app-text);
+}
+
+.team-select:focus {
+  outline: none;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
 }
 </style>

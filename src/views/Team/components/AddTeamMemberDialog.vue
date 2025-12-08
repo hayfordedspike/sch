@@ -8,7 +8,7 @@
   >
     <div class="p-fluid">
       <div class="field mb-4">
-        <label for="teamSelect" class="block text-sm font-medium text-gray-700 mb-2">Team</label>
+        <label for="teamSelect" class="block text-sm font-medium text-muted mb-2">Team</label>
         <Dropdown
           id="teamSelect"
           v-model="formData.team_id"
@@ -22,7 +22,7 @@
       </div>
 
       <div class="field mb-4">
-        <label for="employeeSelect" class="block text-sm font-medium text-gray-700 mb-2">Employee</label>
+        <label for="employeeSelect" class="block text-sm font-medium text-muted mb-2">Employee</label>
         <Dropdown
           id="employeeSelect"
           v-model="formData.employee_id"
@@ -36,7 +36,7 @@
       </div>
 
       <div class="field mb-4">
-        <label for="roleSelect" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+        <label for="roleSelect" class="block text-sm font-medium text-muted mb-2">Role</label>
         <Dropdown
           id="roleSelect"
           v-model="formData.role"
@@ -55,7 +55,7 @@
             v-model="formData.is_primary"
             :binary="true"
           />
-          <label for="isPrimary" class="ml-2 text-sm font-medium text-gray-700">Is Primary Member</label>
+          <label for="isPrimary" class="ml-2 text-sm font-medium text-muted">Is Primary Member</label>
         </div>
       </div>
     </div>

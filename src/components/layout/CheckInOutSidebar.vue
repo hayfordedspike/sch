@@ -1,9 +1,9 @@
 <template>
-  <div v-if="props.visible" class="checkin-sidebar bg-white border-r border-gray-200 w-80 h-full flex flex-col">
+  <div v-if="props.visible" class="checkin-sidebar w-80 h-full flex flex-col">
     <!-- Header -->
-    <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+    <div class="sidebar-header p-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+        <div class="header-icon">
           <i class="pi pi-clock text-white text-lg"></i>
         </div>
         <div>
@@ -14,16 +14,14 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex border-b border-gray-200 bg-gray-50">
+    <div class="sidebar-tablist flex">
       <button
         v-for="tab in tabs"
         :key="tab.key"
         @click="activeTab = tab.key"
         :class="[
-          'flex-1 py-3 px-4 text-sm font-medium transition-colors duration-200',
-          activeTab === tab.key
-            ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
-            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          'sidebar-tab',
+          { 'sidebar-tab--active': activeTab === tab.key }
         ]"
       >
         <i :class="tab.icon" class="mr-2"></i>
@@ -35,23 +33,23 @@
     <div class="flex-1 overflow-hidden">
       <!-- Check-in Tab -->
       <div v-if="activeTab === 'checkin'" class="h-full flex flex-col">
-        <div class="p-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Pending Check-ins</h3>
-          <p class="text-sm text-gray-600">Assignments scheduled for today</p>
+        <div class="section-header">
+          <h3 class="section-title">Pending Check-ins</h3>
+          <p class="section-subtitle">Assignments scheduled for today</p>
         </div>
 
         <div class="flex-1 overflow-y-auto">
-          <div v-if="pendingCheckIns.length === 0" class="p-8 text-center">
+          <div v-if="pendingCheckIns.length === 0" class="empty-state">
             <i class="pi pi-check-circle text-green-500 text-3xl mb-3"></i>
-            <p class="text-gray-500">No pending check-ins</p>
-            <p class="text-sm text-gray-400 mt-1">All assignments are checked in</p>
+            <p class="empty-title">No pending check-ins</p>
+            <p class="empty-subtitle">All assignments are checked in</p>
           </div>
 
-          <div v-else class="divide-y divide-gray-100">
+          <div v-else class="divide-y divide-surface">
             <div
               v-for="assignment in pendingCheckIns"
               :key="assignment.id"
-              class="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              class="assignment-row"
               @click="handleCheckIn(assignment)"
             >
               <div class="flex items-start justify-between">
@@ -64,8 +62,8 @@
                       class="text-xs px-2 py-0.5"
                     />
                   </div>
-                  <p class="text-sm text-gray-600 mb-1">{{ getAssignmentDisplayInfo(assignment).visitInfo }}</p>
-                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                  <p class="text-sm text-muted mb-1">{{ getAssignmentDisplayInfo(assignment).visitInfo }}</p>
+                  <div class="assignment-meta">
                     <span class="flex items-center gap-1">
                       <i class="pi pi-clock"></i>
                       {{ formatTime(assignment.scheduled_start_at) }}
@@ -91,23 +89,23 @@
 
       <!-- Check-out Tab -->
       <div v-if="activeTab === 'checkout'" class="h-full flex flex-col">
-        <div class="p-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Active Assignments</h3>
-          <p class="text-sm text-gray-600">Currently checked-in staff</p>
+        <div class="section-header">
+          <h3 class="section-title">Active Assignments</h3>
+          <p class="section-subtitle">Currently checked-in staff</p>
         </div>
 
         <div class="flex-1 overflow-y-auto">
-          <div v-if="activeAssignments.length === 0" class="p-8 text-center">
+          <div v-if="activeAssignments.length === 0" class="empty-state">
             <i class="pi pi-pause-circle text-orange-500 text-3xl mb-3"></i>
-            <p class="text-gray-500">No active assignments</p>
-            <p class="text-sm text-gray-400 mt-1">All staff have checked out</p>
+            <p class="empty-title">No active assignments</p>
+            <p class="empty-subtitle">All staff have checked out</p>
           </div>
 
-          <div v-else class="divide-y divide-gray-100">
+          <div v-else class="divide-y divide-surface">
             <div
               v-for="assignment in activeAssignments"
               :key="assignment.id"
-              class="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              class="assignment-row"
               @click="handleCheckOut(assignment)"
             >
               <div class="flex items-start justify-between">
@@ -120,8 +118,8 @@
                       class="text-xs px-2 py-0.5"
                     />
                   </div>
-                  <p class="text-sm text-gray-600 mb-1">{{ getAssignmentDisplayInfo(assignment).visitInfo }}</p>
-                  <div class="flex items-center gap-4 text-xs text-gray-500">
+                  <p class="text-sm text-muted mb-1">{{ getAssignmentDisplayInfo(assignment).visitInfo }}</p>
+                  <div class="assignment-meta">
                     <span class="flex items-center gap-1">
                       <i class="pi pi-clock"></i>
                       Checked in: {{ formatTime(assignment.check_in_at!) }}
@@ -147,15 +145,15 @@
     </div>
 
     <!-- Footer Stats -->
-    <div class="p-4 border-t border-gray-200 bg-gray-50">
+    <div class="sidebar-footer p-4">
       <div class="grid grid-cols-2 gap-4 text-center">
         <div>
-          <div class="text-2xl font-bold text-green-600">{{ pendingCheckIns.length }}</div>
-          <div class="text-xs text-gray-600">Pending Check-ins</div>
+          <div class="stat-value text-green-500">{{ pendingCheckIns.length }}</div>
+          <div class="stat-label">Pending Check-ins</div>
         </div>
         <div>
-          <div class="text-2xl font-bold text-blue-600">{{ activeAssignments.length }}</div>
-          <div class="text-xs text-gray-600">Active Assignments</div>
+          <div class="stat-value text-blue-500">{{ activeAssignments.length }}</div>
+          <div class="stat-label">Active Assignments</div>
         </div>
       </div>
     </div>
@@ -317,7 +315,125 @@ onUnmounted(() => {
 
 <style scoped>
 .checkin-sidebar {
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  background: var(--app-surface);
+  border-right: 1px solid var(--app-border);
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08);
+  color: var(--app-text);
+}
+
+.sidebar-header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-tablist {
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--app-text-muted);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.sidebar-tab:hover {
+  color: var(--app-text);
+  background: var(--app-surface);
+}
+
+.sidebar-tab--active {
+  color: var(--app-text);
+  border-bottom-color: var(--app-accent);
+  background: var(--app-surface);
+}
+
+.section-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-text);
+  margin-bottom: 0.35rem;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: var(--app-text-muted);
+}
+
+.empty-state {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--app-text-muted);
+}
+
+.empty-title {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.empty-subtitle {
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+  margin-top: 0.25rem;
+}
+
+.assignment-row {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.assignment-row:hover {
+  background: var(--app-surface-muted);
+}
+
+.assignment-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+}
+
+.divide-surface > :deep(*) + :deep(*) {
+  border-color: var(--app-border);
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--app-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Custom scrollbar */
@@ -326,24 +442,22 @@ onUnmounted(() => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--app-surface-muted);
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--app-border);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--app-accent);
 }
 
-/* Tab transitions */
 button {
   transition: all 0.2s ease-in-out;
 }
 
-/* Tag styling */
 :deep(.p-tag) {
   border-radius: 12px;
   font-size: 0.75rem;

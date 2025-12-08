@@ -5,12 +5,12 @@
         <!-- Member Header -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <i class="pi pi-user text-blue-600 text-lg"></i>
+            <div class="member-card__avatar">
+              <i class="pi pi-user text-white text-lg"></i>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900">{{ memberName }}</h3>
-              <p class="text-sm text-gray-600">{{ member.role }}</p>
+              <p class="text-sm text-muted">{{ member.role }}</p>
             </div>
           </div>
           <div class="flex space-x-1">
@@ -37,15 +37,15 @@
 
         <!-- Contact Information -->
         <div class="space-y-2 mb-4">
-          <div class="flex items-center text-sm text-gray-600">
+          <div class="flex items-center text-sm text-muted">
             <i class="pi pi-users mr-2 text-gray-400"></i>
             <span>{{ teamName }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
+          <div class="flex items-center text-sm text-muted">
             <i class="pi pi-phone mr-2 text-gray-400"></i>
             <span>{{ formattedPhone }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
+          <div class="flex items-center text-sm text-muted">
             <i class="pi pi-circle-fill mr-2 text-xs" :class="memberStatus === 'active' ? 'text-green-500' : 'text-red-500'"></i>
             <span>{{ memberStatus === 'active' ? 'Active' : 'Inactive' }}</span>
           </div>
@@ -55,20 +55,20 @@
         <div class="mb-4">
           <div class="flex items-center mb-2">
             <i class="pi pi-calendar mr-2 text-gray-400"></i>
-            <span class="text-sm font-medium text-gray-700">Member since</span>
+            <span class="text-sm font-medium text-muted">Member since</span>
           </div>
           <div class="text-left">
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-muted">
               {{ new Date(member.joined_at).toLocaleDateString() }}
             </div>
           </div>
         </div>
 
         <!-- Role and Primary Status -->
-        <div class="pt-3 border-t border-gray-200">
+        <div class="member-card__section">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium text-gray-700">Role</span>
-            <span v-if="member.is_primary" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-medium">
+            <span class="text-sm font-medium text-muted">Role</span>
+            <span v-if="member.is_primary" class="member-card__primary">
               Primary
             </span>
           </div>
@@ -164,14 +164,41 @@ onMounted(() => {
 
 <style scoped>
 .member-card {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition-property: box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
+  border-radius: 1rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .member-card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border-color: rgb(191 219 254);
+  border-color: var(--app-accent);
+  transform: translateY(-2px);
+}
+
+.member-card__avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+.member-card__primary {
+  padding: 0.15rem 0.6rem;
+  border-radius: 0.5rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.member-card__section {
+  border-top: 1px solid var(--app-border);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 </style>

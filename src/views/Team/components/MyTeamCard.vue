@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+  <div class="team-card">
     <div class="flex items-start justify-between mb-4">
       <div class="flex-1">
         <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ team.name }}</h3>
-        <p class="text-gray-600 text-sm mb-3">{{ team.description }}</p>
-        <div class="text-xs text-black font-bold mt-1">
+        <p class="text-muted text-sm mb-3">{{ team.description }}</p>
+        <div class="text-xs font-semibold text-muted mt-1">
 
           <span v-if="managerLoading">Loading...</span>
           <span v-else-if="manager" >
@@ -95,3 +95,19 @@ watch(() => props.team, (newTeam) => {
   }
 }, { immediate: true })
 </script>
+
+<style scoped>
+.team-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--app-card-shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.team-card:hover {
+  border-color: var(--app-accent);
+  transform: translateY(-2px);
+}
+</style>

@@ -258,6 +258,20 @@ body .app-surface-muted {
   border-color: var(--app-border);
 }
 
+.team-primary-action {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  border: none !important;
+  color: #fff !important;
+  border-radius: 9999px !important;
+  padding-inline: 1.5rem !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-primary-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 15px 30px rgba(91, 33, 182, 0.35);
+}
+
 @utility g-padding {
   @apply px-4 sm:px-8 md:px-13 lg:px-16 xl:px-36 2xl:px-48;
 }

@@ -11,7 +11,7 @@
       <!-- Row 1: Full Name and Email -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label for="name" class="block text-sm font-semibold text-gray-700">
+          <label for="name" class="block text-sm font-semibold text-muted">
             Full Name <span class="text-red-500">*</span>
           </label>
           <InputText
@@ -25,7 +25,7 @@
         </div>
 
         <div class="space-y-2">
-          <label for="email" class="block text-sm font-semibold text-gray-700">
+          <label for="email" class="block text-sm font-semibold text-muted">
             Email Address <span class="text-red-500">*</span>
           </label>
           <InputText
@@ -43,7 +43,7 @@
       <!-- Row 2: Phone and Address -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label for="phone" class="block text-sm font-semibold text-gray-700">
+          <label for="phone" class="block text-sm font-semibold text-muted">
             Phone Number
           </label>
           <CountryPhoneInput
@@ -55,7 +55,7 @@
         </div>
 
         <div class="space-y-2">
-          <label for="address" class="block text-sm font-semibold text-gray-700">
+          <label for="address" class="block text-sm font-semibold text-muted">
             Address
           </label>
           <InputText
@@ -70,7 +70,7 @@
 
       <!-- Availability Cards -->
       <div class="space-y-4">
-        <label class="block text-sm font-semibold text-gray-700">
+        <label class="block text-sm font-semibold text-muted">
           Availability <span class="text-red-500">*</span>
         </label>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
@@ -79,10 +79,8 @@
             :key="day.value"
             @click="toggleDay(day.value)"
             :class="[
-              'cursor-pointer rounded-lg border-2 px-3 py-2 text-center transition-all duration-200 hover:shadow-md min-w-fit',
-              formData.availability.includes(day.value)
-                ? 'border-blue-500 bg-blue-500 text-white shadow-sm'
-                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+              'member-availability',
+              { 'member-availability--active': formData.availability.includes(day.value) }
             ]"
           >
             <div class="font-medium text-sm whitespace-nowrap">{{ day.label }}</div>
@@ -93,7 +91,7 @@
 
       <!-- Notes Section -->
       <div class="space-y-2 pt-4">
-        <label for="notes" class="block text-sm font-semibold text-gray-700">
+        <label for="notes" class="block text-sm font-semibold text-muted">
           Notes
         </label>
         <Textarea
@@ -337,23 +335,25 @@ const handleCancel = () => {
 :deep(.p-dialog-content) {
   padding: 1.5rem;
   border-radius: 0 0 12px 12px;
+  background: var(--app-surface);
 }
 
 :deep(.p-dialog-footer) {
   padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
 }
 
 /* Ensure PrimeVue inputs display properly with Tailwind styles */
 :deep(.p-inputtext) {
   width: 100% !important;
   padding: 0.75rem 1rem !important;
-  border: 1px solid #d1d5db !important;
+  border: 1px solid var(--app-input-border) !important;
   border-radius: 0.5rem !important;
   font-size: 0.875rem !important;
   transition: all 0.2s ease !important;
-  background-color: white !important;
-  color: #374151 !important;
+  background-color: var(--app-input-bg) !important;
+  color: var(--app-text) !important;
 }
 
 :deep(.p-inputtext:focus) {
@@ -365,12 +365,12 @@ const handleCancel = () => {
 :deep(.p-textarea) {
   width: 100% !important;
   padding: 0.75rem 1rem !important;
-  border: 1px solid #d1d5db !important;
+  border: 1px solid var(--app-input-border) !important;
   border-radius: 0.5rem !important;
   font-size: 0.875rem !important;
   transition: all 0.2s ease !important;
-  background-color: white !important;
-  color: #374151 !important;
+  background-color: var(--app-input-bg) !important;
+  color: var(--app-text) !important;
   resize: none !important;
   font-family: inherit !important;
 }
@@ -391,5 +391,29 @@ const handleCancel = () => {
 :deep(.p-invalid.p-textarea:focus) {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+.member-availability {
+  cursor: pointer;
+  border-radius: 0.85rem;
+  border: 2px solid var(--app-border);
+  padding: 0.55rem 0.75rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  min-width: fit-content;
+  background: var(--app-surface);
+  color: var(--app-text-muted);
+}
+
+.member-availability:hover {
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  border-color: var(--app-accent);
+}
+
+.member-availability--active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
 }
 </style>

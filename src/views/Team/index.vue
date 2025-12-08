@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-white py-8">
+  <div class="team-page min-h-screen py-8">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl p-6">
+        <div class="team-hero-card">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Title and Stats -->
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                <i class="pi pi-users mr-3 text-purple-600"></i>
+              <h1 class="team-hero-title">
+                <i class="pi pi-users mr-3"></i>
                 Team Management
               </h1>
-              <p class="text-gray-600 mt-2">
+              <p class="text-muted mt-2">
                 Manage your team members, roles and availability
               </p>
             </div>
@@ -23,21 +23,21 @@
                 @click="handleAddMyTeam"
                 icon="pi pi-plus"
                 label="Add My Team"
-                class="bg-purple-600 hover:bg-purple-700 border-0 text-white"
+                class="team-primary-action"
               />
               <Button
                 v-if="activeTab === 'members'"
                 @click="handleAddMember"
                 icon="pi pi-user-plus"
                 label="Add New Member"
-                class="bg-purple-600 hover:bg-purple-700 border-0 text-white"
+                class="team-primary-action"
               />
               <Button
                 v-if="activeTab === 'teams'"
                 @click="handleAddTeam"
                 icon="pi pi-plus"
                 label="Create Team Group"
-                class="bg-purple-600 hover:bg-purple-700 border-0 text-white"
+                class="team-primary-action"
               />
           </div>
         </div>
@@ -47,39 +47,23 @@
     <!-- Tabs Navigation -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white p-4">
-          <!-- Custom Tab Navigation -->
-          <div class="inline-flex border-b-2 border-blue-300 relative">
+        <div class="team-tab-shell">
+          <div class="team-tab-rail">
             <button
               @click="activeTabIndex = 0"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 0
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 0 }]"
             >
               My Teams
             </button>
             <button
               @click="activeTabIndex = 1"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 1
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 1 }]"
             >
               Members
             </button>
             <button
               @click="activeTabIndex = 2"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 2
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['team-tab-pill', { 'team-tab-pill--active': activeTabIndex === 2 }]"
             >
               Grouped Teams
             </button>
@@ -91,30 +75,30 @@
     <!-- Content Section -->
     <div class="w-full">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="team-panel">
           <!-- My Teams Content -->
           <div v-if="activeTab === 'my-teams'" class="p-6">
             <!-- Loading State -->
             <div v-if="myTeamsLoading && myTeams.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
-              <p class="text-gray-600 mt-4">Loading my teams...</p>
+              <p class="text-muted mt-4">Loading my teams...</p>
             </div>
 
             <!-- Empty State -->
             <div v-else-if="!myTeamsLoading && myTeams.length === 0" class="text-center py-12">
-              <div class="bg-gray-50 rounded-xl p-12">
+              <div class="team-empty-card">
                 <div class="mb-4">
                   <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No My Teams Yet</h3>
-                <p class="text-gray-600 mb-6">
+                <h3 class="team-empty-title">No My Teams Yet</h3>
+                <p class="text-muted mb-6">
                   Get started by adding your first personal team.
                 </p>
                 <Button
                   @click="handleAddMyTeam"
                   icon="pi pi-plus"
                   label="Add Your First Team"
-                  class="bg-purple-600 hover:bg-purple-700 border-0 text-white font-semibold py-3 px-6"
+                  class="team-primary-action font-semibold py-3 px-6"
                 />
               </div>
             </div>
@@ -136,24 +120,24 @@
             <!-- Loading State -->
             <div v-if="membersLoading && members.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
-              <p class="text-gray-600 mt-4">Loading members...</p>
+              <p class="text-muted mt-4">Loading members...</p>
             </div>
 
             <!-- Empty State -->
             <div v-else-if="!membersLoading && filteredMembers.length === 0" class="text-center py-12">
-              <div class="bg-gray-50 rounded-xl p-12">
+              <div class="team-empty-card">
                 <div class="mb-4">
                   <i class="pi pi-user text-gray-300" style="font-size: 4rem;"></i>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No Members Yet</h3>
-                <p class="text-gray-600 mb-6">
+                <h3 class="team-empty-title">No Members Yet</h3>
+                <p class="text-muted mb-6">
                   Get started by adding your first team member.
                 </p>
                 <Button
                   @click="handleAddMember"
                   icon="pi pi-user-plus"
                   label="Add Your First Member"
-                  class="bg-purple-600 hover:bg-purple-700 border-0 text-white font-semibold py-3 px-6"
+                  class="team-primary-action font-semibold py-3 px-6"
                 />
               </div>
             </div>
@@ -176,24 +160,24 @@
             <!-- Loading State -->
             <div v-if="loading && teams.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
-              <p class="text-gray-600 mt-4">Loading teams...</p>
+              <p class="text-muted mt-4">Loading teams...</p>
             </div>
 
             <!-- Empty State -->
             <div v-else-if="!loading && filteredTeams.length === 0" class="text-center py-12">
-              <div class="bg-gray-50 rounded-xl p-12">
+              <div class="team-empty-card">
                 <div class="mb-4">
                   <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No Teams Yet</h3>
-                <p class="text-gray-600 mb-6">
+                <h3 class="team-empty-title">No Teams Yet</h3>
+                <p class="text-muted mb-6">
                   Get started by creating your first team to organize your workforce.
                 </p>
                 <Button
                   @click="handleAddTeam"
                   icon="pi pi-plus"
                   label="Create Your First Team"
-                  class="bg-purple-600 hover:bg-purple-700 border-0 text-white font-semibold py-3 px-6"
+                  class="team-primary-action font-semibold py-3 px-6"
                 />
               </div>
             </div>
@@ -725,7 +709,101 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Custom styles for the teams page */
+.team-page {
+  --team-bg-start: #f8fafc;
+  --team-bg-end: #e0f2fe;
+  background: linear-gradient(160deg, var(--team-bg-start), var(--team-bg-end));
+  transition: background 0.3s ease;
+}
+
+:global(html.theme-dark) .team-page,
+:global(.theme-dark) .team-page {
+  --team-bg-start: #030915;
+  --team-bg-end: #0d1b36;
+}
+
+.team-hero-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1.5rem;
+  box-shadow: var(--app-card-shadow);
+  padding: 1.5rem;
+}
+
+.team-hero-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--app-text);
+  display: flex;
+  align-items: center;
+}
+
+.team-hero-title i {
+  color: var(--app-accent);
+}
+
+.team-tab-shell {
+  background: var(--app-surface);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
+}
+
+.team-tab-rail {
+  display: inline-flex;
+  border-bottom: 2px solid var(--team-tab-border, var(--app-border));
+  background: var(--team-tab-track, var(--app-surface));
+}
+
+.team-tab-pill {
+  padding: 0.85rem 1.4rem;
+  font-weight: 600;
+  color: var(--app-text-muted);
+  border-top-left-radius: 0.85rem;
+  border-top-right-radius: 0.85rem;
+  border: 2px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.team-tab-pill:hover {
+  color: var(--app-text);
+  background: var(--app-surface-muted);
+}
+
+.team-tab-pill--active {
+  color: var(--app-text);
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  border-bottom: none;
+  margin-bottom: -2px;
+  font-weight: 700;
+  box-shadow: var(--app-card-shadow);
+}
+
+.team-panel {
+  background: var(--app-surface);
+  border-radius: 1.5rem;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
+}
+
+.team-empty-card {
+  background: var(--app-surface-muted);
+  border-radius: 1rem;
+  padding: 3rem;
+  border: 1px dashed var(--app-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.team-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
 :deep(.p-inputtext) {
   border-radius: 8px;
 }

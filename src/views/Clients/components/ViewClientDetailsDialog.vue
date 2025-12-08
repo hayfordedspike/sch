@@ -12,22 +12,22 @@
       <div class="section">
         <h3 class="section-title">Contact Information</h3>
         <!-- Top row: Name, Email, Phone -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200 mb-4">
-          <div class="field-column">
+        <div class="details-grid grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="field-column details-grid__item">
             <label class="field-header">Name</label>
             <p class="field-content">{{ client.first_name }} {{ client.last_name }}</p>
           </div>
-          <div class="field-column">
+          <div class="field-column details-grid__item">
             <label class="field-header">Email</label>
             <p class="field-content truncate">{{ client.email }}</p>
           </div>
-          <div class="field-column">
+          <div class="field-column details-grid__item">
             <label class="field-header">Phone</label>
             <p class="field-content">{{ formatClientPhone(client.phone) }}</p>
           </div>
         </div>
         <!-- Bottom row: Address -->
-        <div class="border-t border-gray-200 pt-4">
+        <div class="section-divider">
           <div class="field-column">
             <label class="field-header">Address</label>
             <p class="field-content">{{ client.city }}, {{ client.state }}</p>
@@ -38,17 +38,17 @@
       <!-- Emergency Contact -->
       <div class="section">
         <h3 class="section-title">Emergency Contact</h3>
-        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-          <div class="field-column">
+        <div v-if="client.emergency_contact_name || client.emergency_contact_phone" class="details-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="field-column details-grid__item">
             <label class="field-header">Contact Name</label>
             <p class="field-content">{{ client.emergency_contact_name || 'Not provided' }}</p>
           </div>
-          <div class="field-column">
+          <div class="field-column details-grid__item">
             <label class="field-header">Contact Phone</label>
             <p class="field-content">{{ client.emergency_contact_phone ? formatClientPhone(client.emergency_contact_phone) : 'Not provided' }}</p>
           </div>
         </div>
-        <div v-else class="text-gray-500 italic">
+        <div v-else class="text-muted italic">
           No emergency contact information provided
         </div>
       </div>
@@ -58,7 +58,7 @@
         <h3 class="section-title">Preferred Service</h3>
         <div class="field">
           
-          <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+          <span class="service-chip">
             {{ getHouseName(client.house_id) }}
           </span>
         </div>
@@ -93,17 +93,17 @@
         <h3 class="section-title">Schedules</h3>
         <div class="space-y-4">
           <!-- Schedule Item 1 -->
-          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-              <div class="field-column">
+          <div class="schedule-card">
+            <div class="details-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="field-column details-grid__item">
                 <label class="field-header">From:</label>
                 <p class="field-content">23rd September, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">To:</label>
                 <p class="field-content">29th September, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">Time:</label>
                 <p class="field-content">8:00AM - 10:00PM</p>
               </div>
@@ -111,17 +111,17 @@
           </div>
           
           <!-- Schedule Item 2 -->
-          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-              <div class="field-column">
+          <div class="schedule-card">
+            <div class="details-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="field-column details-grid__item">
                 <label class="field-header">From:</label>
                 <p class="field-content">30th September, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">To:</label>
                 <p class="field-content">5th October, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">Time:</label>
                 <p class="field-content">9:00AM - 3:00PM</p>
               </div>
@@ -129,17 +129,17 @@
           </div>
           
           <!-- Schedule Item 3 -->
-          <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-              <div class="field-column">
+          <div class="schedule-card">
+            <div class="details-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="field-column details-grid__item">
                 <label class="field-header">From:</label>
                 <p class="field-content">7th October, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">To:</label>
                 <p class="field-content">12th October, 2025</p>
               </div>
-              <div class="field-column">
+              <div class="field-column details-grid__item">
                 <label class="field-header">Time:</label>
                 <p class="field-content">10:00AM - 6:00PM</p>
               </div>
@@ -161,7 +161,7 @@
           label="Edit Client"
           icon="pi pi-pencil"
           @click="handleEdit"
-          class="bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
+          class="details-primary-action"
         />
       </div>
     </template>
@@ -221,19 +221,24 @@ const handleEdit = () => {
 
 <style scoped>
 .section {
-  background: white;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  padding: 1rem;
+  background: var(--app-surface);
+  border-radius: 1rem;
+  border: 1px solid var(--app-border);
+  padding: 1.25rem;
+  box-shadow: var(--app-card-shadow);
+}
+
+.section + .section {
+  margin-top: 1rem;
 }
 
 .section-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--app-text);
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .field {
@@ -243,81 +248,155 @@ const handleEdit = () => {
 .field-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--app-text-muted);
   display: block;
   margin-bottom: 0.25rem;
 }
 
 .field-value {
-  color: #111827;
+  color: var(--app-text);
   font-size: 0.875rem;
   line-height: 1.625;
 }
 
-/* New styles for contact information columns */
 .field-column {
   padding: 1rem;
   text-align: left;
-  min-width: 0; /* Allows flex items to shrink */
+  min-width: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 .field-header {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #374151;
-  display: block;
-  margin-bottom: 0.5rem;
+  color: var(--app-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-align: left;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
 }
 
 .field-content {
-  color: #111827;
-  font-size: 0.875rem;
-  font-weight: 500;
+  color: var(--app-text);
+  font-size: 0.9rem;
+  font-weight: 600;
   line-height: 1.5;
   word-break: break-word;
-  hyphens: auto;
-  text-align: left;
 }
 
-/* Responsive divider adjustments */
+.section-divider {
+  border-top: 1px solid var(--app-border);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.details-grid {
+  position: relative;
+}
+
+.details-grid__item {
+  position: relative;
+}
+
 @media (max-width: 768px) {
   .field-column {
-    padding: 0.75rem 0;
-    border-right: none !important;
+    padding-inline: 0;
+  }
+
+  .details-grid__item + .details-grid__item {
+    border-top: 1px solid var(--app-border);
+    padding-top: 1rem;
   }
 }
 
 @media (min-width: 769px) {
-  .field-column:not(:last-child) {
-    border-right: 1px solid #e5e7eb;
+  .details-grid__item {
+    padding-left: 1rem;
   }
 
-  .field-column:first-child {
+  .details-grid__item:first-child {
     padding-left: 0;
   }
 
-  .field-column:last-child {
-    padding-right: 0;
+  .details-grid__item + .details-grid__item {
+    border-left: 1px solid var(--app-border);
   }
 }
 
+.service-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--app-surface-muted);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+}
+
+.schedule-card {
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: var(--app-surface-muted);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.details-primary-action {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  border: none;
+  color: #fff;
+  border-radius: 0.75rem;
+  padding-inline: 1.5rem;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.details-primary-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 15px 28px rgba(37, 99, 235, 0.45);
+}
+
 :deep(.p-dialog-header) {
-  background: #eff6ff;
-  border-bottom: 1px solid #bfdbfe;
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border);
 }
 
 :deep(.p-dialog-title) {
-  color: #1e3a8a;
+  color: var(--app-text);
   font-weight: 600;
 }
 
 :deep(.p-dialog-content) {
   max-height: 24rem;
   overflow-y: auto;
+  background: var(--app-surface);
+}
+
+:deep(.p-dialog-footer) {
+  background: var(--app-surface-muted);
+  border-top: 1px solid var(--app-border);
+}
+
+:deep(.p-dialog-content::-webkit-scrollbar) {
+  width: 6px;
+}
+
+:deep(.p-dialog-content::-webkit-scrollbar-track) {
+  background: var(--app-surface-muted);
+}
+
+:deep(.p-dialog-content::-webkit-scrollbar-thumb) {
+  background: var(--app-border);
+  border-radius: 3px;
+}
+
+:deep(.p-dialog-content::-webkit-scrollbar-thumb:hover) {
+  background: var(--app-accent);
+}
+
+.text-muted {
+  color: var(--app-text-muted);
 }
 </style>

@@ -1,16 +1,16 @@
 <template>
-  <div class="checkin-checkout-page min-h-screen bg-gray-50">
+  <div class="checkin-checkout-page min-h-screen">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Page Header -->
       <div class="mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 text-center">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div class="checkin-card text-center p-6">
+          <div class="icon-badge icon-badge--clock">
             <i class="pi pi-clock text-white text-2xl"></i>
           </div>
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">
+          <h1 class="checkin-heading text-2xl font-bold mb-2">
             Check-in/Check-out
           </h1>
-          <p class="text-gray-600">
+          <p class="text-muted">
             Record your attendance for scheduled assignments
           </p>
         </div>
@@ -18,26 +18,24 @@
 
       <!-- Current Date & Time Card -->
       <div class="mb-6">
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div class="checkin-card p-6">
           <div class="text-center">
-            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="icon-badge icon-badge--calendar">
               <i class="pi pi-calendar text-white text-lg"></i>
             </div>
-            <div class="text-3xl font-bold text-gray-900 mb-1">
+            <div class="checkin-time text-3xl font-bold mb-1">
               {{ currentTime }}
             </div>
-            <div class="text-lg text-gray-600 mb-2">
+            <div class="text-lg text-muted mb-2">
               {{ currentDate }}
             </div>
-            <div class="text-sm text-gray-500">
-              {{ currentDay }}, {{ currentMonth }} {{ currentYear }}
-            </div>
+           
           </div>
         </div>
       </div>
 
       <!-- Check-in/Check-out Buttons -->
-      <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+      <div class="checkin-card p-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Check-in Button -->
           <div class="text-center">
@@ -50,7 +48,7 @@
               :loading="checkInLoading"
               @click="handleQuickCheckIn"
             />
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-sm text-muted mt-2">
               Start your shift for today's assignment
             </p>
           </div>
@@ -66,7 +64,7 @@
               :loading="checkOutLoading"
               @click="handleQuickCheckOut"
             />
-            <p class="text-sm text-gray-500 mt-2">
+              <p class="text-sm text-muted mt-2">
               End your shift for today's assignment
             </p>
           </div>
@@ -74,14 +72,7 @@
 
         <!-- Status Message -->
         <div v-if="statusMessage" class="mt-6 text-center">
-          <div
-            :class="[
-              'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium',
-              statusMessage.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' :
-              statusMessage.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
-              'bg-blue-50 text-blue-700 border border-blue-200'
-            ]"
-          >
+            <div :class="['status-chip', `status-chip--${statusMessage.type}`]">
             <i :class="statusMessage.icon"></i>
             {{ statusMessage.text }}
           </div>
@@ -317,7 +308,84 @@ fetchAssignments()
 
 <style scoped>
 .checkin-checkout-page {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --checkin-bg-start: var(--app-background);
+  --checkin-bg-end: var(--app-surface-muted);
+  background: linear-gradient(135deg, var(--checkin-bg-start), var(--checkin-bg-end));
+  transition: background 0.3s ease, color 0.3s ease;
+  color: var(--app-text);
+}
+
+:global(html.theme-dark) .checkin-checkout-page,
+:global(.theme-dark) .checkin-checkout-page {
+  --checkin-bg-start: #050d1f;
+  --checkin-bg-end: #0f1d3b;
+}
+
+.checkin-heading,
+.checkin-time {
+  color: var(--app-text);
+}
+
+.checkin-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--app-card-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.checkin-card:hover {
+  border-color: var(--app-accent);
+}
+
+.icon-badge {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+}
+
+.icon-badge--clock {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.icon-badge--calendar {
+  width: 3.25rem;
+  height: 3.25rem;
+  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+}
+
+.status-chip--success {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.status-chip--error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+.status-chip--info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #3b82f6;
 }
 
 /* Custom button styles for larger touch targets */
