@@ -47,7 +47,7 @@
       <!-- Assign Team Lead Dropdown -->
       <div class="field">
         <label for="teamLead" class="block text-sm font-medium text-muted mb-2">Assign Team Lead (Optional)</label>
-        <select id="teamLead" v-model="selectedTeamLeadId" class="team-select">
+        <select id="teamLead" v-model="selectedTeamLeadId" class="team-select app-select">
           <option value="" disabled>Select team lead</option>
           <option v-for="member in selectedMembers.length ? selectedMembers : allMembers" :key="member.id" :value="member.id">{{ member.name }}</option>
         </select>

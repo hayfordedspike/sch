@@ -20,7 +20,7 @@ html {
 
 :root {
   color-scheme: light;
-  --app-background: #f8fafc;
+  --app-background: #ffffff;
   --app-surface: #ffffff;
   --app-surface-elevated: #ffffff;
   --app-surface-muted: #f1f5f9;
@@ -44,8 +44,8 @@ html {
 
 :root.theme-dark {
   color-scheme: dark;
-  --app-background: #040a18;
-  --app-surface: #0b1222;
+  --app-background: #16223a;
+  --app-surface: #16223a;
   --app-surface-elevated: #111b2f;
   --app-surface-muted: #16223a;
   --app-border: rgba(148, 163, 184, 0.24);
@@ -325,6 +325,53 @@ body .app-surface-muted {
   box-shadow: var(--app-card-shadow);
 }
 
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-dropdown,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-multiselect,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-autocomplete,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-inputnumber,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-calendar {
+  background-color: var(--app-input-bg) !important;
+  border-color: var(--app-input-border) !important;
+  color: var(--app-text) !important;
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-dropdown-panel,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-multiselect-panel,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-autocomplete-panel,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-cascadeselect-panel,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-listbox-list-wrapper {
+  background-color: var(--app-surface-elevated) !important;
+  border-color: var(--app-border) !important;
+  color: var(--app-text) !important;
+  box-shadow: 0 25px 65px rgba(2, 6, 23, 0.5) !important;
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-dropdown-item,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-multiselect-item,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-autocomplete-item,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-cascadeselect-item,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-listbox-item {
+  color: var(--app-text) !important;
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-dropdown-item:not(.p-disabled):hover,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-multiselect-item:not(.p-disabled):hover,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-autocomplete-item:not(.p-disabled):hover,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-cascadeselect-item:not(.p-disabled):hover,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-listbox-item:not(.p-disabled):hover {
+  background-color: var(--app-surface-muted) !important;
+  color: var(--app-text) !important;
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-dropdown-item.p-highlight,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-multiselect-item.p-highlight,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-autocomplete-item.p-highlight,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-cascadeselect-item.p-highlight,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .p-listbox-item.p-highlight {
+  background-color: var(--app-accent-soft) !important;
+  color: var(--app-text-strong) !important;
+}
+
 .p-dropdown-items,
 .p-multiselect-items,
 .p-autocomplete-items,
@@ -385,6 +432,28 @@ input:focus,
   box-shadow: 0 0 0 1px var(--app-accent-soft);
 }
 
+.app-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+  color: var(--app-text);
+}
+
+.app-select:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,15 12,9 18,15'%3e%3c/polyline%3e%3c/svg%3e");
+  box-shadow: 0 0 0 1px var(--app-accent-soft);
+}
+
+.app-select::-ms-expand {
+  display: none;
+}
+
 .app-input {
   background-color: var(--app-input-bg) !important;
   border: 1px solid var(--app-input-border) !important;
@@ -407,6 +476,12 @@ select option,
 .team-select option {
   background-color: var(--app-surface);
   color: var(--app-text);
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) select option,
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .team-select option {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
 }
 
 .app-tab-card {
@@ -453,6 +528,163 @@ select option,
   margin-bottom: -2px;
   font-weight: 700;
   box-shadow: var(--app-card-shadow);
+}
+
+.app-calendar {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-card-shadow);
+  color: var(--app-text);
+}
+
+.app-calendar table,
+.app-calendar th,
+.app-calendar td {
+  color: inherit;
+  border-color: var(--app-border);
+}
+
+.app-calendar .bg-white,
+.app-calendar .bg-gray-100 {
+  background-color: var(--app-surface);
+}
+
+.app-calendar .bg-gray-50,
+.app-calendar .bg-gray-200,
+.app-calendar .bg-blue-50 {
+  background-color: var(--app-surface-muted);
+}
+
+.app-calendar .border-gray-200,
+.app-calendar .border-gray-100,
+.app-calendar .border-gray-50,
+.app-calendar .border-dashed {
+  border-color: var(--app-border) !important;
+}
+
+.app-calendar .text-gray-900,
+.app-calendar .text-gray-800,
+.app-calendar .text-gray-700,
+.app-calendar .text-gray-600,
+.app-calendar .text-blue-900,
+.app-calendar .text-green-900,
+.app-calendar .text-purple-900,
+.app-calendar .text-amber-900,
+.app-calendar .text-rose-900,
+.app-calendar .text-teal-900,
+.app-calendar .text-indigo-900,
+.app-calendar .text-emerald-900 {
+  color: var(--app-text);
+}
+
+.app-calendar .text-gray-500,
+.app-calendar .text-gray-400,
+.app-calendar .text-gray-300 {
+  color: var(--app-text-muted);
+}
+
+.app-calendar .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #065f46;
+}
+
+:where(html.theme-dark, .theme-dark, [data-theme="dark"]) .app-calendar .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.28);
+  color: #bbf7d0;
+}
+
+.app-calendar .bg-gray-100.text-gray-600 {
+  color: var(--app-text);
+}
+
+.app-calendar .bg-blue-500 {
+  background-color: var(--app-accent);
+}
+
+.app-calendar .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.12);
+}
+
+.app-calendar .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+.app-calendar .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.14);
+}
+
+.app-calendar .border-green-200 {
+  border-color: rgba(34, 197, 94, 0.35) !important;
+}
+
+.app-calendar .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.14);
+}
+
+.app-calendar .border-purple-200 {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.app-calendar .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.16);
+}
+
+.app-calendar .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+.app-calendar .bg-rose-50 {
+  background-color: rgba(244, 63, 94, 0.14);
+}
+
+.app-calendar .border-rose-200 {
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+.app-calendar .bg-teal-50 {
+  background-color: rgba(20, 184, 166, 0.16);
+}
+
+.app-calendar .border-teal-200 {
+  border-color: rgba(20, 184, 166, 0.35) !important;
+}
+
+.app-calendar .bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.15);
+}
+
+.app-calendar .border-indigo-200 {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+.app-calendar .bg-emerald-50 {
+  background-color: rgba(52, 211, 153, 0.16);
+}
+
+.app-calendar .border-emerald-200 {
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+.app-calendar tbody tr:nth-child(even) {
+  background-color: var(--app-surface);
+}
+
+.app-calendar tbody tr:nth-child(odd) {
+  background-color: var(--app-surface-muted);
+}
+
+.app-calendar .text-gray-400.text-xs {
+  color: var(--app-text-muted);
+}
+
+.app-calendar .border-blue-400,
+.app-calendar .border-blue-500 {
+  border-color: var(--app-accent) !important;
+}
+
+.app-calendar .text-xs.font-semibold.uppercase {
+  letter-spacing: 0.08em;
 }
 
 @utility g-padding {

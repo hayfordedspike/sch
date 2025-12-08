@@ -119,7 +119,7 @@ const goToRoster = () => {
         <div class="relative w-full md:w-60">
           <select
             v-model="selectedFilter"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full text-sm app-input app-select"
           >
             <option
               v-for="option in filterOptions"
@@ -141,30 +141,10 @@ const goToRoster = () => {
       />
     </div>
   </div>
-</template><style scoped>
+<template><style scoped>
 /* Custom styles for better interaction */
 button:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
-}
-
-select:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Custom arrow for select */
-select {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 0.5rem center !important;
-  background-size: 1rem !important;
-  padding-right: 2.5rem !important;
-}
-
-select:focus {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='18,15 12,9 6,15'%3e%3c/polyline%3e%3c/svg%3e") !important;
 }
 </style>
