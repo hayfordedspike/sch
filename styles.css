@@ -40,9 +40,15 @@ html {
   --app-input-border: #cbd5f5;
   --app-table-header-bg: #292d32;
   --app-table-header-text: #ffffff;
+  --profile-gradient-start: rgba(102, 126, 234, 0.95);
+  --profile-gradient-end: rgba(118, 75, 162, 0.95);
+  --profile-gradient-border: transparent;
 }
 
-:root.theme-dark {
+:root.theme-dark,
+:root[data-theme="dark"],
+body.theme-dark,
+body[data-theme="dark"] {
   color-scheme: dark;
   --app-background: #16223a;
   --app-surface: #16223a;
@@ -64,6 +70,9 @@ html {
   --app-input-border: rgba(148, 163, 184, 0.45);
   --app-table-header-bg: #1f2937;
   --app-table-header-text: #f8fafc;
+  --profile-gradient-start: rgba(15, 23, 42, 0.95);
+  --profile-gradient-end: rgba(30, 41, 59, 0.95);
+  --profile-gradient-border: var(--app-border);
 }
 
 .p-dropdown-panel,

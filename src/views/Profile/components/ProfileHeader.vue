@@ -1,9 +1,9 @@
 <template>
-  <Card class="profile-header-card w-full">
+  <Card class="profile-panel profile-header-card w-full">
     <template #content>
-      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div class="flex w-full md:flex-1 items-center gap-4 sm:gap-6">
-          <div class="shrink-0">
+      <div class="profile-header__layout">
+        <div class="profile-header__info">
+          <div class="profile-avatar">
             <img
               :src="defaultAvatarUrl"
               :alt="displayName"
@@ -18,8 +18,8 @@
           </div>
         </div>
 
-        <div class="profile-actions flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
-            <div v-if="!editing" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+        <div class="profile-actions">
+          <div v-if="!editing" class="profile-actions__group">
             <GlobalButton
               label="Edit Profile"
               icon="pi pi-user-edit"
@@ -37,7 +37,7 @@
               @click="$emit('change-password')"
             />
           </div>
-          <div v-else class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+          <div v-else class="profile-actions__group">
             <GlobalButton
               label="Cancel"
               icon="pi pi-times"
@@ -111,20 +111,11 @@ const displayName = computed(() => {
 */
 
 .profile-header-card {
-  --profile-gradient-start: rgba(102, 126, 234, 0.95);
-  --profile-gradient-end: rgba(118, 75, 162, 0.95);
-  --profile-gradient-border: transparent;
-}
-
-:global([data-theme='dark']) .profile-header-card,
-:global(html.theme-dark) .profile-header-card {
-  --profile-gradient-start: rgba(15, 23, 42, 0.95);
-  --profile-gradient-end: rgba(30, 41, 59, 0.95);
-  --profile-gradient-border: var(--app-border);
+  color: var(--app-text);
 }
 
 :deep(.profile-header-card .p-card) {
-  background: linear-gradient(135deg, var(--profile-gradient-start) 0%, var(--profile-gradient-end) 100%);
+   background-color: var(--app-surface);
   border: 1px solid var(--profile-gradient-border);
   box-shadow: var(--app-card-shadow);
   width: 100%;
@@ -134,7 +125,7 @@ const displayName = computed(() => {
 }
 
 :deep(.profile-header-card .p-card-content) {
-  background: var(--app-surface);
+    background-color: var(--app-surface);
   color: var(--app-text);
   margin: 4px;
   border-radius: 1.25rem;
@@ -150,8 +141,65 @@ const displayName = computed(() => {
   transition: color 0.3s ease;
 }
 
+
+.profile-header__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .profile-header__layout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.profile-header__info {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--app-text);
+}
+
+.profile-avatar {
+  padding: 0.35rem;
+  border-radius: 9999px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
+  display: inline-flex;
+}
+
 .profile-actions {
   width: 100%;
+  color: var(--app-text);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+@media () {
+  .profile-actions {
+    width: auto;
+    align-items: flex-end;
+  }
+}
+
+.profile-actions__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .profile-actions__group {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
 
 .profile-btn {
