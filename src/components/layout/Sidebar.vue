@@ -40,11 +40,11 @@ const handleNavigation = (route: string) => {
 
 <template>
   <aside :class="[
-    'app-sidebar min-w-[256px] pt-6 border-r-2 h-full relative transition-transform duration-300 ease-in-out',
+    'min-w-[256px] pt-6 border-r-2 border-gray-100 h-full relative transition-transform duration-300 ease-in-out',
     'md:translate-x-0 md:static md:z-auto',
     visible ? 'translate-x-0' : '-translate-x-full',
     'md:block',
-    visible ? 'block fixed left-0 top-0 z-50' : 'hidden md:block'
+    visible ? 'block fixed left-0 top-0 z-50 bg-transparent' : 'hidden md:block'
   ]">
     <img alt="DropShop" class="w-30 mx-auto" src="@/assets/scheduler-logo.svg" />
 
@@ -52,10 +52,8 @@ const handleNavigation = (route: string) => {
       <div
         v-for="item in navItems"
         :key="item.key"
-        :class="[
-          'sidebar-item mt-2 px-4 py-2 cursor-pointer flex items-center gap-2 transition-colors ease-in-out duration-500',
-          { 'sidebar-item--active': isRouteActive(item.route) }
-        ]"
+        class="sidebar-item mt-2 px-4 py-2 cursor-pointer flex items-center gap-2 text-primary transition-colors ease-in-out duration-500"
+        :style="isRouteActive(item.route) ? { backgroundColor: '#064a6d !important', color: 'white !important' } : {}"
         @click="handleNavigation(item.route)"
       >
         <i :class="item.icon"></i>
@@ -66,38 +64,14 @@ const handleNavigation = (route: string) => {
 </template>
 
 <style scoped>
-.app-sidebar {
-  background-color: var(--app-sidebar-bg);
-  border-color: var(--app-sidebar-border);
-  color: var(--app-text);
-  box-shadow: var(--app-card-shadow);
-}
-
-.sidebar-item {
-  border-radius: 0.75rem;
-  background-color: transparent;
-  color: var(--app-text);
-}
-
-.sidebar-item i {
-  color: var(--app-text-muted);
-}
-
 .sidebar-item:hover {
-  background-color: rgba(6, 89, 134, 0.08);
-  color: var(--app-accent);
+  background-color: #064a6d !important;
+  color: white !important;
 }
 
 .sidebar-item:hover i {
-  color: var(--app-accent);
-}
-
-.sidebar-item--active {
-  background-color: var(--sidebar-active-bg) !important;
-  color: var(--sidebar-active-text) !important;
-}
-
-.sidebar-item--active i {
-  color: inherit !important;
+  color: white !important;
 }
 </style>
+
+<style scoped></style>
