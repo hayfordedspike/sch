@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white py-8">
+  <div class="profile-view min-h-screen py-8">
     <!-- Profile Header - Full Width -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,8 +23,8 @@
                 <InputText v-model="changePasswordForm.new_password" type="password" class="w-full" required />
               </div>
               <div class="flex justify-end gap-2 mt-6">
-                <Button label="Cancel" @click="showChangePasswordDialog = false" severity="secondary" outlined />
-                <Button
+                <GlobalButton label="Cancel" @click="showChangePasswordDialog = false" type="warning" />
+                <GlobalButton
                   label="Change Password"
                   type="submit"
                   severity="secondary"
@@ -66,12 +66,12 @@
     <!-- Go to Dashboard Button - Full Width -->
     <div class="w-full mt-12">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <Button
+        <GlobalButton
           @click="goToDashboard"
           class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl border-0"
           label="Back To Dashboard"
           icon="pi pi-home"
-          size="large"
+          size="lg"
         />
       </div>
     </div>
@@ -97,7 +97,7 @@ import { useProfile } from '@/composables/useProfile'
 import { useChangePassword } from '@/composables/useChangePassword'
 import { useCertificates } from '@/composables/useCertificates'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ProfileHeader from './components/ProfileHeader.vue'
 import PersonalDataSection from './components/PersonalDataSection.vue'
 import CertificationsSection from './components/CertificationsSection.vue'
@@ -372,5 +372,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Custom styles can be added here if needed */
+.profile-view {
+  background-color: var(--app-background);
+  color: var(--app-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 </style>

@@ -3,14 +3,14 @@
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-medium text-gray-800">Certificate Management</h1>
       <div class="flex gap-3">
-        <Button 
+        <GlobalButton 
           label="Add Certificate Type" 
           icon="pi pi-plus" 
           @click="handleAddCertificateType" 
           severity="secondary"
           outlined
         />
-        <Button 
+        <GlobalButton 
           label="Add Certificate" 
           icon="pi pi-plus" 
           @click="showAddDialog = true" 
@@ -93,7 +93,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { Certificate } from './types'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Toast from 'primevue/toast'
 import CertificateList from './components/CertificateList.vue'
 import CertificateTypes from './components/CertificateTypes.vue'

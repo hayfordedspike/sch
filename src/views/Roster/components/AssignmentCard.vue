@@ -14,48 +14,48 @@
             </div>
           </div>
           <div class="flex space-x-1">
-            <Button
+            <GlobalButton
               v-if="!displayInfo.isCheckedIn"
               icon="pi pi-sign-in"
               severity="success"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('check-in', assignment)"
               v-tooltip.top="'Check In'"
             />
-            <Button
+            <GlobalButton
               v-if="displayInfo.isCheckedIn && !displayInfo.isCheckedOut"
               icon="pi pi-sign-out"
               severity="warning"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('check-out', assignment)"
               v-tooltip.top="'Check Out'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-eye"
               severity="info"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('view-details', assignment)"
               v-tooltip.top="'View Details'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-pencil"
               severity="secondary"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('edit', assignment)"
               v-tooltip.top="'Edit Assignment'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-trash"
               severity="danger"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('delete', assignment)"
@@ -103,7 +103,7 @@ import { useEmployees } from '@/composables/useEmployees'
 import { useVisits } from '@/composables/useVisits'
 import { useAssignments } from '@/composables/useAssignments'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Assignment } from '@/views/Roster/types'
 
 interface Props {

@@ -1,8 +1,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 export default defineComponent({
   name: 'ClientCard',
+  components: {
+    GlobalButton
+  },
   emits: ['edit', 'view']
 })
 </script>
@@ -39,7 +43,7 @@ export default defineComponent({
     </div>
   </section>
 
-  <Button label="View Details" class="mt-5 !bg-transparent !text-primary hover:!bg-primary hover:!text-white w-full" @click="$emit('view')" />
+  <GlobalButton label="View Details" class="mt-5 !bg-transparent !text-primary hover:!bg-primary hover:!text-white w-full" @click="$emit('view')" />
 </div>
 </template>
 

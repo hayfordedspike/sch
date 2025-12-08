@@ -166,17 +166,18 @@
 
     <template #footer>
       <div class="flex justify-between gap-2">
-        <Button
+        <GlobalButton
           label="Edit Visit"
           icon="pi pi-pencil"
           class="p-button-outlined"
           @click="handleEdit"
         />
-        <Button
+        <GlobalButton
           label="Close"
           icon="pi pi-times"
           class="p-button-text text-gray-600 hover:text-gray-800"
           @click="handleClose"
+          type="warning"
         />
       </div>
     </template>
@@ -190,7 +191,7 @@ import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 import { useEmployees } from '@/composables/useEmployees'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import type { Visit } from '@/views/Roster/types'
 

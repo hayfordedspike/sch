@@ -1,7 +1,7 @@
 <template>
-  <Card class="mb-8">
+  <Card class="mb-8 profile-panel">
     <template #header>
-      <div class="px-6 py-4 border-b border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200 profile-panel__header">
         <h2 class="text-xl font-semibold text-gray-900 flex items-center">
           <i class="pi pi-user mr-3 text-blue-600"></i>
           Contact Information
@@ -10,7 +10,7 @@
     </template>
 
     <template #content>
-      <div class="p-6">
+      <div class="p-6 profile-panel__body">
         <!-- View Mode -->
         <div v-if="!editing" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:divide-x lg:divide-gray-200">
@@ -230,6 +230,28 @@ const formatDate = (dateString: string) => {
 </script>
 
 <style scoped>
+.profile-panel {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--app-card-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-panel__header {
+  border-color: var(--app-border);
+  color: var(--app-text-strong);
+}
+
+.profile-panel__body {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+}
+
+.profile-panel label {
+  color: var(--app-text-muted);
+}
+
 :deep(.p-card-header) {
   padding: 0;
 }
@@ -241,14 +263,16 @@ const formatDate = (dateString: string) => {
 /* Input field styling */
 :deep(.p-inputtext) {
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--app-border);
   border-radius: 8px;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: var(--app-input-bg);
+  color: var(--app-text);
 }
 
 :deep(.p-inputtext:focus) {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35);
 }
 
 :deep(.p-calendar .p-inputtext) {
@@ -256,15 +280,17 @@ const formatDate = (dateString: string) => {
 }
 
 :deep(.p-textarea) {
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--app-border);
   border-radius: 8px;
   padding: 0.75rem;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: var(--app-input-bg);
+  color: var(--app-text);
 }
 
 :deep(.p-textarea:focus) {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35);
 }
 
 /* Calendar icon styling - position inside the input field */

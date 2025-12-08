@@ -68,11 +68,11 @@
       <div class="field-column">
         <div class="flex items-center justify-between mb-4">
           <h3 class="field-header">Team Members</h3>
-          <Button
+          <GlobalButton
             label="Manage Members"
             icon="pi pi-users"
             @click="handleManageMembers"
-            size="small"
+            size="sm"
             outlined
           />
         </div>
@@ -80,12 +80,12 @@
         <div v-if="membersList.length === 0" class="team-details__empty">
           <i class="pi pi-users text-gray-300 text-4xl mb-3"></i>
           <p class="text-muted">No members assigned to this team yet.</p>
-          <Button
+          <GlobalButton
             label="Add First Member"
             icon="pi pi-plus"
             @click="handleManageMembers"
             class="mt-3"
-            size="small"
+            size="sm"
           />
         </div>
 
@@ -143,7 +143,7 @@
     <template #footer>
       <div class="flex justify-between">
         <div>
-          <Button
+          <GlobalButton
             label="Manage Members"
             icon="pi pi-users"
             @click="handleManageMembers"
@@ -151,17 +151,18 @@
           />
         </div>
         <div class="flex space-x-3">
-          <Button
+          <GlobalButton
             label="Edit Team"
             icon="pi pi-pencil"
             @click="handleEdit"
             class="bg-blue-500 hover:bg-blue-600 border-0 text-white"
           />
-          <Button
+          <GlobalButton
             label="Close"
             icon="pi pi-times"
             @click="handleClose"
             class="p-button-text"
+            type="warning"
           />
         </div>
       </div>
@@ -173,7 +174,7 @@
 import { computed } from 'vue'
 import { useTeamsDummy } from '@/composables/useTeamsDummy'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import type { Team } from '@/composables/useTeams'
 

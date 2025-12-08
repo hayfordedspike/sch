@@ -119,7 +119,7 @@
     </div>
 
     <div>
-      <Button
+      <GlobalButton
         type="submit"
         :loading="loading"
         class="w-full bg-primary hover:bg-primary-dark"
@@ -145,7 +145,7 @@ import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import { useAuthStore } from '@/stores/auth'
 import type { RegistrationFormData, RegistrationApiPayload } from '../types'
 

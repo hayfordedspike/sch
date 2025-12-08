@@ -2,7 +2,7 @@
   <div class="card">
     <h2 class="text-xl font-semibold mb-4">Certificate Types</h2>
     <div class="mb-4">
-      <Button label="Add New Type" @click="handleAddNewType" />
+      <GlobalButton label="Add New Type" @click="handleAddNewType" />
     </div>
   
     <table class="min-w-full divide-y divide-gray-200">
@@ -30,8 +30,8 @@
           <td class="px-6 py-4 whitespace-nowrap">{{ type.description || '-' }}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex gap-2">
-              <Button icon="pi pi-pencil" rounded outlined severity="info" aria-label="Edit" @click="handleEditType(type)" />
-              <Button icon="pi pi-trash" rounded outlined severity="danger" aria-label="Delete" @click="handleDeleteType(type)" />
+              <GlobalButton icon="pi pi-pencil" rounded outlined severity="info" aria-label="Edit" @click="handleEditType(type)" />
+              <GlobalButton icon="pi pi-trash" rounded outlined severity="danger" aria-label="Delete" @click="handleDeleteType(type)" />
             </div>
           </td>
         </tr>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import AddCertificateTypeDialog from './AddCertificateTypeDialog.vue'
 import { useCertificates } from '@/composables/useCertificates'
 

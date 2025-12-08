@@ -77,8 +77,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
-        <Button
+        <GlobalButton label="Cancel" @click="handleClose" type="warning" />
+        <GlobalButton
           :label="editMode ? 'Update' : 'Add Certificate Type'"
           @click="handleSubmit"
           :loading="loading"
@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'

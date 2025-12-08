@@ -29,19 +29,19 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <Button
+            <GlobalButton
               v-if="showViewAllButton"
               label="View All"
               outlined
               severity="warning"
-              size="small"
+              size="sm"
               @click="$emit('view-all')"
             />
-            <Button
+            <GlobalButton
               label="Add Certificate"
               outlined
               severity="danger"
-              size="small"
+              size="sm"
               @click="$emit('add-certificate')"
             />
           </div>
@@ -56,7 +56,7 @@ import { computed, onMounted } from 'vue'
 import { useCertificates } from '@/composables/useCertificates'
 import type { Certificate } from '../types'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 interface Emits {
   (e: 'add-certificate'): void

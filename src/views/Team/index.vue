@@ -18,21 +18,21 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
-              <Button
+              <GlobalButton
                 v-if="activeTab === 'my-teams'"
                 @click="handleAddMyTeam"
                 icon="pi pi-plus"
                 label="Add My Team"
                 class="team-primary-action"
               />
-              <Button
+              <GlobalButton
                 v-if="activeTab === 'members'"
                 @click="handleAddMember"
                 icon="pi pi-user-plus"
                 label="Add New Member"
                 class="team-primary-action"
               />
-              <Button
+              <GlobalButton
                 v-if="activeTab === 'teams'"
                 @click="handleAddTeam"
                 icon="pi pi-plus"
@@ -94,7 +94,7 @@
                 <p class="text-muted mb-6">
                   Get started by adding your first personal team.
                 </p>
-                <Button
+                <GlobalButton
                   @click="handleAddMyTeam"
                   icon="pi pi-plus"
                   label="Add Your First Team"
@@ -133,7 +133,7 @@
                 <p class="text-muted mb-6">
                   Get started by adding your first team member.
                 </p>
-                <Button
+                <GlobalButton
                   @click="handleAddMember"
                   icon="pi pi-user-plus"
                   label="Add Your First Member"
@@ -173,7 +173,7 @@
                 <p class="text-muted mb-6">
                   Get started by creating your first team to organize your workforce.
                 </p>
-                <Button
+                <GlobalButton
                   @click="handleAddTeam"
                   icon="pi pi-plus"
                   label="Create Your First Team"
@@ -266,7 +266,7 @@ import { useTeams } from '@/composables/useTeams'
 import { useTeamMembers } from '@/composables/useTeamMembers'
 import type { CreateTeamRequest, UpdateTeamRequest, Team } from '@/composables/useTeams'
 import type { TeamMember } from '@/composables/useTeamMembers'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { TeamCard, MemberCard, MyTeamCard, AddTeamDialog, AddMemberDialog, AddMyTeamDialog, ViewTeamDetailsDialog, ManageTeamMembersDialog, AddTeamMemberDialog, EditTeamMemberDialog } from './components/index'
 

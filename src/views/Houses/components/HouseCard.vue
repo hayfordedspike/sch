@@ -20,11 +20,11 @@
         
         <!-- Actions Dropdown -->
         <div class="relative">
-          <Button
+          <GlobalButton
             icon="pi pi-ellipsis-v"
             text
             rounded
-            size="small"
+            size="sm"
             @click="toggleDropdown"
             aria-label="House actions"
           />
@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { House } from '../types'
 
 interface Props {

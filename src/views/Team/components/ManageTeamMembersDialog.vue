@@ -39,12 +39,12 @@
             />
             <label for="primary" class="ml-2 text-sm text-muted">Primary</label>
           </div>
-          <Button
+          <GlobalButton
             label="Add"
             icon="pi pi-plus"
             @click="handleAddMember"
             :disabled="!canAddMember"
-            size="small"
+            size="sm"
             class="col-span-1"
           />
         </div>
@@ -86,11 +86,11 @@
               </div>
             </div>
             <div class="flex space-x-2">
-              <Button
+              <GlobalButton
                 icon="pi pi-trash"
                 @click="handleRemoveMember(member)"
                 severity="danger"
-                size="small"
+                size="sm"
                 outlined
                 v-tooltip="'Remove Member'"
               />
@@ -102,7 +102,7 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <Button
+        <GlobalButton
           label="Done"
           icon="pi pi-check"
           @click="handleDone"
@@ -121,7 +121,7 @@ import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
 import Dropdown from 'primevue/dropdown'
 import Checkbox from 'primevue/checkbox'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import type { Team, AddTeamMemberRequest, TeamMember } from '@/composables/useTeams'
 

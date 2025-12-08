@@ -41,13 +41,14 @@
       </div>
     </div>
     <template #footer>
-      <Button
+      <GlobalButton
         label="Cancel"
         icon="pi pi-times"
         class="p-button-text"
         @click="handleCancel"
+        type="warning"
       />
-      <Button
+      <GlobalButton
         label="Save"
         icon="pi pi-check"
         class="p-button-primary"
@@ -63,7 +64,7 @@ import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Team, CreateTeamRequest, UpdateTeamRequest } from './types'
 import { useEmployees } from '@/composables/useEmployees'
 

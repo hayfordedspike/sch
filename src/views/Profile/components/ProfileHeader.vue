@@ -2,9 +2,7 @@
   <Card class="profile-header-card w-full">
     <template #content>
       <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <!-- Profile Image and Name -->
-        <div class="flex w-full items-center gap-4 sm:gap-6">
-          <!-- Profile Image -->
+        <div class="flex w-full md:flex-1 items-center gap-4 sm:gap-6">
           <div class="shrink-0">
             <img
               :src="defaultAvatarUrl"
@@ -13,47 +11,35 @@
             />
           </div>
 
-          <!-- User Name -->
           <div class="flex flex-col text-left">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-700">
+            <h1 class="profile-name text-2xl sm:text-3xl font-bold">
               {{ displayName }}
             </h1>
           </div>
         </div>
 
-        <!-- Edit Profile & Change Password Buttons -->
-        <div class="flex w-full md:w-auto flex-col gap-2">
-          <div v-if="!editing" class="flex flex-col md:flex-row gap-2">
-            <Button
-              @click="$emit('edit')"
-              class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
-              label="Edit Profile"
-              icon="pi pi-user-edit"
-            />
-            <Button
-              @click="$emit('change-password')"
-              class="w-full md:w-auto font-semibold py-3 px-6"
-              label="Change Password"
-              icon="pi pi-key"
-              severity="secondary"
-              outlined
-            />
+        <div class="profile-actions flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
+            <div v-if="!editing" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+            <GlobalButton type="primary" class="profile-btn w-full sm:w-auto" @click="$emit('edit')">
+              <i class="pi pi-user-edit"></i>
+              <span>Edit Profile</span>
+            </GlobalButton>
+            
+            <GlobalButton type="secondary" class="profile-btn w-full sm:w-auto" @click="$emit('change-password')">
+              <i class="pi pi-key"></i>
+              <span>Change Password</span>
+            </GlobalButton>
           </div>
-          <div v-else class="flex flex-col md:flex-row gap-2">
-            <Button
-              @click="$emit('cancel')"
-              outlined
-              class="w-full border-2 border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
-              label="Cancel"
-              icon="pi pi-times"
-              severity="secondary"
-            />
-            <Button
-              @click="$emit('save')"
-              class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
-              label="Save"
-              icon="pi pi-check"
-            />
+          <div v-else class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
+            <GlobalButton type="warning" class="profile-btn w-full sm:w-auto" @click="$emit('cancel')">
+              <i class="pi pi-times"></i>
+              <span>Cancel</span>
+            </GlobalButton>
+            
+            <GlobalButton type="primary" class="profile-btn w-full sm:w-auto" @click="$emit('save')">
+              <i class="pi pi-check"></i>
+              <span>Save</span>
+            </GlobalButton>
           </div>
         </div>
       </div>
@@ -64,7 +50,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue' // <-- Make sure the path is correct
 import type { User } from '@/stores/auth'
 
 interface Props {
@@ -104,21 +90,59 @@ const displayName = computed(() => {
 </script>
 
 <style scoped>
+/*
+  Note on Dark Mode: The custom button's dark mode requires Tailwind's 'dark' class
+  to be toggled on the <html> or <body> tag, which you seem to be handling 
+  with the :global([data-theme='dark']) selector in your CSS.
+*/
+
 :deep(.profile-header-card .p-card) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  border: 1px solid transparent;
+  box-shadow: var(--app-card-shadow);
   width: 100%;
-  border-radius: 0;
+  border-radius: 1.5rem;
+  padding: 0.25rem;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global([data-theme='dark']) :deep(.profile-header-card .p-card) {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  border-color: var(--app-border);
 }
 
 :deep(.profile-header-card .p-card-content) {
-  background: white;
+  background: var(--app-surface);
+  color: var(--app-text);
   margin: 4px;
-  border-radius: 12px;
+  border-radius: 1.25rem;
   padding: 2rem;
   width: calc(100% - 8px);
+  border: 1px solid var(--app-border);
+  box-shadow: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
+.profile-name {
+  color: var(--app-text-strong);
+  transition: color 0.3s ease;
+}
+
+.profile-actions {
+  width: 100%;
+}
+
+.profile-btn {
+  /* Ensure these styles integrate with the GlobalButton's base styles */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 640px) {

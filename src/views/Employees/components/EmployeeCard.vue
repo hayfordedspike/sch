@@ -4,21 +4,21 @@
       <div class="relative">
         <!-- Action Buttons -->
         <div class="absolute top-4 right-4 flex space-x-1">
-          <Button
+          <GlobalButton
             icon="pi pi-pencil"
             class="p-button-rounded p-button-outlined p-button-sm"
             @click.stop="handleEdit"
             v-tooltip="'Edit Employee'"
             severity="info"
           />
-          <Button
+          <GlobalButton
             icon="pi pi-trash"
             class="p-button-rounded p-button-outlined p-button-sm"
             @click.stop="handleDelete"
             v-tooltip="'Delete Employee'"
             severity="danger"
           />
-          <Button
+          <GlobalButton
             icon="pi pi-sync"
             class="p-button-rounded p-button-outlined p-button-sm"
             @click.stop="handleChangeStatus"
@@ -73,7 +73,7 @@
     <template #footer>
       <div class="p-0">
         <!-- View Details Button -->
-        <Button
+        <GlobalButton
           label="View Details"
           icon="pi pi-eye"
           class="w-full rounded-t-none"
@@ -92,7 +92,7 @@
 import { computed } from 'vue'
 import { useEmployees } from '@/composables/useEmployees'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import type { Employee } from '@/views/Employees/types'
 

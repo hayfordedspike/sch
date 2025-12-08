@@ -11,14 +11,14 @@
         <div class="field md:col-span-2">
           <label class="block text-sm font-medium text-gray-700 mb-2">Visit For</label>
           <div class="flex gap-3">
-            <Button
+            <GlobalButton
               label="Client"
               type="button"
               :severity="visitAssignmentType === 'client' ? 'primary' : 'secondary'"
               :outlined="visitAssignmentType !== 'client'"
               @click="visitAssignmentType = 'client'"
             />
-            <Button
+            <GlobalButton
               label="House"
               type="button"
               :severity="visitAssignmentType === 'house' ? 'primary' : 'secondary'"
@@ -122,13 +122,14 @@
     </div>
 
     <template #footer>
-      <Button
+      <GlobalButton
         label="Cancel"
         icon="pi pi-times"
         class="p-button-text"
         @click="handleCancel"
+        type="warning"
       />
-      <Button
+      <GlobalButton
         :label="visit ? 'Update Visit' : 'Create Visit'"
         icon="pi pi-check"
         class="p-button-primary"
@@ -150,7 +151,7 @@ import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Visit, CreateVisitRequest, UpdateVisitRequest } from '@/views/Roster/types'
 
 interface ClientOption {

@@ -61,7 +61,7 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
-              <Button
+              <GlobalButton
                 @click="handleAddEmployee"
                 icon="pi pi-plus"
                 label="Add New Employee"
@@ -92,7 +92,7 @@
             <p class="text-muted mb-6">
               Get started by adding your first employee to the system.
             </p>
-            <Button
+            <GlobalButton
               @click="handleAddEmployee"
               icon="pi pi-plus"
               label="Add Your First Employee"
@@ -116,7 +116,7 @@
 
         <!-- Load More Button -->
         <div v-if="!loading && filteredEmployees.length > 0 && hasMoreEmployees" class="text-center mt-8">
-          <Button
+          <GlobalButton
             @click="loadMoreEmployees"
             icon="pi pi-angle-down"
             label="Load More Employees"
@@ -152,7 +152,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useEmployees } from '@/composables/useEmployees'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 // Adjust the import paths to the actual locations of the components
 import { EmployeeCard, AddEmployeeDialog, ViewEmployeeDetailsDialog } from './components'

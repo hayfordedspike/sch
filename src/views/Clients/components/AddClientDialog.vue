@@ -88,12 +88,12 @@
           <div class="flex flex-col gap-2 md:col-span-2">
             <div class="flex items-center justify-between">
               <label class="font-semibold">Select House (optional)</label>
-              <Button
+              <GlobalButton
                 v-if="formData.house_id"
                 label="Clear"
                 severity="secondary"
                 text
-                size="small"
+                size="sm"
                 @click="clearHouseSelection"
               />
             </div>
@@ -315,8 +315,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
-        <Button
+        <GlobalButton label="Cancel" @click="handleClose" type="warning" />
+        <GlobalButton
           :label="editMode ? 'Update Client' : 'Add Client'"
           @click="handleSubmit"
           :loading="loading"
@@ -341,7 +341,7 @@ import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/
 import type { CreateClientRequest, Client } from '@/views/Clients/types'
 import type { House } from '@/views/Houses/types'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Calendar from 'primevue/calendar'

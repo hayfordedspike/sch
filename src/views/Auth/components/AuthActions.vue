@@ -4,7 +4,7 @@
       <p class="text-sm text-gray-600 mb-4">
         Didn't receive the email?
       </p>
-      <Button
+      <GlobalButton
         @click="handleResend"
         :loading="loading"
         class="w-full bg-primary hover:bg-primary-dark"
@@ -17,7 +17,7 @@
 <script setup lang="ts">
 defineOptions({ name: 'AuthActions' })
 
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 interface Props {
   loading?: boolean

@@ -14,19 +14,19 @@
             </div>
           </div>
           <div class="flex space-x-1">
-            <Button
+            <GlobalButton
               icon="pi pi-pencil"
               severity="secondary"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('edit', member)"
               v-tooltip.top="'Edit Member'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-trash"
               severity="danger"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('delete', member)"
@@ -91,6 +91,7 @@ import { useEmployees } from '@/composables/useEmployees'
 import type { TeamMember } from '@/composables/useTeamMembers'
 import type { Team } from '@/composables/useTeams'
 import type { Employee } from '@/views/Employees/types'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 interface Props {
   member: TeamMember

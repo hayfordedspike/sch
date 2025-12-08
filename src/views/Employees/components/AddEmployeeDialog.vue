@@ -35,7 +35,7 @@
                 :class="{ 'p-invalid': !!userLookupError || errors.email }"
               />
               <div class="flex gap-2">
-                <Button
+                <GlobalButton
                   label="Lookup"
                   icon="pi pi-search"
                   @click="lookupUserByEmail"
@@ -43,7 +43,7 @@
                   type="button"
                   :disabled="!userSearchEmail || userLookupLoading"
                 />
-                <Button
+                <GlobalButton
                   v-if="selectedUser"
                   icon="pi pi-times"
                   severity="secondary"
@@ -155,8 +155,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
-        <Button
+        <GlobalButton label="Cancel" @click="handleClose" type="warning" />
+        <GlobalButton
           :label="editMode ? 'Update Employee' : 'Add Employee'"
           @click="handleSubmit"
           :loading="loading"
@@ -177,7 +177,7 @@ import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/
 import type { CreateEmployeeRequest, Employee } from '@/views/Employees/types'
 import type { User } from '@/stores/auth'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import InputText from 'primevue/inputtext'
 import Calendar from 'primevue/calendar'
 import Dropdown from 'primevue/dropdown'

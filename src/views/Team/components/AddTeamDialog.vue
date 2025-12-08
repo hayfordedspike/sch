@@ -56,13 +56,14 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <Button
+        <GlobalButton
           label="Cancel"
           icon="pi pi-times"
           @click="handleCancel"
           class="p-button-text"
+          type="warning"
         />
-        <Button
+        <GlobalButton
           :label="isEditing ? 'Update Team' : 'Create Team'"
           icon="pi pi-check"
           @click="handleSubmit"
@@ -80,7 +81,7 @@ import { useTeamsDummy } from '@/composables/useTeamsDummy'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 // ...existing code...
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Team } from '@/composables/useTeams'
 
 interface Props {

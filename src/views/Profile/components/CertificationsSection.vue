@@ -1,23 +1,23 @@
 <template>
-  <Card class="mb-8">
+  <Card class="mb-8 profile-panel">
     <template #header>
-      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between profile-panel__header">
         <h2 class="text-xl font-semibold text-gray-900 flex items-center">
           <i class="pi pi-verified mr-3 text-green-600"></i>
           My Certifications
         </h2>
-        <Button
+        <GlobalButton
           @click="$emit('add-certificate')"
           class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 border-0"
           label="Add Certificate"
           icon="pi pi-plus"
-          size="small"
+          size="sm"
         />
       </div>
     </template>
     
     <template #content>
-      <div class="p-6">
+      <div class="p-6 profile-panel__body">
         <!-- Loading State -->
         <div v-if="loading" class="text-center py-12">
           <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
@@ -29,7 +29,7 @@
           <div 
             v-for="certification in userCertifications" 
             :key="certification.id"
-            class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300"
+            class="certification-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300"
           >
             <div class="flex items-center justify-between">
               <!-- Left side: Crown icon + Certificate info -->
@@ -76,14 +76,14 @@
 
               <!-- Right side: Action buttons -->
               <div class="flex space-x-2 ml-4">
-                <Button
+                <GlobalButton
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-outlined p-button-sm"
                   @click="editCertificate(certification)"
                   v-tooltip="'Edit Certificate'"
                   severity="info"
                 />
-                <Button
+                <GlobalButton
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-outlined p-button-sm"
                   @click="deleteCertificate(certification)"
@@ -104,7 +104,7 @@
           <p class="text-gray-600 mb-6">
             You haven't added any certifications to your profile yet.
           </p>
-          <Button
+          <GlobalButton
             @click="$emit('add-certificate')"
             class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 border-0"
             label="Add Your First Certificate"
@@ -122,7 +122,7 @@
 <script setup lang="ts">
 import { useConfirm } from 'primevue/useconfirm'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import ConfirmDialog from 'primevue/confirmdialog'
 import type { UserCertification } from '../types'
@@ -255,6 +255,35 @@ const deleteCertificate = (certification: UserCertification) => {
 
 :deep(.p-card-content) {
   padding: 0;
+}
+
+.profile-panel {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--app-card-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-panel__header {
+  border-color: var(--app-border);
+  color: var(--app-text-strong);
+}
+
+.profile-panel__body {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+}
+
+.certification-card {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+[data-theme="dark"] .certification-card {
+  background-color: var(--app-surface-muted);
 }
 
 /* Hover effects for certification cards */

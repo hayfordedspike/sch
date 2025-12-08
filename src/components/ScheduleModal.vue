@@ -45,10 +45,10 @@
         <div class="flex-1">
           <div class="flex justify-between items-center">
             <label class="block text-sm font-medium mb-1 truncate">Client Location</label>
-            <Button
+            <GlobalButton
               v-show="locationLocked"
               label="Clear"
-              size="small"
+              size="sm"
               severity="secondary"
               text
               type="button"
@@ -75,8 +75,8 @@
         <Textarea v-model="form.note" class="w-full" rows="2" placeholder="Additional notes" />
       </div>
       <div class="flex justify-end gap-2 mt-6">
-        <Button label="Cancel" class="p-button-text" @click="close" />
-        <Button label="Create" type="submit" class="bg-blue-600 text-white" />
+        <GlobalButton label="Cancel" class="p-button-text" @click="close" type="warning" />
+        <GlobalButton label="Create" type="submit" class="bg-blue-600 text-white" />
       </div>
     </form>
   </Dialog>
@@ -91,6 +91,7 @@ import { useApi } from '@/composables/useApi'
 import { useEmployees } from '@/composables/useEmployees'
 import { useClients } from '@/composables/useClients'
 import type { Client } from '@/views/Clients/types'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 // Use active clients for client dropdown
 const { clients, fetchClients, activeClients } = useClients()

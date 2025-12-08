@@ -108,13 +108,14 @@
     <template #footer>
       <div class="flex justify-end gap-3 pt-4">
       
-         <Button
+         <GlobalButton
           label="Cancel"
           icon="pi pi-times"
           @click="handleCancel"
           class="p-button-text"
-        />
-        <Button
+            type="warning"
+          />
+        <GlobalButton
           :label="isEditing ? 'Update Member' : 'Add Member'"
           icon="pi pi-check"
           class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-lg transition-colors"
@@ -131,7 +132,7 @@ import { ref, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
 import { COUNTRY_BY_NAME, DEFAULT_COUNTRY_NAME } from '@/constants/countries'
 import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/lib/phone'

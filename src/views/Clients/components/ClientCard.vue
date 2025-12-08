@@ -4,21 +4,21 @@
       <div class="relative">
         <!-- Action Buttons -->
         <div class="absolute top-4 right-4 flex space-x-1">
-          <Button
+          <GlobalButton
             icon="pi pi-pencil"
             class="p-button-rounded p-button-outlined p-button-sm"
             @click.stop="handleEdit"
             v-tooltip="'Edit Client'"
             severity="info"
           />
-          <Button
+          <GlobalButton
             icon="pi pi-trash"
             class="p-button-rounded p-button-outlined p-button-sm"
             @click.stop="handleDelete"
             v-tooltip="'Delete Client'"
             severity="danger"
           />
-          <Button
+          <GlobalButton
             v-if="!client.is_active"
             icon="pi pi-check"
             class="p-button-rounded p-button-outlined p-button-sm"
@@ -26,7 +26,7 @@
             v-tooltip="'Activate Client'"
             severity="success"
           />
-          <Button
+          <GlobalButton
             v-else
             icon="pi pi-times"
             class="p-button-rounded p-button-outlined p-button-sm"
@@ -93,7 +93,7 @@
     <template #footer>
       <div class="p-0">
         <!-- View Details Button -->
-        <Button
+        <GlobalButton
           label="View Details"
           icon="pi pi-eye"
           class="w-full rounded-t-none"
@@ -117,7 +117,7 @@ import { computed, ref, onMounted } from 'vue'
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import ViewClientDetailsDialog from './ViewClientDetailsDialog.vue'
 import type { Client } from '@/views/Clients/types'

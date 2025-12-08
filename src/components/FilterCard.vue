@@ -2,6 +2,7 @@
 import { ref, computed, watch, defineProps, defineEmits, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEmployees } from '@/composables/useEmployees'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 const router = useRouter()
 
@@ -131,7 +132,7 @@ const goToRoster = () => {
         </div>
       </div>
 
-      <Button
+      <GlobalButton
         v-if="!isMobile"
         label="Go To Roster"
         @click="goToRoster"

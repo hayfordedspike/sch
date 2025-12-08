@@ -6,7 +6,7 @@
         <h1 class="text-3xl font-bold text-gray-900">House Management</h1>
         <p class="text-gray-600 mt-1">Manage houses and their details</p>
       </div>
-      <Button
+      <GlobalButton
         label="Add House"
         icon="pi pi-plus"
         @click="showAddDialog = true"
@@ -25,7 +25,7 @@
           />
         </div>
         <div class="flex gap-2">
-          <Button
+          <GlobalButton
             label="Reset"
             icon="pi pi-refresh"
             outlined
@@ -61,7 +61,7 @@
       <p class="text-gray-600 mb-4">
         {{ searchQuery ? 'No houses match your search criteria.' : 'Get started by adding your first house.' }}
       </p>
-      <Button
+      <GlobalButton
         v-if="!searchQuery"
         label="Add First House"
         icon="pi pi-plus"
@@ -110,7 +110,7 @@ import { useDebounce } from '@/composables/useDebounce'
 import type { House } from './types'
 
 // Components
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Paginator from 'primevue/paginator'
 import ConfirmDialog from 'primevue/confirmdialog'
 import SearchBar from '@/components/layout/SearchBar.vue'

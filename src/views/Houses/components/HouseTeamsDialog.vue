@@ -35,10 +35,10 @@
             <i class="pi pi-users mr-2 text-green-500"></i>
             Teams ({{ teams.length }})
           </h3>
-          <Button
+          <GlobalButton
             label="Add Team"
             icon="pi pi-plus"
-            size="small"
+            size="sm"
             @click="showAddTeamDialog = true"
           />
         </div>
@@ -68,9 +68,9 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <Button
+                <GlobalButton
                   icon="pi pi-trash"
-                  size="small"
+                  size="sm"
                   text
                   rounded
                   severity="danger"
@@ -86,10 +86,10 @@
         <div v-else class="text-center py-8">
           <i class="pi pi-users text-gray-300 text-3xl mb-2"></i>
           <p class="text-gray-600 text-sm mb-4">No teams assigned to this house yet</p>
-          <Button
+          <GlobalButton
             label="Add First Team"
             icon="pi pi-plus"
-            size="small"
+            size="sm"
             @click="showAddTeamDialog = true"
           />
         </div>
@@ -98,7 +98,7 @@
 
     <template #footer>
       <div class="flex justify-end">
-        <Button label="Close" severity="secondary" @click="handleClose" outlined />
+        <GlobalButton label="Close" @click="handleClose" type="warning" />
       </div>
     </template>
 
@@ -118,7 +118,7 @@ import { useToast } from 'primevue/usetoast'
 import { useHouses } from '@/composables/useHouses'
 import type { House, HouseTeam } from '../types'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import AddTeamDialog from './AddTeamDialog.vue'
 
 interface Props {

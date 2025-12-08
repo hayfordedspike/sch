@@ -2,7 +2,7 @@
   <div class="certificate-list p-4">
     <div class="mb-4 flex justify-between items-center">
       <h3 class="text-lg font-semibold">Certificate List</h3>
-      <Button
+      <GlobalButton
         label="Add Certificate"
         icon="pi pi-plus"
         @click="$emit('add-certificate')"
@@ -66,8 +66,8 @@
           </td>
           <td class="px-4 py-2 whitespace-nowrap">
             <div class="flex gap-2">
-              <Button icon="pi pi-pencil" rounded outlined severity="info" aria-label="Edit" @click="handleEditCertificate(cert)" />
-              <Button icon="pi pi-trash" rounded outlined severity="danger" aria-label="Delete" @click="handleDeleteCertificate(cert)" />
+              <GlobalButton icon="pi pi-pencil" rounded outlined severity="info" aria-label="Edit" @click="handleEditCertificate(cert)" />
+              <GlobalButton icon="pi pi-trash" rounded outlined severity="danger" aria-label="Delete" @click="handleDeleteCertificate(cert)" />
             </div>
           </td>
         </tr>
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Dialog from 'primevue/dialog'
 import AddCertificateDialog from './AddCertificateDialog.vue'
 import { useCertificates } from '@/composables/useCertificates'

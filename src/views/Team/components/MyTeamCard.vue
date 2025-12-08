@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="flex gap-2 ml-4">
-        <Button
+        <GlobalButton
           icon="pi pi-pencil"
           rounded
           outlined
@@ -24,7 +24,7 @@
           @click="$emit('edit', team)"
           class="p-2"
         />
-        <Button
+        <GlobalButton
           icon="pi pi-trash"
           rounded
           outlined
@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Team } from './types'
 import { useEmployees } from '@/composables/useEmployees'
 import type { Employee } from '@/views/Employees/types'

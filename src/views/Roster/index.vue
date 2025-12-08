@@ -7,7 +7,7 @@ import ScheduleModal from '@/components/ScheduleModal.vue'
 import { VisitList } from './components'
 import { AssignmentList } from './components'
 import { useAssignments } from '@/composables/useAssignments'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import { useToast } from 'primevue/usetoast'
 
 defineOptions({ name: 'RosterView' })
@@ -249,21 +249,21 @@ onMounted(async () => {
             </div>
 
             <div class="flex gap-3">
-              <Button
+              <GlobalButton
                 label="Check In"
                 icon="pi pi-sign-in"
                 severity="success"
-                size="small"
+                size="sm"
                 class="quick-action-button"
                 :loading="checkingIn"
                 :disabled="!canCheckIn"
                 @click="handleQuickCheckIn"
               />
-              <Button
+              <GlobalButton
                 label="Check Out"
                 icon="pi pi-sign-out"
                 severity="warning"
-                size="small"
+                size="sm"
                 class="quick-action-button"
                 :loading="checkingOut"
                 :disabled="!canCheckOut"

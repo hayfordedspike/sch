@@ -2,7 +2,7 @@
   <div v-if="visible" class="fixed top-0 right-0 w-96 h-full bg-white shadow-lg z-50 flex flex-col">
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="text-lg font-semibold">Notifications</h2>
-      <Button icon="pi pi-times" @click="close" class="p-button-text" />
+      <GlobalButton icon="pi pi-times" @click="close" class="p-button-text" />
     </div>
     <div class="flex-1 overflow-y-auto">
       <div v-if="loading" class="p-4 text-center text-gray-500">Loading notifications...</div>
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits, computed } from 'vue'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Notification } from '@/composables/useNotifications'
 
 const props = defineProps<{ visible: boolean, notifications: Notification[], loading?: boolean }>()

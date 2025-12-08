@@ -130,7 +130,7 @@
                   <i class="pi pi-file-pdf text-4xl text-red-400 mb-2"></i>
                   <span class="text-gray-700">{{ file.name }}</span>
                 </template>
-                <Button label="Remove" severity="danger" size="small" class="mt-2" @click.stop="removeFile(idx)" />
+                <GlobalButton label="Remove" severity="danger" size="sm" class="mt-2" @click.stop="removeFile(idx)" />
               </div>
             </div>
           </template>
@@ -141,8 +141,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
-        <Button
+        <GlobalButton label="Cancel" @click="handleClose" type="warning" />
+        <GlobalButton
           :label="editMode ? 'Update Certificate' : 'Add Certificate'"
           @click="handleSubmit"
           :loading="loading"
@@ -166,7 +166,7 @@ import InputText from 'primevue/inputtext';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
-import Button from 'primevue/button';
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 
 import type { Certificate } from '../types';
 

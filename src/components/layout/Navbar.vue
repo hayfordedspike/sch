@@ -262,7 +262,7 @@ const handleThemeToggle = () => {
         :image="userImage || defaultAvatarUrl"
         :label="!userImage && !defaultAvatarUrl ? initials : undefined"
         shape="circle"
-        size="large"
+        size="lg"
         class="w-12 h-12 cursor-pointer"
         @click="toggleMenu"
       />

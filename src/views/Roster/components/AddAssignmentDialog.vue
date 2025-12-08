@@ -126,13 +126,14 @@
     </div>
 
     <template #footer>
-      <Button
+      <GlobalButton
         label="Cancel"
         icon="pi pi-times"
         class="p-button-text"
         @click="handleCancel"
+        type="warning"
       />
-      <Button
+      <GlobalButton
         :label="assignment ? 'Update Assignment' : 'Create Assignment'"
         icon="pi pi-check"
         class="p-button-primary"
@@ -152,7 +153,7 @@ import { useCurrentUser } from '@/composables/useCurrentUser'
 import Dialog from 'primevue/dialog'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Assignment, CreateAssignmentRequest, UpdateAssignmentRequest } from '@/views/Roster/types'
 
 interface Props {

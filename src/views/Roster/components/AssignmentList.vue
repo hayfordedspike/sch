@@ -8,7 +8,7 @@
       </div>
 
       <div class="flex gap-3">
-        <Button
+        <GlobalButton
           label="Create Assignment"
           icon="pi pi-plus"
           class="bg-blue-600 hover:bg-blue-700 border-0 text-white"
@@ -100,13 +100,13 @@
       </div>
 
       <div class="flex gap-3 mt-4">
-        <Button
+        <GlobalButton
           label="Search"
           icon="pi pi-search"
           @click="handleSearch"
           :loading="loading"
         />
-        <Button
+        <GlobalButton
           label="Clear"
           icon="pi pi-times"
           severity="secondary"
@@ -237,7 +237,7 @@ import { useAssignments } from '@/composables/useAssignments'
 import { useEmployees } from '@/composables/useEmployees'
 import { useVisits } from '@/composables/useVisits'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import Paginator from 'primevue/paginator'

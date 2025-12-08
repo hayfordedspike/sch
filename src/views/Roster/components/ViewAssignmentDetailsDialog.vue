@@ -188,14 +188,14 @@
 
         <!-- Check-in/out Actions -->
         <div class="mt-4 flex gap-3">
-          <Button
+          <GlobalButton
             v-if="!displayInfo.isCheckedIn"
             label="Check In"
             icon="pi pi-sign-in"
             severity="success"
             @click="$emit('check-in', assignment)"
           />
-          <Button
+          <GlobalButton
             v-if="displayInfo.isCheckedIn && !displayInfo.isCheckedOut"
             label="Check Out"
             icon="pi pi-sign-out"
@@ -234,17 +234,18 @@
 
     <template #footer>
       <div class="flex justify-between gap-2">
-        <Button
+        <GlobalButton
           label="Edit Assignment"
           icon="pi pi-pencil"
           class="p-button-outlined"
           @click="handleEdit"
         />
-        <Button
+        <GlobalButton
           label="Close"
           icon="pi pi-times"
           class="p-button-text text-gray-600 hover:text-gray-800"
           @click="handleClose"
+          type="warning"
         />
       </div>
     </template>
@@ -259,7 +260,7 @@ import { useVisits } from '@/composables/useVisits'
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import type { Assignment } from '@/views/Roster/types'
 

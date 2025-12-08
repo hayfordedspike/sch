@@ -151,13 +151,13 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <Button
+        <GlobalButton
           label="Close"
           icon="pi pi-times"
           @click="closeDialog"
-          outlined
+          type="warning"
         />
-        <Button
+        <GlobalButton
           label="Edit Client"
           icon="pi pi-pencil"
           @click="handleEdit"
@@ -171,7 +171,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 import type { Client } from '@/views/Clients/types'

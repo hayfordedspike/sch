@@ -13,14 +13,14 @@
             <div class="text-sm text-muted">{{ totalMembers === 1 ? 'Member' : 'Members' }}</div>
           </div>
           <div class="flex space-x-2">
-            <Button
+            <GlobalButton
               icon="pi pi-pencil"
               class="p-button-sm p-button-outlined"
               @click.stop="handleEdit"
               v-tooltip="'Edit Team'"
               severity="info"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-trash"
               class="p-button-sm p-button-outlined"
               @click.stop="handleDelete"
@@ -103,7 +103,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useTeamsDummy } from '@/composables/useTeamsDummy'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Team } from '@/composables/useTeams'
 
 interface Props {

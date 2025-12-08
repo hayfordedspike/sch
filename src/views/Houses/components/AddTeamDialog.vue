@@ -53,8 +53,8 @@
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <Button label="Cancel" severity="secondary" @click="handleClose" outlined />
-        <Button
+        <GlobalButton label="Cancel" @click="handleClose" type="warning" />
+        <GlobalButton
           label="Add Team"
           @click="handleSubmit"
           :loading="loading"
@@ -70,7 +70,7 @@ import { ref, computed } from 'vue'
 import { useHouses } from '@/composables/useHouses'
 import type { CreateHouseTeamRequest } from '../types'
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Dropdown from 'primevue/dropdown'

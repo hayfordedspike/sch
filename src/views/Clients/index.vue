@@ -19,7 +19,7 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
-              <Button
+              <GlobalButton
                 @click="handleAddClient"
                 icon="pi pi-plus"
                 label="Add New Client"
@@ -50,7 +50,7 @@
             <p class="text-muted mb-6">
               Get started by adding your first client to the system.
             </p>
-            <Button
+            <GlobalButton
               @click="handleAddClient"
               icon="pi pi-plus"
               label="Add Your First Client"
@@ -75,7 +75,7 @@
 
         <!-- Load More Button -->
         <div v-if="!loading && filteredClients.length > 0 && hasMoreClients" class="text-center mt-8">
-          <Button
+          <GlobalButton
             @click="loadMoreClients"
             icon="pi pi-angle-down"
             label="Load More Clients"
@@ -107,7 +107,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useClients } from '@/composables/useClients'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ClientCard, AddClientDialog } from './components'
 import type { Client } from './types'

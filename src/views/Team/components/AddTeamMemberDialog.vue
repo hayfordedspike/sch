@@ -60,13 +60,14 @@
       </div>
     </div>
     <template #footer>
-      <Button
+      <GlobalButton
         label="Cancel"
         icon="pi pi-times"
         class="p-button-text"
         @click="handleCancel"
+        type="warning"
       />
-      <Button
+      <GlobalButton
         label="Add Member"
         icon="pi pi-plus"
         class="p-button-primary"
@@ -82,7 +83,7 @@ import { ref, computed, onMounted } from 'vue'
 import Dialog from 'primevue/dialog'
 import Dropdown from 'primevue/dropdown'
 import Checkbox from 'primevue/checkbox'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import { useTeams } from '@/composables/useTeams'
 import { useEmployees } from '@/composables/useEmployees'
 import { useTeamMembers, type AddTeamMemberRequest, type TeamMember } from '@/composables/useTeamMembers'

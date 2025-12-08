@@ -13,28 +13,28 @@
             </div>
           </div>
           <div class="flex space-x-1">
-            <Button
+            <GlobalButton
               icon="pi pi-eye"
               severity="info"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('view-details', visit)"
               v-tooltip.top="'View Details'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-pencil"
               severity="secondary"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('edit', visit)"
               v-tooltip.top="'Edit Visit'"
             />
-            <Button
+            <GlobalButton
               icon="pi pi-trash"
               severity="danger"
-              size="small"
+              size="sm"
               outlined
               rounded
               @click="$emit('delete', visit)"
@@ -92,7 +92,7 @@ import { useVisits } from '@/composables/useVisits'
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 import Card from 'primevue/card'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { Visit } from '@/views/Roster/types'
 
 interface Props {

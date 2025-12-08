@@ -39,11 +39,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Check-in Button -->
           <div class="text-center">
-            <Button
+            <GlobalButton
               label="Check In"
               icon="pi pi-sign-in"
               severity="success"
-              size="large"
+              size="lg"
               class="w-full h-16 text-lg font-semibold"
               :loading="checkInLoading"
               @click="handleQuickCheckIn"
@@ -55,11 +55,11 @@
 
           <!-- Check-out Button -->
           <div class="text-center">
-            <Button
+            <GlobalButton
               label="Check Out"
               icon="pi pi-sign-out"
               severity="warning"
-              size="large"
+              size="lg"
               class="w-full h-16 text-lg font-semibold"
               :loading="checkOutLoading"
               @click="handleQuickCheckOut"
@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { useAssignments } from '@/composables/useAssignments'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import { useToast } from 'primevue/usetoast'
 
 defineOptions({ name: 'CheckInOutView' })

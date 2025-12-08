@@ -74,9 +74,9 @@
                     </span>
                   </div>
                 </div>
-                <Button
+                <GlobalButton
                   label="Check In"
-                  size="small"
+                  size="sm"
                   severity="success"
                   class="text-xs px-3 py-1"
                   @click.stop="handleCheckIn(assignment)"
@@ -130,9 +130,9 @@
                     </span>
                   </div>
                 </div>
-                <Button
+                <GlobalButton
                   label="Check Out"
-                  size="small"
+                  size="sm"
                   severity="warning"
                   class="text-xs px-3 py-1"
                   @click.stop="handleCheckOut(assignment)"
@@ -163,7 +163,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAssignments } from '@/composables/useAssignments'
-import Button from 'primevue/button'
+import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import { useToast } from 'primevue/usetoast'
 import type { Assignment } from '@/views/Roster/types'
