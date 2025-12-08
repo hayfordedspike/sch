@@ -12,50 +12,58 @@
   --breakpoint-lg: 65rem;
 }
 
-:root {
-  --app-background: #f8fafc;
-  --app-surface: #ffffff;
-  --app-surface-muted: #f1f5f9;
-  --app-surface-elevated: #ffffff;
-  --app-border: rgba(15, 23, 42, 0.08);
-  --app-text: #0f172a;
-  --app-text-muted: #64748b;
-  --app-text-strong: #0f172a;
-  --app-accent: #2563eb;
-  --app-accent-soft: rgba(37, 99, 235, 0.15);
-  --app-input-bg: rgba(248, 250, 252, 0.9);
-  --app-input-border: rgba(15, 23, 42, 0.12);
-  --app-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  --app-table-header-bg: #0f172a;
-  --app-table-header-text: #f8fafc;
-  --sidebar-active-bg: rgba(37, 99, 235, 0.18);
-  --sidebar-active-text: #1d4ed8;
-}
-
-:where(html.theme-dark, .theme-dark, [data-theme="dark"]) {
-  --app-background: #020617;
-  --app-surface: #0f172a;
-  --app-surface-muted: #1e293b;
-  --app-surface-elevated: #111a2e;
-  --app-border: rgba(148, 163, 184, 0.2);
-  --app-text: #f8fafc;
-  --app-text-muted: #cbd5f5;
-  --app-text-strong: #e2e8f0;
-  --app-accent: #38bdf8;
-  --app-accent-soft: rgba(56, 189, 248, 0.22);
-  --app-input-bg: rgba(15, 23, 42, 0.92);
-  --app-input-border: rgba(148, 163, 184, 0.35);
-  --app-card-shadow: 0 30px 60px rgba(2, 6, 23, 0.65);
-  --app-table-header-bg: #0b1120;
-  --app-table-header-text: #e2e8f0;
-  --sidebar-active-bg: rgba(56, 189, 248, 0.25);
-  --sidebar-active-text: #bae6fd;
-}
-
 html {
   font-family: "Nunito", sans-serif;
   font-optical-sizing: auto;
   /*@apply bg-background text-black;*/
+}
+
+:root {
+  color-scheme: light;
+  --app-background: #ffffff;
+  --app-surface: #ffffff;
+  --app-surface-elevated: #ffffff;
+  --app-surface-muted: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-border-strong: #cbd5f5;
+  --app-text: #0f172a;
+  --app-text-strong: #020617;
+  --app-text-muted: #64748b;
+  --app-accent: #065986;
+  --app-accent-soft: rgba(6, 89, 134, 0.12);
+  --app-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  --app-sidebar-bg: #ffffff;
+  --app-sidebar-border: #e2e8f0;
+  --sidebar-active-bg: #065986;
+  --sidebar-active-text: #ffffff;
+  --app-input-bg: #ffffff;
+  --app-input-border: #cbd5f5;
+  --app-table-header-bg: #292d32;
+  --app-table-header-text: #ffffff;
+}
+
+:root.theme-dark {
+  color-scheme: dark;
+  --app-background: #16223a;
+  --app-surface: #16223a;
+  --app-surface-elevated: #111b2f;
+  --app-surface-muted: #16223a;
+  --app-border: rgba(148, 163, 184, 0.24);
+  --app-border-strong: rgba(148, 163, 184, 0.4);
+  --app-text: #f8fafc;
+  --app-text-strong: #f8fafc;
+  --app-text-muted: #cbd5f5;
+  --app-accent: #38bdf8;
+  --app-accent-soft: rgba(56, 189, 248, 0.2);
+  --app-card-shadow: 0 20px 60px rgba(2, 6, 23, 0.65);
+  --app-sidebar-bg: #0f172a;
+  --app-sidebar-border: rgba(148, 163, 184, 0.24);
+  --sidebar-active-bg: rgba(56, 189, 248, 0.18);
+  --sidebar-active-text: #e2e8f0;
+  --app-input-bg: #0b1222;
+  --app-input-border: rgba(148, 163, 184, 0.45);
+  --app-table-header-bg: #1f2937;
+  --app-table-header-text: #f8fafc;
 }
 
 .p-dropdown-panel,
@@ -624,194 +632,6 @@ select option,
   margin-bottom: -2px;
   font-weight: 700;
   box-shadow: var(--app-card-shadow);
-}
-
-@media (max-width: 640px) {
-  .app-tab-card {
-    padding: 0.75rem;
-  }
-
-  .app-tab-inline {
-    flex-direction: column;
-    border-bottom: none;
-    gap: 0.75rem;
-  }
-
-  .app-tab-button {
-    width: 100%;
-    white-space: normal;
-    text-align: center;
-    border-radius: 0.85rem;
-    border: 1px solid transparent;
-  }
-
-  .app-tab-button--active {
-    margin-bottom: 0;
-    border-color: var(--app-tab-border);
-    border-bottom: 1px solid var(--app-tab-border);
-    box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
-  }
-
-  .app-tab-button--inactive:hover {
-    background: var(--app-surface);
-  }
-}
-
-.app-calendar {
-  background-color: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 1rem;
-  box-shadow: var(--app-card-shadow);
-  color: var(--app-text);
-}
-
-.app-calendar table,
-.app-calendar th,
-.app-calendar td {
-  color: inherit;
-  border-color: var(--app-border);
-}
-
-.app-calendar .bg-white,
-.app-calendar .bg-gray-100 {
-  background-color: var(--app-surface);
-}
-
-.app-calendar .bg-gray-50,
-.app-calendar .bg-gray-200,
-.app-calendar .bg-blue-50 {
-  background-color: var(--app-surface-muted);
-}
-
-.app-calendar .border-gray-200,
-.app-calendar .border-gray-100,
-.app-calendar .border-gray-50,
-.app-calendar .border-dashed {
-  border-color: var(--app-border) !important;
-}
-
-.app-calendar .text-gray-900,
-.app-calendar .text-gray-800,
-.app-calendar .text-gray-700,
-.app-calendar .text-gray-600,
-.app-calendar .text-blue-900,
-.app-calendar .text-green-900,
-.app-calendar .text-purple-900,
-.app-calendar .text-amber-900,
-.app-calendar .text-rose-900,
-.app-calendar .text-teal-900,
-.app-calendar .text-indigo-900,
-.app-calendar .text-emerald-900 {
-  color: var(--app-text);
-}
-
-.app-calendar .text-gray-500,
-.app-calendar .text-gray-400,
-.app-calendar .text-gray-300 {
-  color: var(--app-text-muted);
-}
-
-.app-calendar .bg-green-100 {
-  background-color: rgba(16, 185, 129, 0.18);
-  color: #065f46;
-}
-
-:where(html.theme-dark, .theme-dark, [data-theme="dark"]) .app-calendar .bg-green-100 {
-  background-color: rgba(16, 185, 129, 0.28);
-  color: #bbf7d0;
-}
-
-.app-calendar .bg-gray-100.text-gray-600 {
-  color: var(--app-text);
-}
-
-.app-calendar .bg-blue-500 {
-  background-color: var(--app-accent);
-}
-
-.app-calendar .bg-blue-50 {
-  background-color: rgba(59, 130, 246, 0.12);
-}
-
-.app-calendar .border-blue-200 {
-  border-color: rgba(59, 130, 246, 0.35) !important;
-}
-
-.app-calendar .bg-green-50 {
-  background-color: rgba(34, 197, 94, 0.14);
-}
-
-.app-calendar .border-green-200 {
-  border-color: rgba(34, 197, 94, 0.35) !important;
-}
-
-.app-calendar .bg-purple-50 {
-  background-color: rgba(168, 85, 247, 0.14);
-}
-
-.app-calendar .border-purple-200 {
-  border-color: rgba(168, 85, 247, 0.35) !important;
-}
-
-.app-calendar .bg-amber-50 {
-  background-color: rgba(245, 158, 11, 0.16);
-}
-
-.app-calendar .border-amber-200 {
-  border-color: rgba(245, 158, 11, 0.35) !important;
-}
-
-.app-calendar .bg-rose-50 {
-  background-color: rgba(244, 63, 94, 0.14);
-}
-
-.app-calendar .border-rose-200 {
-  border-color: rgba(244, 63, 94, 0.35) !important;
-}
-
-.app-calendar .bg-teal-50 {
-  background-color: rgba(20, 184, 166, 0.16);
-}
-
-.app-calendar .border-teal-200 {
-  border-color: rgba(20, 184, 166, 0.35) !important;
-}
-
-.app-calendar .bg-indigo-50 {
-  background-color: rgba(99, 102, 241, 0.15);
-}
-
-.app-calendar .border-indigo-200 {
-  border-color: rgba(99, 102, 241, 0.35) !important;
-}
-
-.app-calendar .bg-emerald-50 {
-  background-color: rgba(52, 211, 153, 0.16);
-}
-
-.app-calendar .border-emerald-200 {
-  border-color: rgba(52, 211, 153, 0.35) !important;
-}
-
-.app-calendar tbody tr:nth-child(even) {
-  background-color: var(--app-surface);
-}
-
-.app-calendar tbody tr:nth-child(odd) {
-  background-color: var(--app-surface-muted);
-}
-
-.app-calendar .text-gray-400.text-xs {
-  color: var(--app-text-muted);
-}
-
-.app-calendar .border-blue-400,
-.app-calendar .border-blue-500 {
-  border-color: var(--app-accent) !important;
-}
-
-.app-calendar .text-xs.font-semibold.uppercase {
-  letter-spacing: 0.08em;
 }
 
 .g-padding {
