@@ -1,7 +1,8 @@
 <template>
-  <div class="team-page min-h-screen py-8">
+<div class="p-6 bg-white min-h-screen">
+  <div class=" min-h-screen py-8">
     <!-- Header Section -->
-    <div class="w-full mb-8">
+    <div class="w-full mb-12 lg:mb-16">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="team-hero-card">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -45,25 +46,25 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <div class="w-full mb-6">
+    <div class="w-full mb-6 mt-4 md:mt-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="team-tab-card">
-          <div class="team-tab-inline">
+        <div class="app-tab-card">
+          <div class="app-tab-inline">
             <button
               @click="activeTabIndex = 0"
-              :class="['team-tab-button', activeTabIndex === 0 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
+              :class="['app-tab-button', activeTabIndex === 0 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               My Teams
             </button>
             <button
               @click="activeTabIndex = 1"
-              :class="['team-tab-button', activeTabIndex === 1 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
+              :class="['app-tab-button', activeTabIndex === 1 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Members
             </button>
             <button
               @click="activeTabIndex = 2"
-              :class="['team-tab-button', activeTabIndex === 2 ? 'team-tab-button--active' : 'team-tab-button--inactive']"
+              :class="['app-tab-button', activeTabIndex === 2 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Grouped Teams
             </button>
@@ -256,7 +257,7 @@
     <!-- Confirmation Dialog -->
     <ConfirmDialog />
   </div>
-</template>
+</div></template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
@@ -741,53 +742,6 @@ onMounted(async () => {
 
 .team-hero-title i {
   color: var(--app-accent);
-}
-
-.team-tab-card {
-  --team-tab-border: rgba(59, 130, 246, 0.35);
-  background: var(--app-surface);
-  border-radius: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--app-border);
-  box-shadow: var(--app-card-shadow);
-}
-
-.team-tab-inline {
-  display: inline-flex;
-  border-bottom: 2px solid var(--team-tab-border);
-  gap: 0.25rem;
-}
-
-.team-tab-button {
-  padding: 0.85rem 1.5rem;
-  font-weight: 600;
-  border-top-left-radius: 0.85rem;
-  border-top-right-radius: 0.85rem;
-  border: 2px solid transparent;
-  border-bottom: none;
-  background: transparent;
-  color: var(--app-text-muted);
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-}
-
-.team-tab-button--inactive:hover {
-  color: var(--app-text);
-  background: var(--app-surface-muted);
-}
-
-.team-tab-button--active {
-  color: var(--app-text);
-  background: var(--app-surface);
-  border-color: var(--team-tab-border);
-  border-bottom: 2px solid var(--app-surface);
-  margin-bottom: -2px;
-  font-weight: 700;
-  box-shadow: var(--app-card-shadow);
-}
-
-:global(html.theme-dark) .team-tab-card,
-:global(.theme-dark) .team-tab-card {
-  --team-tab-border: rgba(96, 165, 250, 0.55);
 }
 
 .team-panel {

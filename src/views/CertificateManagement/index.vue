@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <div class="p-6 bg-white min-h-screen">
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-medium text-gray-800">Certificate Management</h1>
       <div class="flex gap-3">

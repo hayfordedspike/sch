@@ -207,7 +207,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen app-surface py-8">
+  <div class="p-6 bg-white min-h-screen">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">

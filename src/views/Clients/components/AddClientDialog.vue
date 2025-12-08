@@ -99,28 +99,29 @@
             </div>
 
             <!-- Loading State -->
-            <div v-if="housesLoading" class="flex items-center justify-center py-8">
-              <i class="pi pi-spinner pi-spin text-gray-400 mr-2"></i>
-              <span class="text-gray-600">Loading houses...</span>
+            <div v-if="housesLoading" class="flex items-center justify-center py-8 text-muted">
+              <i class="pi pi-spinner pi-spin mr-2 text-muted"></i>
+              <span>Loading houses...</span>
             </div>
 
             <!-- Houses Grid -->
-            <div v-else-if="houses.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3">
+            <div
+              v-else-if="houses.length > 0"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto rounded-lg p-3 house-selection-grid"
+            >
               <div
                 v-for="house in houses"
                 :key="house.id"
                 @click="selectHouse(house)"
                 :class="[
-                  'border rounded-lg p-3 cursor-pointer transition-all duration-200 hover:shadow-md',
-                  formData.house_id === house.id
-                    ? 'border-blue-500 bg-blue-50 shadow-md'
-                    : 'border-gray-200 hover:border-blue-300'
+                  'house-option',
+                  { 'house-option--selected': formData.house_id === house.id }
                 ]"
               >
                 <!-- House Header -->
                 <div class="flex items-center mb-2">
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-semibold text-sm text-gray-900 truncate">{{ house.name }}</h4>
+                    <h4 class="house-option__title font-semibold text-sm truncate">{{ house.name }}</h4>
                   </div>
                   <!-- Selection Indicator -->
                   <div v-if="formData.house_id === house.id" class="ml-2">
@@ -133,9 +134,9 @@
             </div>
 
             <!-- No Houses Available -->
-            <div v-else class="text-center py-8 border border-gray-200 rounded-lg">
-              <i class="pi pi-home text-gray-300 text-2xl mb-2"></i>
-              <p class="text-gray-600 text-sm">No houses available</p>
+            <div v-else class="text-center py-8 rounded-lg house-selection-empty">
+              <i class="pi pi-home text-2xl mb-2 house-selection-empty__icon"></i>
+              <p class="text-muted text-sm">No houses available</p>
             </div>
           </div>
         </div>
@@ -281,6 +282,7 @@
               v-model="formData.medical_notes"
               placeholder="Enter any medical notes or conditions"
               rows="3"
+              class="app-input"
             />
           </div>
 
@@ -292,6 +294,7 @@
               v-model="formData.care_notes"
               placeholder="Enter any care instructions or special requirements"
               rows="3"
+              class="app-input"
             />
           </div>
 
@@ -663,6 +666,50 @@ onMounted(() => {
 <style scoped>
 .p-invalid {
   border-color: #ef4444;
+}
+
+.house-selection-grid,
+.house-selection-empty {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.house-selection-grid {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.house-option {
+  border: 1px solid var(--app-border);
+  border-radius: 0.75rem;
+  background: var(--app-surface);
+  color: var(--app-text);
+  padding: 0.75rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.house-option:hover {
+  border-color: var(--app-border-strong);
+  background: var(--app-surface-muted);
+  box-shadow: var(--app-card-shadow);
+}
+
+.house-option--selected {
+  border-color: var(--app-accent);
+  background: var(--app-accent-soft);
+  box-shadow: 0 12px 30px rgba(6, 89, 134, 0.25);
+}
+
+.house-option__title {
+  color: var(--app-text);
+}
+
+.house-selection-empty__icon {
+  color: var(--app-border-strong);
 }
 
 :deep(.p-dialog-header-close) {

@@ -30,6 +30,7 @@
           v-model="formData.description"
           rows="5"
           placeholder="Enter description"
+          class="app-input"
           :class="{ 'p-invalid': errors.description }"
         />
         <small v-if="errors.description" class="text-red-500">{{ errors.description }}</small>

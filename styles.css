@@ -30,6 +30,7 @@ html {
   --app-text-strong: #020617;
   --app-text-muted: #64748b;
   --app-accent: #065986;
+  --app-accent-soft: rgba(6, 89, 134, 0.12);
   --app-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
   --app-sidebar-bg: #ffffff;
   --app-sidebar-border: #e2e8f0;
@@ -53,6 +54,7 @@ html {
   --app-text-strong: #f8fafc;
   --app-text-muted: #cbd5f5;
   --app-accent: #38bdf8;
+  --app-accent-soft: rgba(56, 189, 248, 0.2);
   --app-card-shadow: 0 20px 60px rgba(2, 6, 23, 0.65);
   --app-sidebar-bg: #0f172a;
   --app-sidebar-border: rgba(148, 163, 184, 0.24);
@@ -108,6 +110,13 @@ body.theme-dark,
 :where(body, html)[data-theme="dark"],
 html.theme-dark {
   --tw-ring-color: var(--app-accent);
+}
+
+:where(html.theme-dark, .theme-dark, [data-theme="dark"]) .p-inputtextarea,
+:where(html.theme-dark, .theme-dark, [data-theme="dark"]) .p-inputtextarea:focus {
+  background-color: var(--app-input-bg) !important;
+  border-color: var(--app-input-border) !important;
+  color: var(--app-text) !important;
 }
 
 [data-theme="dark"] .bg-white,
@@ -270,6 +279,180 @@ body .app-surface-muted {
 .team-primary-action:hover {
   transform: translateY(-1px);
   box-shadow: 0 15px 30px rgba(91, 33, 182, 0.35);
+}
+
+/* PrimeVue dropdown + overlay theming */
+.p-dropdown,
+.p-multiselect,
+.p-autocomplete,
+.p-inputnumber,
+.p-calendar,
+.p-inputtext,
+.p-inputtextarea {
+  background-color: var(--app-input-bg);
+  border-color: var(--app-input-border);
+  color: var(--app-text);
+}
+
+.p-dropdown .p-dropdown-label,
+.p-dropdown .p-dropdown-label.p-placeholder,
+.p-multiselect .p-multiselect-label,
+.p-calendar .p-inputtext,
+.p-inputnumber .p-inputtext,
+.p-inputtextarea,
+.p-inputtextarea::placeholder {
+  color: var(--app-text);
+  background-color: transparent;
+}
+
+.p-inputtextarea::placeholder {
+  color: var(--app-text-muted);
+}
+
+.p-dropdown .p-dropdown-trigger,
+.p-multiselect .p-multiselect-trigger {
+  color: var(--app-text-muted);
+}
+
+.p-dropdown-panel,
+.p-multiselect-panel,
+.p-autocomplete-panel,
+.p-cascadeselect-panel,
+.p-listbox-list-wrapper {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  box-shadow: var(--app-card-shadow);
+}
+
+.p-dropdown-items,
+.p-multiselect-items,
+.p-autocomplete-items,
+.p-cascadeselect-items,
+.p-listbox-list {
+  background-color: transparent;
+}
+
+.p-dropdown-item,
+.p-multiselect-item,
+.p-autocomplete-item,
+.p-cascadeselect-item,
+.p-listbox-item {
+  color: var(--app-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.p-dropdown-item:not(.p-disabled):hover,
+.p-multiselect-item:not(.p-disabled):hover,
+.p-autocomplete-item:not(.p-disabled):hover,
+.p-cascadeselect-item:not(.p-disabled):hover,
+.p-listbox-item:not(.p-disabled):hover {
+  background-color: var(--app-surface-muted);
+  color: var(--app-text);
+}
+
+.p-dropdown-item.p-highlight,
+.p-multiselect-item.p-highlight,
+.p-autocomplete-item.p-highlight,
+.p-cascadeselect-item.p-highlight,
+.p-listbox-item.p-highlight {
+  background-color: var(--app-accent-soft);
+  color: var(--app-text-strong);
+}
+
+textarea,
+select,
+input,
+.team-select {
+  background-color: var(--app-input-bg);
+  border: 1px solid var(--app-input-border);
+  color: var(--app-text);
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--app-text-muted);
+}
+
+textarea:focus,
+select:focus,
+input:focus,
+.team-select:focus {
+  outline: none;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px var(--app-accent-soft);
+}
+
+.app-input {
+  background-color: var(--app-input-bg) !important;
+  border: 1px solid var(--app-input-border) !important;
+  color: var(--app-text) !important;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-input::placeholder {
+  color: var(--app-text-muted) !important;
+}
+
+.app-input:focus {
+  outline: none;
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 1px var(--app-accent-soft) !important;
+}
+
+select option,
+.team-select option {
+  background-color: var(--app-surface);
+  color: var(--app-text);
+}
+
+.app-tab-card {
+  --app-tab-border: rgba(59, 130, 246, 0.35);
+  background: var(--app-surface);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
+}
+
+:where(html.theme-dark, .theme-dark, [data-theme="dark"]) .app-tab-card {
+  --app-tab-border: rgba(96, 165, 250, 0.55);
+}
+
+.app-tab-inline {
+  display: inline-flex;
+  border-bottom: 2px solid var(--app-tab-border);
+  gap: 0.25rem;
+}
+
+.app-tab-button {
+  padding: 0.85rem 1.5rem;
+  font-weight: 600;
+  border-top-left-radius: 0.85rem;
+  border-top-right-radius: 0.85rem;
+  border: 2px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--app-text-muted);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.app-tab-button--inactive:hover {
+  color: var(--app-text);
+  background: var(--app-surface-muted);
+}
+
+.app-tab-button--active {
+  color: var(--app-text);
+  background: var(--app-surface);
+  border-color: var(--app-tab-border);
+  border-bottom: 2px solid var(--app-surface);
+  margin-bottom: -2px;
+  font-weight: 700;
+  box-shadow: var(--app-card-shadow);
 }
 
 @utility g-padding {

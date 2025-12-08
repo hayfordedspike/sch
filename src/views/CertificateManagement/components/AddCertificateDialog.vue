@@ -92,6 +92,7 @@
           v-model="formData.note"
           placeholder="Enter any additional notes"
           rows="3"
+          class="app-input"
         />
       </div>
 

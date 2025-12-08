@@ -126,7 +126,7 @@
               :model-value="profileData.address"
               @update:model-value="updateField('address', $event)"
               placeholder="Enter your full address"
-              class="w-full"
+              class="w-full app-input"
               rows="3"
               autoResize
             />

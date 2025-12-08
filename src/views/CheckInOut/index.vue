@@ -1,5 +1,5 @@
 <template>
-  <div class="checkin-checkout-page min-h-screen">
+<div class="p-6 bg-white min-h-screen">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Page Header -->
       <div class="mb-8">

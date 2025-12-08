@@ -72,7 +72,7 @@
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium mb-1">Note <span class="text-xs text-gray-400">(optional)</span></label>
-        <Textarea v-model="form.note" class="w-full" rows="2" placeholder="Additional notes" />
+        <Textarea v-model="form.note" class="w-full app-input" rows="2" placeholder="Additional notes" />
       </div>
       <div class="flex justify-end gap-2 mt-6">
         <GlobalButton label="Cancel" class="p-button-text" @click="close" type="warning" />

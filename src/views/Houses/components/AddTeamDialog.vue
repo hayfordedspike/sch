@@ -34,6 +34,7 @@
           v-model="formData.coverage_notes"
           placeholder="Enter coverage notes (optional)"
           rows="3"
+          class="app-input"
         />
       </div>
 

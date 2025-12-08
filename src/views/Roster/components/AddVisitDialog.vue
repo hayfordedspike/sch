@@ -116,7 +116,7 @@
           v-model="formData.notes"
           placeholder="Enter visit notes (optional)"
           rows="3"
-          class="w-full"
+          class="w-full app-input"
         />
       </div>
     </div>

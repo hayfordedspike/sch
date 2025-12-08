@@ -23,7 +23,7 @@
           v-model="formData.description"
           placeholder="Enter team description"
           rows="3"
-          class="w-full"
+          class="w-full app-input"
         />
       </div>
       <div class="field mb-4">

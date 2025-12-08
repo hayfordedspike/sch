@@ -24,9 +24,12 @@ const handleAddCertificate = (data: unknown) => {
 
 <template>
   <!-- Dynamic Greeting Card -->
+  <div class="p-6 bg-white min-h-screen">
+    <div class="w-full mb-8">
+      <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
   <GreetingCard class="mb-6" />
 
-  <div class="px-12 md:px-6 py-6 max-w-7xl mx-auto">
+
         <!-- Certificate Warning Banner -->
     <CertificateWarningBanner class="mb-6" @add-certificate="showAddCertificateDialog = true" />
 
@@ -56,7 +59,7 @@ const handleAddCertificate = (data: unknown) => {
       v-model:visible="showAddCertificateDialog"
       @submit="handleAddCertificate"
     />
-  </div>
+  </div></div></div>
 </template>
 
 <style scoped>

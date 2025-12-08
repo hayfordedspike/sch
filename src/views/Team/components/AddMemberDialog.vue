@@ -99,6 +99,7 @@
           v-model="formData.notes"
           rows="4"
           placeholder="Enter any additional notes about this member..."
+          class="app-input"
           :class="{ 'p-invalid': errors.notes }"
         />
         <small v-if="errors.notes" class="text-red-500 text-xs">{{ errors.notes }}</small>
