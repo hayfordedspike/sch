@@ -166,6 +166,8 @@ watch(() => props.currentDate, (val) => {
   min-height: 2.5rem;
   min-width: 12rem;
   width: fit-content;
+  text-align: center;
+  text-align-last: center;
 }
 
 @media (max-width: 767px) {

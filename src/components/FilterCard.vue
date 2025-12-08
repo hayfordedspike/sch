@@ -171,12 +171,13 @@ button:focus {
   .filter-card__content {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 1rem;
   }
 
   .filter-card__date,
   .filter-card__select-group {
-    flex: 1;
+    flex: unset;
   }
 }
 
@@ -212,6 +213,8 @@ button:focus {
   min-height: 2.75rem;
   width: fit-content;
   min-width: 12rem;
+  text-align: center;
+  text-align-last: center;
 }
 
 .filter-card__roster-btn {
