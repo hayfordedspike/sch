@@ -35,7 +35,7 @@
           option-label="label"
           option-value="value"
           placeholder="Select a manager"
-          class="w-full"
+          class="w-full app-input"
           :loading="employeesLoading"
         />
       </div>

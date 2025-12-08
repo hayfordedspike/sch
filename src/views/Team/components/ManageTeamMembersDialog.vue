@@ -29,7 +29,7 @@
             v-model="newMember.role"
             :options="roleOptions"
             placeholder="Select Role"
-            class="col-span-1"
+            class="col-span-1 app-input"
           />
           <div class="flex items-center col-span-1">
             <Checkbox

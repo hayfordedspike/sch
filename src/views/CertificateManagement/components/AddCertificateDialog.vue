@@ -24,7 +24,7 @@
             optionLabel="label"
             optionValue="value"
             placeholder="Select certificate"
-            class="w-full"
+            class="w-full app-input"
             :class="{ 'p-invalid': errors.certificate_id }"
           />
           <small v-if="errors.certificate_id" class="text-red-500">{{ errors.certificate_id }}</small>
@@ -59,14 +59,14 @@
       <div class="flex gap-4">
         <div class="flex flex-col gap-2 flex-1">
           <label for="certificateType" class="font-semibold">Status</label>
-        <Dropdown
+          <Dropdown
   id="status"
   v-model="formData.status"
   :options="statusOptions"
   optionLabel="label"
   optionValue="value"
   placeholder="Select status"
-  class="w-full"
+        class="w-full app-input"
   :class="{ 'p-invalid': errors.status }"
 />
           <small v-if="errors.status" class="text-red-500">{{ errors.status }}</small>

@@ -18,51 +18,63 @@ html {
   /*@apply bg-background text-black;*/
 }
 
-:root {
-  color-scheme: light;
-  --app-background: #ffffff;
-  --app-surface: #ffffff;
-  --app-surface-elevated: #ffffff;
-  --app-surface-muted: #f1f5f9;
-  --app-border: #e2e8f0;
-  --app-border-strong: #cbd5f5;
-  --app-text: #0f172a;
-  --app-text-strong: #020617;
-  --app-text-muted: #64748b;
-  --app-accent: #065986;
-  --app-accent-soft: rgba(6, 89, 134, 0.12);
-  --app-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  --app-sidebar-bg: #ffffff;
-  --app-sidebar-border: #e2e8f0;
-  --sidebar-active-bg: #065986;
-  --sidebar-active-text: #ffffff;
-  --app-input-bg: #ffffff;
-  --app-input-border: #cbd5f5;
-  --app-table-header-bg: #292d32;
-  --app-table-header-text: #ffffff;
+.p-dropdown-panel,
+.p-multiselect-panel,
+.p-autocomplete-panel,
+.p-cascadeselect-panel,
+.p-listbox-list-wrapper,
+[data-pc-section="panel"] {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  box-shadow: var(--app-card-shadow);
+  border-radius: 0.85rem;
 }
 
-:root.theme-dark {
-  color-scheme: dark;
-  --app-background: #16223a;
-  --app-surface: #16223a;
-  --app-surface-elevated: #111b2f;
-  --app-surface-muted: #16223a;
-  --app-border: rgba(148, 163, 184, 0.24);
-  --app-border-strong: rgba(148, 163, 184, 0.4);
-  --app-text: #f8fafc;
-  --app-text-strong: #f8fafc;
-  --app-text-muted: #cbd5f5;
-  --app-accent: #38bdf8;
-  --app-accent-soft: rgba(56, 189, 248, 0.2);
-  --app-card-shadow: 0 20px 60px rgba(2, 6, 23, 0.65);
-  --app-sidebar-bg: #0f172a;
-  --app-sidebar-border: rgba(148, 163, 184, 0.24);
-  --sidebar-active-bg: rgba(56, 189, 248, 0.18);
-  --sidebar-active-text: #e2e8f0;
-  --app-input-bg: #0b1222;
-  --app-input-border: rgba(148, 163, 184, 0.45);
-  --app-table-header-bg: #1f2937;
+.p-dropdown-items,
+.p-multiselect-items,
+.p-autocomplete-items,
+.p-cascadeselect-items,
+.p-listbox-list,
+[data-pc-section="items"],
+[data-pc-section="list"] {
+  background-color: transparent;
+  padding-block: 0.25rem;
+}
+
+.p-dropdown-item,
+.p-multiselect-item,
+.p-autocomplete-item,
+.p-cascadeselect-item,
+.p-listbox-item,
+[data-pc-section="item"] {
+  color: var(--app-text);
+  border-radius: 0.65rem;
+  margin: 0.15rem 0.35rem;
+  padding: 0.35rem 0.55rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.p-dropdown-item:not(.p-disabled):hover,
+.p-multiselect-item:not(.p-disabled):hover,
+.p-autocomplete-item:not(.p-disabled):hover,
+.p-cascadeselect-item:not(.p-disabled):hover,
+.p-listbox-item:not(.p-disabled):hover,
+[data-pc-section="item"]:not(.p-disabled):hover {
+  background-color: var(--app-surface-muted);
+  color: var(--app-text);
+}
+
+.p-dropdown-item.p-highlight,
+.p-multiselect-item.p-highlight,
+.p-autocomplete-item.p-highlight,
+.p-cascadeselect-item.p-highlight,
+.p-listbox-item.p-highlight,
+[data-pc-section="item"].p-highlight {
+  background-color: var(--app-accent-soft);
+  color: var(--app-text-strong);
+  font-weight: 600;
+}
   --app-table-header-text: #f8fafc;
 }
 
@@ -305,6 +317,45 @@ body .app-surface-muted {
   background-color: transparent;
 }
 
+.p-calendar .p-datepicker-trigger {
+  background-color: var(--app-surface-muted);
+  border: 1px solid var(--app-input-border);
+  color: var(--app-text-muted);
+  border-radius: 0.65rem;
+  margin-left: 0.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.p-calendar .p-datepicker-trigger:hover {
+  background-color: var(--app-surface);
+  border-color: var(--app-accent);
+  color: var(--app-text);
+}
+
+.p-calendar .p-datepicker-trigger:focus-visible {
+  outline: none;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px var(--app-accent-soft);
+}
+
+.p-calendar .p-datepicker-trigger .pi {
+  font-size: 0.95rem;
+}
+
+.calendar-inline-icon {
+  color: var(--app-text-muted) !important;
+  transition: color 0.2s ease;
+}
+
+:where(html.theme-dark, [data-theme="dark"], .theme-dark) .calendar-inline-icon {
+  color: var(--app-text) !important;
+}
+
 .p-inputtextarea::placeholder {
   color: var(--app-text-muted);
 }
@@ -491,6 +542,8 @@ select option,
   padding: 1rem;
   border: 1px solid var(--app-border);
   box-shadow: var(--app-card-shadow);
+  width: 100%;
+  overflow: hidden;
 }
 
 :where(html.theme-dark, .theme-dark, [data-theme="dark"]) .app-tab-card {
@@ -498,9 +551,12 @@ select option,
 }
 
 .app-tab-inline {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   border-bottom: 2px solid var(--app-tab-border);
-  gap: 0.25rem;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: flex-end;
 }
 
 .app-tab-button {
@@ -513,6 +569,8 @@ select option,
   background: transparent;
   color: var(--app-text-muted);
   transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .app-tab-button--inactive:hover {
@@ -528,6 +586,37 @@ select option,
   margin-bottom: -2px;
   font-weight: 700;
   box-shadow: var(--app-card-shadow);
+}
+
+@media (max-width: 640px) {
+  .app-tab-card {
+    padding: 0.75rem;
+  }
+
+  .app-tab-inline {
+    flex-direction: column;
+    border-bottom: none;
+    gap: 0.75rem;
+  }
+
+  .app-tab-button {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+    border-radius: 0.85rem;
+    border: 1px solid transparent;
+  }
+
+  .app-tab-button--active {
+    margin-bottom: 0;
+    border-color: var(--app-tab-border);
+    border-bottom: 1px solid var(--app-tab-border);
+    box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
+  }
+
+  .app-tab-button--inactive:hover {
+    background: var(--app-surface);
+  }
 }
 
 .app-calendar {
@@ -687,8 +776,44 @@ select option,
   letter-spacing: 0.08em;
 }
 
-@utility g-padding {
-  @apply px-4 sm:px-8 md:px-13 lg:px-16 xl:px-36 2xl:px-48;
+.g-padding {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .g-padding {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .g-padding {
+    padding-left: 3.25rem;
+    padding-right: 3.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .g-padding {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .g-padding {
+    padding-left: 9rem;
+    padding-right: 9rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .g-padding {
+    padding-left: 12rem;
+    padding-right: 12rem;
+  }
 }
 
 

@@ -28,7 +28,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Employees"
-            class="w-full"
+            class="w-full app-input"
             :loading="employeesLoading"
             show-clear
           />
@@ -42,7 +42,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Visits"
-            class="w-full"
+            class="w-full app-input"
             :loading="visitsLoading"
             show-clear
           />
@@ -56,7 +56,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Statuses"
-            class="w-full"
+            class="w-full app-input"
             show-clear
           />
         </div>
@@ -69,7 +69,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Roles"
-            class="w-full"
+            class="w-full app-input"
             show-clear
           />
         </div>

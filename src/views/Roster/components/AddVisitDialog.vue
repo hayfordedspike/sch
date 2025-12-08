@@ -38,7 +38,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select a client"
-            class="w-full"
+            class="w-full app-input"
             :loading="clientsLoading"
             :class="{ 'p-invalid': errors.client_id }"
           />
@@ -55,7 +55,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select a house"
-            class="w-full"
+            class="w-full app-input"
             :class="{ 'p-invalid': errors.house_id }"
           />
           <small v-if="errors.house_id" class="p-error">{{ errors.house_id }}</small>

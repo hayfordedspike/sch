@@ -18,7 +18,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select an employee"
-            class="w-full"
+            class="w-full app-input"
             :loading="employeesLoading"
             :class="{ 'p-invalid': errors.employee_id }"
           />
@@ -35,7 +35,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select a visit"
-            class="w-full"
+            class="w-full app-input"
             :loading="visitsLoading"
             :class="{ 'p-invalid': errors.visit_id }"
           />
@@ -66,7 +66,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select a role"
-            class="w-full"
+            class="w-full app-input"
             :class="{ 'p-invalid': errors.role_on_visit }"
           />
           <small v-if="errors.role_on_visit" class="p-error">{{ errors.role_on_visit }}</small>
@@ -82,7 +82,7 @@
             option-label="label"
             option-value="value"
             placeholder="Select status"
-            class="w-full"
+            class="w-full app-input"
             :class="{ 'p-invalid': errors.status }"
           />
           <small v-if="errors.status" class="p-error">{{ errors.status }}</small>

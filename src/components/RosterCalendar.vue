@@ -360,7 +360,7 @@ function getStaffColorClass(staffIdx: number) {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6 space-y-6">
+  <div class="app-calendar bg-white rounded-xl border border-gray-200 shadow-sm p-6 mt-6 space-y-6">
     <!-- Mobile Schedule Cards -->
     <div class="md:hidden flex flex-col gap-6">
       <template v-if="mobileStaffGroups.length">

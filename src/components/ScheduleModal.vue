@@ -13,7 +13,7 @@
             :options="assignToOptions"
             optionLabel="label"
             optionValue="value"
-            class="w-full"
+            class="w-full app-input"
             placeholder="Select staff"
           />
         </div>
@@ -26,9 +26,9 @@
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Time</label>
           <div class="flex items-center gap-2">
-            <Dropdown v-model="form.startTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2" placeholder="Start time" />
+            <Dropdown v-model="form.startTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2 app-input" placeholder="Start time" />
             <span class="mx-2 text-center font-semibold">To</span>
-            <Dropdown v-model="form.endTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2" placeholder="End time" />
+            <Dropdown v-model="form.endTime" :options="timeOptions" optionLabel="label" optionValue="value" class="w-1/2 app-input" placeholder="End time" />
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
         
         <div class="flex-1">
           <label class="block text-sm font-medium mb-1">Client</label>
-          <Dropdown v-model="form.client" :options="clientOptions" optionLabel="label" optionValue="value" class="w-full" placeholder="Select client" />
+          <Dropdown v-model="form.client" :options="clientOptions" optionLabel="label" optionValue="value" class="w-full app-input" placeholder="Select client" />
           
           <div class="pt-4" style="min-height: 16px;"></div>
         </div>

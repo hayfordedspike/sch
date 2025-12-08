@@ -48,6 +48,7 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Select status"
+          class="app-input"
         />
       </div>
     </div>

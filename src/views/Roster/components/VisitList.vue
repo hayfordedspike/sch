@@ -28,7 +28,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Clients"
-            class="w-full"
+            class="w-full app-input"
             :loading="clientsLoading"
             show-clear
           />
@@ -42,7 +42,7 @@
             option-label="label"
             option-value="value"
             placeholder="All Houses"
-            class="w-full"
+            class="w-full app-input"
             :loading="housesLoading"
             show-clear
           />

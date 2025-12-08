@@ -6,7 +6,7 @@
         :options="countryOptions"
         optionLabel="label"
         optionValue="value"
-        class="w-40"
+        class="w-40 app-input"
         filter
         :disabled="disabled"
       >

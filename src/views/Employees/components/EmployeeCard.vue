@@ -1,26 +1,25 @@
 <template>
   <Card class="employee-card hover:shadow-lg transition-all duration-300 cursor-pointer">
     <template #header>
-      <div class="relative">
-        <!-- Action Buttons -->
-        <div class="absolute top-4 right-4 flex space-x-1">
+      <div class="employee-card__header">
+        <div class="employee-card__actions">
           <GlobalButton
             icon="pi pi-pencil"
-            class="p-button-rounded p-button-outlined p-button-sm"
+            class="p-button-rounded p-button-outlined p-button-sm employee-card__action-btn"
             @click.stop="handleEdit"
             v-tooltip="'Edit Employee'"
             severity="info"
           />
           <GlobalButton
             icon="pi pi-trash"
-            class="p-button-rounded p-button-outlined p-button-sm"
+            class="p-button-rounded p-button-outlined p-button-sm employee-card__action-btn"
             @click.stop="handleDelete"
             v-tooltip="'Delete Employee'"
             severity="danger"
           />
           <GlobalButton
             icon="pi pi-sync"
-            class="p-button-rounded p-button-outlined p-button-sm"
+            class="p-button-rounded p-button-outlined p-button-sm employee-card__action-btn"
             @click.stop="handleChangeStatus"
             v-tooltip="'Change Status'"
             severity="warning"
@@ -163,6 +162,22 @@ const handleChangeStatus = () => {
   box-shadow: 0 20px 45px rgba(2, 6, 23, 0.12);
 }
 
+.employee-card__header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.25rem 0.5rem 0;
+}
+
+.employee-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.employee-card__actions > * {
+  min-width: 2.5rem;
+}
+
 /* Card content spacing */
 :deep(.p-card-header),
 :deep(.p-card-content),
@@ -197,6 +212,17 @@ const handleChangeStatus = () => {
     max-width: 98vw;
     min-width: 0;
     padding: 0.75rem 0.5rem;
+  }
+  .employee-card__header {
+    justify-content: flex-start;
+    padding: 0.25rem 0.25rem 0.5rem;
+  }
+  .employee-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .employee-card__actions > * {
+    flex: 1 1 30%;
   }
   h3.text-xl {
     font-size: 1.1rem;

@@ -403,5 +403,21 @@ onMounted(async () => {
     overflow-x: auto;
     padding-bottom: 1rem;
   }
+
+  .employee-section h1 {
+    font-size: 1.75rem;
+  }
+
+  .employee-stat {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
 }
 </style>

@@ -111,7 +111,7 @@
                   :yearNavigator="true"
                   yearRange="1940:2010"
                 />
-                <i class="pi pi-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10"></i>
+                <i class="pi pi-calendar calendar-inline-icon absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10"></i>
               </div>
             </div>
           </div>

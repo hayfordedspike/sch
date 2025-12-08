@@ -145,6 +145,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select employee status"
+              class="app-input"
               :class="{ 'p-invalid': errors.status }"
             />
             <small v-if="errors.status" class="text-red-500">{{ errors.status }}</small>

@@ -1,6 +1,6 @@
 <template>
   <div class="team-card">
-    <div class="flex items-start justify-between mb-4">
+    <div class="team-card__header">
       <div class="flex-1">
         <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ team.name }}</h3>
         <p class="text-muted text-sm mb-3">{{ team.description }}</p>
@@ -14,7 +14,7 @@
           <span v-else>Unknown</span>
         </div>
       </div>
-      <div class="flex gap-2 ml-4">
+      <div class="team-card__actions">
         <GlobalButton
           icon="pi pi-pencil"
           rounded
@@ -22,7 +22,7 @@
           severity="info"
           aria-label="Edit"
           @click="$emit('edit', team)"
-          class="p-2"
+          class="p-2 team-card__action-btn"
         />
         <GlobalButton
           icon="pi pi-trash"
@@ -31,7 +31,7 @@
           severity="danger"
           aria-label="Delete"
           @click="$emit('delete', team)"
-          class="p-2"
+          class="p-2 team-card__action-btn"
         />
       </div>
     </div>
@@ -106,8 +106,40 @@ watch(() => props.team, (newTeam) => {
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
+.team-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.team-card__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.team-card__action-btn {
+  min-width: 2.5rem;
+}
+
 .team-card:hover {
   border-color: var(--app-accent);
   transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .team-card__header {
+    flex-direction: column;
+  }
+
+  .team-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .team-card__action-btn {
+    flex: 1 1 47%;
+  }
 }
 </style>

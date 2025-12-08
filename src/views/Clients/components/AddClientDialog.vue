@@ -223,6 +223,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select country"
+              class="app-input"
               :class="{ 'p-invalid': errors.country }"
               filter
               :disabled="isAddressLocked"
@@ -308,6 +309,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select client status"
+              class="app-input"
               :class="{ 'p-invalid': errors.is_active }"
             />
             <small v-if="errors.is_active" class="text-red-500">{{ errors.is_active }}</small>

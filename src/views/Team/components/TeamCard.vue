@@ -7,22 +7,22 @@
         <h3 class="text-xl font-bold text-gray-900">
           {{ team.name }}
         </h3>
-        <div class="flex items-center justify-between">
+        <div class="team-card__header-row">
           <div class="flex items-center space-x-2">
             <div class="text-2xl font-bold text-purple-600">{{ totalMembers }}</div>
             <div class="text-sm text-muted">{{ totalMembers === 1 ? 'Member' : 'Members' }}</div>
           </div>
-          <div class="flex space-x-2">
+          <div class="team-card__actions">
             <GlobalButton
               icon="pi pi-pencil"
-              class="p-button-sm p-button-outlined"
+              class="p-button-sm p-button-outlined team-card__action-btn"
               @click.stop="handleEdit"
               v-tooltip="'Edit Team'"
               severity="info"
             />
             <GlobalButton
               icon="pi pi-trash"
-              class="p-button-sm p-button-outlined"
+              class="p-button-sm p-button-outlined team-card__action-btn"
               @click.stop="handleDelete"
               v-tooltip="'Delete Team'"
               severity="danger"
@@ -239,5 +239,39 @@ const handleViewDetails = () => {
 
 .team-link:hover {
   color: var(--app-text);
+}
+
+.team-card__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.team-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.team-card__action-btn {
+  min-width: 2.5rem;
+}
+
+@media (max-width: 640px) {
+  .team-card__header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .team-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .team-card__action-btn {
+    flex: 1 1 47%;
+  }
 }
 </style>

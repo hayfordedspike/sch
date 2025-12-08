@@ -16,7 +16,7 @@
           option-label="label"
           option-value="value"
           placeholder="Select a team"
-          class="w-full"
+          class="w-full app-input"
           :loading="teamsLoading"
         />
       </div>
@@ -30,7 +30,7 @@
           option-label="label"
           option-value="value"
           placeholder="Select an employee"
-          class="w-full"
+          class="w-full app-input"
           :loading="employeesLoading"
         />
       </div>
@@ -44,7 +44,7 @@
           option-label="label"
           option-value="value"
           placeholder="Select a role"
-          class="w-full"
+          class="w-full app-input"
         />
       </div>
 

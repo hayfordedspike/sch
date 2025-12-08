@@ -3,7 +3,7 @@
     <template #content>
       <div class="p-4">
         <!-- Member Header -->
-        <div class="flex items-center justify-between mb-3">
+        <div class="member-card__header">
           <div class="flex items-center space-x-3">
             <div class="member-card__avatar">
               <i class="pi pi-user text-white text-lg"></i>
@@ -13,7 +13,7 @@
               <p class="text-sm text-muted">{{ member.role }}</p>
             </div>
           </div>
-          <div class="flex space-x-1">
+          <div class="member-card__actions">
             <GlobalButton
               icon="pi pi-pencil"
               severity="secondary"
@@ -21,6 +21,7 @@
               outlined
               rounded
               @click="$emit('edit', member)"
+              class="member-card__action-btn"
               v-tooltip.top="'Edit Member'"
             />
             <GlobalButton
@@ -30,6 +31,7 @@
               outlined
               rounded
               @click="$emit('delete', member)"
+              class="member-card__action-btn"
               v-tooltip.top="'Delete Member'"
             />
           </div>
@@ -188,6 +190,24 @@ onMounted(() => {
   box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
 }
 
+.member-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.member-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.member-card__action-btn {
+  min-width: 2.5rem;
+}
+
 .member-card__primary {
   padding: 0.15rem 0.6rem;
   border-radius: 0.5rem;
@@ -201,5 +221,21 @@ onMounted(() => {
   border-top: 1px solid var(--app-border);
   padding-top: 0.75rem;
   margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .member-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .member-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .member-card__action-btn {
+    flex: 1 1 47%;
+  }
 }
 </style>
