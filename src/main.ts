@@ -10,6 +10,7 @@ import '../styles.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { ToastService, ConfirmationService } from 'primevue'
 import { useAuthStore } from './stores/auth'
+import { useThemeStore } from './stores/theme'
 
 const app = createApp(App)
 
@@ -28,12 +29,15 @@ app.use(PrimeVue, {
   theme: {
     preset: Noir,
     options: {
-      darkModeSelector: false,
+      darkModeSelector: 'html.theme-dark',
     },
   },
 })
 app.use(ToastService)
 app.use(ConfirmationService)
+
+const themeStore = useThemeStore(pinia)
+themeStore.initializeTheme()
 
 // Initialize authentication state after mounting
 app.mount('#app')

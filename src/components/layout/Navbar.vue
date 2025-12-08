@@ -21,6 +21,8 @@ import SearchBar from "./SearchBar.vue";
 import { useAuth } from "@/composables/useAuth";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { onMounted, onUnmounted } from "vue";
+import { storeToRefs } from 'pinia'
+import { useThemeStore } from '@/stores/theme'
 
 interface Props {
   toggleSidebar?: () => void
@@ -177,6 +179,17 @@ const handleLogout = async () => {
     })
   }
 };
+
+const themeStore = useThemeStore()
+const { currentTheme } = storeToRefs(themeStore)
+
+const isDarkMode = computed(() => currentTheme.value === 'dark')
+const themeToggleIcon = computed(() => isDarkMode.value ? 'pi pi-sun' : 'pi pi-moon')
+const themeToggleLabel = computed(() => isDarkMode.value ? 'Switch to light mode' : 'Switch to dark mode')
+
+const handleThemeToggle = () => {
+  themeStore.toggleTheme()
+}
 </script>
 
 <template>
@@ -191,6 +204,14 @@ const handleLogout = async () => {
       </div>
       
       <div class="flex items-center gap-4 md:gap-8">
+        <button
+          type="button"
+          class="theme-toggle-button"
+          :aria-label="themeToggleLabel"
+          @click="handleThemeToggle"
+        >
+          <i :class="themeToggleIcon" />
+        </button>
         <div class="relative">
           <i class="pi pi-bell cursor-pointer" style="width: 24px; height: 24px" @click="openNotificationDrawer" />
           <span v-if="notificationCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">{{ notificationCount }}</span>
@@ -271,4 +292,25 @@ const handleLogout = async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.theme-toggle-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle-button:hover {
+  background-color: var(--app-surface-muted);
+}
+
+.theme-toggle-button i {
+  font-size: 1rem;
+}
+</style>

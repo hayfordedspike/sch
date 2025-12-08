@@ -46,7 +46,7 @@
         </div>
 
         <!-- Employee Details -->
-        <div class="space-y-2 text-sm text-gray-600 mb-4">
+        <div class="space-y-2 text-sm text-muted mb-4">
           <!-- Phone -->
           <div class="flex items-center">
             <i class="pi pi-phone mr-2 text-green-500 w-4"></i>
@@ -140,7 +140,7 @@ const handleChangeStatus = () => {
 <style scoped>
 /* Card base styles */
 .employee-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
@@ -148,16 +148,19 @@ const handleChangeStatus = () => {
   box-sizing: border-box;
   padding: 1.25rem 1rem 1rem 1rem;
   margin: 0 auto 1.5rem auto;
-  background: #fff;
+  background: var(--app-surface);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   height: 100%;
+  box-shadow: var(--app-card-shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .employee-card:hover {
-  border-color: #d1d5db;
+  border-color: var(--app-accent);
   transform: translateY(-2px);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.12);
 }
 
 /* Card content spacing */
@@ -210,5 +213,9 @@ const handleChangeStatus = () => {
 h3.text-xl, .truncate, .employee-card span {
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.text-muted {
+  color: var(--app-text-muted);
 }
 </style>

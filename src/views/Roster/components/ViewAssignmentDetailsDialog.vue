@@ -13,7 +13,7 @@
         </div>
         <div>
           <h2 class="text-gray-900 font-semibold text-2xl">Assignment Details</h2>
-          <p class="text-gray-500 text-sm mt-1">Comprehensive assignment information</p>
+          <p class="text-muted text-sm mt-1">Comprehensive assignment information</p>
         </div>
       </div>
     </template>
@@ -31,8 +31,8 @@
                 :value="displayInfo.status"
                 class="font-medium px-3 py-1"
               />
-              <span class="text-gray-500 text-sm">•</span>
-              <span class="text-gray-500 text-sm">{{ displayInfo.role }}</span>
+              <span class="text-muted text-sm">•</span>
+              <span class="text-muted text-sm">{{ displayInfo.role }}</span>
             </div>
           </div>
         </div>
@@ -148,8 +148,8 @@
                 <span class="text-green-600 font-medium">Checked In</span>
               </div>
               <div v-else class="flex items-center gap-2">
-                <i class="pi pi-times-circle text-gray-400"></i>
-                <span class="text-gray-500">Not Checked In</span>
+                <i class="pi pi-times-circle text-muted"></i>
+                <span class="text-muted">Not Checked In</span>
               </div>
             </div>
           </div>
@@ -163,8 +163,8 @@
                 <span class="text-blue-600 font-medium">Checked Out</span>
               </div>
               <div v-else class="flex items-center gap-2">
-                <i class="pi pi-times-circle text-gray-400"></i>
-                <span class="text-gray-500">Not Checked Out</span>
+                <i class="pi pi-times-circle text-muted"></i>
+                <span class="text-muted">Not Checked Out</span>
               </div>
             </div>
           </div>
@@ -393,16 +393,21 @@ const handleEdit = () => {
 <style scoped>
 :deep(.p-dialog-header) {
   padding: 1.5rem 2rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 :deep(.p-dialog-content) {
   padding: 0 2rem;
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 :deep(.p-dialog-footer) {
   padding: 1rem 2rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface);
 }
 
 :deep(.w-14) {
@@ -424,34 +429,34 @@ const handleEdit = () => {
   justify-content: center;
 }
 
-/* Remove all rounded corners, backgrounds, and borders */
 :deep(.p-dialog) {
-  border-radius: 0;
+  border-radius: 1rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
 }
 
 :deep(.p-tag) {
-  border-radius: 0;
+  border-radius: 9999px;
   border: none;
   font-weight: 500;
 }
 
-/* Clean typography and spacing */
 label {
-  color: #64748b;
+  color: var(--app-text-muted);
   font-weight: 600;
   letter-spacing: 0.025em;
 }
 
-/* Remove any background colors and borders from content areas */
 .text-gray-900 {
-  color: #1f2937;
+  color: var(--app-text);
 }
 
 .text-gray-700 {
-  color: #374151;
+  color: var(--app-text);
 }
 
 .text-gray-500 {
-  color: #6b7280;
+  color: var(--app-text-muted);
 }
 </style>

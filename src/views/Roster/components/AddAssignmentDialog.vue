@@ -42,9 +42,9 @@
           <small v-if="errors.visit_id" class="p-error">{{ errors.visit_id }}</small>
           <div
             v-if="selectedVisitTimeline"
-            class="mt-2 rounded border border-gray-200 bg-gray-50 p-2 text-xs text-gray-600"
+            class="timeline-hint mt-2 text-xs"
           >
-            <p class="font-semibold text-gray-700">Visit timeline</p>
+            <p class="timeline-hint__title">Visit timeline</p>
             <p><span class="font-medium">Starts:</span> {{ selectedVisitTimeline.start }}</p>
             <p><span class="font-medium">Ends:</span> {{ selectedVisitTimeline.end }}</p>
             <p>
@@ -52,7 +52,7 @@
               {{ selectedVisitTimeline.durationHours }} hour{{ selectedVisitTimeline.durationHours === 1 ? '' : 's' }}
             </p>
             <p><span class="font-medium">Required staff:</span> {{ selectedVisitTimeline.requiredStaff }}</p>
-            <p class="mt-1 text-gray-500">Assignments must start and end within this window.</p>
+            <p class="timeline-hint__note">Assignments must start and end within this window.</p>
           </div>
         </div>
 
@@ -494,3 +494,24 @@ const handleSave = async () => {
   }
 }
 </script>
+
+<style scoped>
+.timeline-hint {
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  color: var(--app-text-muted);
+}
+
+.timeline-hint__title {
+  color: var(--app-text);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-hint__note {
+  margin-top: 0.5rem;
+  color: var(--app-text-muted);
+}
+</style>

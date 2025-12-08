@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-white py-8">
+  <div class="min-h-screen app-surface py-8">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl  p-6">
+        <div class="client-section rounded-xl p-6 shadow-sm border border-gray-200">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Title and Stats -->
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+              <h1 class="text-3xl font-bold text-primary flex items-center">
                 <i class="pi pi-users mr-3 text-blue-600"></i>
                 Client Management
               </h1>
-              <p class="text-gray-600 mt-2">
+              <p class="text-muted mt-2">
                 Manage your clients information and service preferences
               </p>
 
@@ -36,18 +36,18 @@
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Loading State -->
         <div v-if="loading && clients.length === 0" class="text-center py-12">
-          <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
-          <p class="text-gray-600 mt-4">Loading clients...</p>
+          <i class="pi pi-spinner pi-spin text-muted" style="font-size: 2rem;"></i>
+          <p class="text-muted mt-4">Loading clients...</p>
         </div>
 
         <!-- Empty State -->
         <div v-else-if="!loading && filteredClients.length === 0" class="text-center py-12">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+          <div class="client-section rounded-xl shadow-sm border border-gray-200 p-12">
             <div class="mb-4">
               <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No Clients Yet</h3>
-            <p class="text-gray-600 mb-6">
+            <h3 class="text-lg font-medium text-primary mb-2">No Clients Yet</h3>
+            <p class="text-muted mb-6">
               Get started by adding your first client to the system.
             </p>
             <Button
@@ -310,5 +310,16 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+}
+
+.client-section {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+  box-shadow: var(--app-card-shadow);
+}
+
+.text-muted {
+  color: var(--app-text-muted);
 }
 </style>

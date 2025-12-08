@@ -11,11 +11,11 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <main class="h-screen w-screen overflow-hidden">
+  <main class="dashboard-shell h-screen w-screen overflow-hidden">
     <section class="flex w-full h-full">
       <!-- Conditionally render Sidebar and Navbar based on the route -->
       <Sidebar :visible="sidebarVisible" @close="sidebarVisible = false" />
-      <section class="w-full h-full overflow-y-auto">
+      <section class="dashboard-content w-full h-full overflow-y-auto">
         <Navbar :toggleSidebar="toggleSidebar" :sidebarVisible="sidebarVisible" />
         <div class="p-6 pb-20">
           <router-view></router-view>
@@ -25,4 +25,14 @@ const toggleSidebar = () => {
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.dashboard-shell {
+  background-color: var(--app-background);
+  color: var(--app-text);
+}
+
+.dashboard-content {
+  background-color: var(--app-background);
+  color: inherit;
+}
+</style>

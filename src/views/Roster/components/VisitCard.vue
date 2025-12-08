@@ -5,8 +5,8 @@
         <!-- Visit Header -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <i class="pi pi-map-marker text-blue-600 text-lg"></i>
+            <div class="card-avatar">
+              <i class="pi pi-map-marker card-avatar__icon"></i>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900"></h3>
@@ -45,37 +45,38 @@
 
         <!-- Visit Details -->
         <div class="space-y-2 mb-4">
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-calendar mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-calendar mr-2 text-muted"></i>
             <span>{{ displayInfo.startDate }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-clock mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-clock mr-2 text-muted"></i>
             <span>{{ displayInfo.duration }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-users mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-users mr-2 text-muted"></i>
             <span>{{ displayInfo.requiredStaff }} staff required</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-circle-fill mr-2 text-xs"
-               :class="displayInfo.status === 'completed' ? 'text-green-500' :
-                      displayInfo.status === 'in_progress' ? 'text-blue-500' : 'text-orange-500'"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i
+              class="pi pi-circle-fill mr-2 text-xs visit-status-dot"
+              :class="`visit-status-dot--${displayInfo.status}`"
+            ></i>
             <span class="capitalize">{{ displayInfo.status.replace('_', ' ') }}</span>
           </div>
         </div>
 
         <!-- Notes -->
         <div v-if="visit.notes" class="mb-4">
-          <div class="text-sm text-gray-600">
-            <i class="pi pi-comment mr-2 text-gray-400"></i>
+          <div class="text-sm text-muted">
+            <i class="pi pi-comment mr-2 text-muted"></i>
             {{ visit.notes.length > 50 ? visit.notes.substring(0, 50) + '...' : visit.notes }}
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="pt-3 border-t border-gray-200">
-          <div class="flex items-center justify-between text-xs text-gray-500">
+        <div class="visit-card__meta">
+          <div class="flex items-center justify-between text-xs text-muted">
             <span>ID: {{ visit.id }}</span>
             <span>{{ new Date(visit.created_at).toLocaleDateString() }}</span>
           </div>
@@ -168,14 +169,59 @@ const displayInfo = computed(() => {
 
 <style scoped>
 .visit-card {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition-property: box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+  box-shadow: var(--app-card-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .visit-card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border-color: rgb(191 219 254);
+  border-color: var(--app-accent);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.12);
+  transform: translateY(-2px);
+}
+
+.card-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--app-surface-muted);
+  color: var(--app-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px var(--app-border);
+}
+
+.card-avatar__icon {
+  font-size: 1.1rem;
+  color: inherit;
+}
+
+.visit-card__meta {
+  border-top: 1px solid var(--app-border);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.visit-status-dot {
+  color: var(--app-text-muted);
+}
+
+.visit-status-dot--completed {
+  color: #10b981;
+}
+
+.visit-status-dot--in_progress {
+  color: #2563eb;
+}
+
+.visit-status-dot--scheduled {
+  color: #f59e0b;
+}
+
+.visit-status-dot--cancelled {
+  color: #ef4444;
 }
 </style>

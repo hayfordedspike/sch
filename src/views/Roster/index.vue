@@ -66,6 +66,21 @@ const currentAssignment = computed(() => {
   return assignments[0]
 })
 
+const checkingIn = ref(false)
+const checkingOut = ref(false)
+
+const canCheckIn = computed(() => {
+  const assignment = currentAssignment.value
+  if (!assignment) return false
+  return !assignment.check_in_at
+})
+
+const canCheckOut = computed(() => {
+  const assignment = currentAssignment.value
+  if (!assignment) return false
+  return !!assignment.check_in_at && !assignment.check_out_at
+})
+
 function handleAddNewSchedlue() {
   showScheduleModal.value = true
 }
@@ -78,6 +93,7 @@ function handleScheduleSubmit() {
 
 // Check-in/check-out methods
 const handleQuickCheckIn = async () => {
+  if (checkingIn.value) return
   if (!currentAssignment.value) {
     toast.add({
       severity: 'error',
@@ -88,7 +104,7 @@ const handleQuickCheckIn = async () => {
     return
   }
 
-  if (currentAssignment.value.check_in_at) {
+  if (!canCheckIn.value) {
     toast.add({
       severity: 'info',
       summary: 'Already Checked In',
@@ -99,6 +115,7 @@ const handleQuickCheckIn = async () => {
   }
 
   try {
+    checkingIn.value = true
     await checkInAssignment(currentAssignment.value.id, {
       check_in_at: new Date().toISOString()
     })
@@ -119,10 +136,13 @@ const handleQuickCheckIn = async () => {
       detail: 'Failed to check in. Please try again.',
       life: 5000
     })
+  } finally {
+    checkingIn.value = false
   }
 }
 
 const handleQuickCheckOut = async () => {
+  if (checkingOut.value) return
   if (!currentAssignment.value) {
     toast.add({
       severity: 'error',
@@ -143,7 +163,7 @@ const handleQuickCheckOut = async () => {
     return
   }
 
-  if (currentAssignment.value.check_out_at) {
+  if (!canCheckOut.value) {
     toast.add({
       severity: 'info',
       summary: 'Already Checked Out',
@@ -154,6 +174,7 @@ const handleQuickCheckOut = async () => {
   }
 
   try {
+    checkingOut.value = true
     await checkOutAssignment(currentAssignment.value.id, {
       check_out_at: new Date().toISOString()
     })
@@ -174,6 +195,8 @@ const handleQuickCheckOut = async () => {
       detail: 'Failed to check out. Please try again.',
       life: 5000
     })
+  } finally {
+    checkingOut.value = false
   }
 }
 
@@ -184,11 +207,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white py-8">
+  <div class="min-h-screen app-surface py-8">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl p-6">
+        <div class="roster-section rounded-xl p-6 shadow-sm border border-gray-200">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Title and Stats -->
             <div>
@@ -196,7 +219,7 @@ onMounted(async () => {
                 <i class="pi pi-calendar mr-3 text-blue-600"></i>
                 Roster Management
               </h1>
-              <p class="text-gray-600 mt-2">
+              <p class="text-muted mt-2">
                 Visual Schedule Planning And Team Roster
               </p>
             </div>
@@ -210,15 +233,18 @@ onMounted(async () => {
     <!-- Check-in/Check-out Section -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div class="roster-section rounded-xl p-6 shadow-sm border border-gray-200">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                 <i class="pi pi-clock text-green-600"></i>
                 Quick Check-in/Check-out
               </h2>
-              <p class="text-gray-600 text-sm">
+              <p class="text-muted text-sm">
                 Record your attendance for today's assignment
+              </p>
+              <p v-if="!currentAssignment" class="text-muted text-xs mt-1">
+                No assignments scheduled for today.
               </p>
             </div>
 
@@ -228,18 +254,20 @@ onMounted(async () => {
                 icon="pi pi-sign-in"
                 severity="success"
                 size="small"
-                :loading="false"
+                class="quick-action-button"
+                :loading="checkingIn"
+                :disabled="!canCheckIn"
                 @click="handleQuickCheckIn"
-                class="px-6"
               />
               <Button
                 label="Check Out"
                 icon="pi pi-sign-out"
                 severity="warning"
                 size="small"
-                :loading="false"
+                class="quick-action-button"
+                :loading="checkingOut"
+                :disabled="!canCheckOut"
                 @click="handleQuickCheckOut"
-                class="px-6"
               />
             </div>
           </div>
@@ -250,7 +278,7 @@ onMounted(async () => {
     <!-- Tabs Navigation -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white p-4">
+        <div class="roster-tab-shell p-4">
           <!-- Custom Tab Navigation -->
           <div class="inline-flex border-b-2 border-blue-300 relative">
             <button
@@ -294,7 +322,7 @@ onMounted(async () => {
     <!-- Content Section -->
     <div class="w-full">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="roster-section rounded-xl shadow-sm border border-gray-200">
           <!-- Schedule Content -->
           <div v-if="activeTab === 'schedule'" class="p-6">
             <div class="flex flex-col sm:flex-row gap-3 mb-6">
@@ -339,6 +367,29 @@ onMounted(async () => {
 
 <style scoped>
 /* Custom styles for the roster page */
+.roster-section {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-muted {
+  color: var(--app-text-muted);
+}
+
+.roster-tab-shell {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-card-shadow);
+}
+
+:deep(.quick-action-button) {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  min-width: 8.5rem;
+}
+
 :deep(.p-inputtext) {
   border-radius: 8px;
 }

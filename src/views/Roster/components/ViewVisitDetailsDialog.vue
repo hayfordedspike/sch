@@ -13,7 +13,7 @@
         </div>
         <div>
           <h2 class="text-gray-900 font-semibold text-2xl">Visit Details</h2>
-          <p class="text-gray-500 text-sm mt-1">Comprehensive visit information</p>
+          <p class="text-muted text-sm mt-1">Comprehensive visit information</p>
         </div>
       </div>
     </template>
@@ -31,8 +31,8 @@
                 :value="displayInfo.statusLabel"
                 class="font-medium px-3 py-1"
               />
-              <span class="text-gray-500 text-sm">•</span>
-              <span class="text-gray-500 text-sm">{{ displayInfo.duration }}</span>
+              <span class="text-muted text-sm">•</span>
+              <span class="text-muted text-sm">{{ displayInfo.duration }}</span>
             </div>
           </div>
         </div>
@@ -124,8 +124,8 @@
           Notes
         </h3>
 
-        <div class="bg-gray-50 rounded-lg p-4">
-          <p class="text-gray-700 whitespace-pre-wrap">{{ visit.notes }}</p>
+        <div class="notes-panel rounded-lg p-4">
+          <p class="notes-text whitespace-pre-wrap">{{ visit.notes }}</p>
         </div>
       </div>
 
@@ -333,46 +333,60 @@ const getStatusSeverity = (status: string) => {
 <style scoped>
 :deep(.p-dialog-header) {
   padding: 1.5rem 2rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 :deep(.p-dialog-content) {
   padding: 0 2rem;
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 :deep(.p-dialog-footer) {
   padding: 1rem 2rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface);
 }
 
-/* Remove all rounded corners, backgrounds, and borders */
 :deep(.p-dialog) {
-  border-radius: 0;
+  border-radius: 1rem;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-card-shadow);
 }
 
 :deep(.p-tag) {
-  border-radius: 0;
+  border-radius: 9999px;
   border: none;
   font-weight: 500;
 }
 
-/* Clean typography and spacing */
 label {
-  color: #64748b;
+  color: var(--app-text-muted);
   font-weight: 600;
   letter-spacing: 0.025em;
 }
 
-/* Remove any background colors and borders from content areas */
 .text-gray-900 {
-  color: #1f2937;
+  color: var(--app-text);
 }
 
 .text-gray-700 {
-  color: #374151;
+  color: var(--app-text);
 }
 
 .text-gray-500 {
-  color: #6b7280;
+  color: var(--app-text-muted);
+}
+
+.notes-panel {
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+}
+
+.notes-text {
+  color: var(--app-text);
 }
 </style>

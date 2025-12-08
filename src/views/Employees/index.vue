@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-white py-8">
+  <div class="min-h-screen app-surface py-8">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl  p-6">
+        <div class="employee-section rounded-xl p-6 shadow-sm border border-gray-200">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <!-- Title and Stats -->
             <div>
@@ -11,48 +11,48 @@
                 <i class="pi pi-users mr-3 text-blue-600"></i>
                 Employee Management
               </h1>
-              <p class="text-gray-600 mt-2">
+              <p class="text-muted mt-2">
                 Manage your employees information and status
               </p>
 
               <!-- Employee Stats -->
               <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <div class="employee-stat employee-stat--total">
                   <div class="flex items-center">
-                    <i class="pi pi-users text-blue-600 mr-2"></i>
+                    <i class="pi pi-users stat-icon mr-2"></i>
                     <div>
-                      <p class="text-sm font-medium text-blue-900">Total</p>
-                      <p class="text-xl font-bold text-blue-700">{{ employeeStats.total }}</p>
+                      <p class="stat-label">Total</p>
+                      <p class="stat-value">{{ employeeStats.total }}</p>
                     </div>
                   </div>
                 </div>
 
-                <div class="bg-green-50 rounded-lg p-3 border border-green-200">
+                <div class="employee-stat employee-stat--active">
                   <div class="flex items-center">
-                    <i class="pi pi-check-circle text-green-600 mr-2"></i>
+                    <i class="pi pi-check-circle stat-icon mr-2"></i>
                     <div>
-                      <p class="text-sm font-medium text-green-900">Active</p>
-                      <p class="text-xl font-bold text-green-700">{{ employeeStats.active }}</p>
+                      <p class="stat-label">Active</p>
+                      <p class="stat-value">{{ employeeStats.active }}</p>
                     </div>
                   </div>
                 </div>
 
-                <div class="bg-red-50 rounded-lg p-3 border border-red-200">
+                <div class="employee-stat employee-stat--inactive">
                   <div class="flex items-center">
-                    <i class="pi pi-times-circle text-red-600 mr-2"></i>
+                    <i class="pi pi-times-circle stat-icon mr-2"></i>
                     <div>
-                      <p class="text-sm font-medium text-red-900">Inactive</p>
-                      <p class="text-xl font-bold text-red-700">{{ employeeStats.inactive }}</p>
+                      <p class="stat-label">Inactive</p>
+                      <p class="stat-value">{{ employeeStats.inactive }}</p>
                     </div>
                   </div>
                 </div>
 
-                <div class="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                <div class="employee-stat employee-stat--leave">
                   <div class="flex items-center">
-                    <i class="pi pi-clock text-yellow-600 mr-2"></i>
+                    <i class="pi pi-clock stat-icon mr-2"></i>
                     <div>
-                      <p class="text-sm font-medium text-yellow-900">On Leave</p>
-                      <p class="text-xl font-bold text-yellow-700">{{ employeeStats.onLeave }}</p>
+                      <p class="stat-label">On Leave</p>
+                      <p class="stat-value">{{ employeeStats.onLeave }}</p>
                     </div>
                   </div>
                 </div>
@@ -78,18 +78,18 @@
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Loading State -->
         <div v-if="loading && employees.length === 0" class="text-center py-12">
-          <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
-          <p class="text-gray-600 mt-4">Loading employees...</p>
+          <i class="pi pi-spinner pi-spin text-muted" style="font-size: 2rem;"></i>
+          <p class="text-muted mt-4">Loading employees...</p>
         </div>
 
         <!-- Empty State -->
         <div v-else-if="!loading && filteredEmployees.length === 0" class="text-center py-12">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+          <div class="employee-section rounded-xl shadow-sm border border-gray-200 p-12">
             <div class="mb-4">
               <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No Employees Yet</h3>
-            <p class="text-gray-600 mb-6">
+            <p class="text-muted mb-6">
               Get started by adding your first employee to the system.
             </p>
             <Button
@@ -318,6 +318,65 @@ onMounted(async () => {
 
 <style scoped>
 /* Custom styles for the employees page */
+.employee-section {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-muted {
+  color: var(--app-text-muted);
+}
+
+.employee-stat {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-muted);
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.employee-stat:hover {
+  border-color: var(--app-accent);
+  transform: translateY(-2px);
+}
+
+.employee-stat--total {
+  --stat-color: #0369a1;
+}
+
+.employee-stat--active {
+  --stat-color: #047857;
+}
+
+.employee-stat--inactive {
+  --stat-color: #b91c1c;
+}
+
+.employee-stat--leave {
+  --stat-color: #a16207;
+}
+
+.stat-icon {
+  color: var(--stat-color);
+  font-size: 1.2rem;
+}
+
+.stat-label {
+  color: var(--stat-color);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+.stat-value {
+  color: var(--app-text);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
 :deep(.p-inputtext) {
   border-radius: 8px;
 }

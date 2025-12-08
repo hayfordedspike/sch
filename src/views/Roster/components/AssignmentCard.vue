@@ -5,12 +5,12 @@
         <!-- Assignment Header -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <i class="pi pi-user text-blue-600 text-lg"></i>
+            <div class="card-avatar">
+              <i class="pi pi-user card-avatar__icon"></i>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900">{{ displayInfo.employeeName }}</h3>
-              <p class="text-sm text-gray-600">{{ displayInfo.visitInfo }}</p>
+              <p class="text-sm text-muted">{{ displayInfo.visitInfo }}</p>
             </div>
           </div>
           <div class="flex space-x-1">
@@ -66,27 +66,28 @@
 
         <!-- Assignment Details -->
         <div class="space-y-2 mb-4">
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-calendar mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-calendar mr-2 text-muted"></i>
             <span>{{ displayInfo.scheduledStart }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-clock mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-clock mr-2 text-muted"></i>
             <span>{{ displayInfo.duration }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-user mr-2 text-gray-400"></i>
+          <div class="flex items-center text-sm text-muted">
+            <i class="pi pi-user mr-2 text-muted"></i>
             <span>{{ displayInfo.role }}</span>
           </div>
-          <div class="flex items-center text-sm text-gray-600">
-            <i class="pi pi-circle-fill mr-2 text-xs"
-               :class="'text-gray-500'">
-            </i>
+          <div class="flex items-center text-sm text-muted">
+            <i
+              class="pi pi-circle-fill mr-2 text-xs assignment-status-dot"
+              :class="`assignment-status-dot--${displayInfo.status.toLowerCase()}`"
+            ></i>
             <span class="capitalize">{{ displayInfo.status.toLowerCase() }}</span>
           </div>
         </div>
-        <div class="pt-3 border-t border-gray-200">
-          <div class="flex items-center justify-between text-xs text-gray-500">
+        <div class="assignment-card__meta">
+          <div class="flex items-center justify-between text-xs text-muted">
             <span>ID: {{ assignment.id }}</span>
             <span>{{ displayInfo.assignedAt }}</span>
           </div>
@@ -195,14 +196,63 @@ const getStatusColor = (status: string) => {
 
 <style scoped>
 .assignment-card {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  transition-property: box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  background: var(--app-surface);
+  box-shadow: var(--app-card-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .assignment-card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border-color: rgb(191 219 254);
+  border-color: var(--app-accent);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.12);
+  transform: translateY(-2px);
+}
+
+.card-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--app-surface-muted);
+  color: var(--app-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px var(--app-border);
+}
+
+.card-avatar__icon {
+  font-size: 1.1rem;
+  color: inherit;
+}
+
+.assignment-card__meta {
+  border-top: 1px solid var(--app-border);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.assignment-status-dot {
+  color: var(--app-text-muted);
+}
+
+.assignment-status-dot--tentative {
+  color: #f59e0b;
+}
+
+.assignment-status-dot--confirmed {
+  color: #2563eb;
+}
+
+.assignment-status-dot--in_progress {
+  color: #10b981;
+}
+
+.assignment-status-dot--completed {
+  color: #8b5cf6;
+}
+
+.assignment-status-dot--cancelled {
+  color: #ef4444;
 }
 </style>

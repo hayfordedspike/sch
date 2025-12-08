@@ -41,13 +41,13 @@
     <template #content>
       <div class="px-6 pb-4">
         <!-- Client Name -->
-        <h3 class="text-xl font-bold text-gray-900 mb-2">
+        <h3 class="text-xl font-bold text-primary mb-2">
           {{ displayInfo.fullName }}
         </h3>
 
         <!-- House Name -->
         <div class="mb-2">
-          <span class="text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+          <span class="house-chip">
             {{ getHouseName(client.house_id) }}
           </span>
         </div>
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Client Details -->
-        <div class="space-y-2 text-sm text-gray-600 mb-4">
+        <div class="space-y-2 text-sm text-muted mb-4">
           <!-- Phone -->
           <div class="flex items-center">
             <i class="pi pi-phone mr-2 text-green-500 w-4"></i>
@@ -83,8 +83,8 @@
 
           <!-- Upcoming Appointments -->
           <div class="flex items-center">
-            <i class="pi pi-calendar mr-2 text-purple-500 w-4"></i>
-            <span class="text-xs bg-white text-back px-2 py-1 rounded">2 upcoming appointments</span>
+            <i class="pi pi-calendar mr-2 text-purple-400 w-4"></i>
+            <span class="badge-muted">2 upcoming appointments</span>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@ onMounted(() => {
 /* Card base styles */
 /* Card base styles */
 .client-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
@@ -198,14 +198,16 @@ onMounted(() => {
   box-sizing: border-box;
   padding: 1.25rem 1rem 1rem 1rem;
   margin: 0 auto 1.5rem auto;
-  background: #fff;
+  background: var(--app-surface);
+  color: var(--app-text);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  box-shadow: var(--app-card-shadow);
 }
 
 .client-card:hover {
-  border-color: #d1d5db;
+  border-color: var(--app-border-strong);
   transform: translateY(-2px);
 }
 
@@ -259,5 +261,28 @@ onMounted(() => {
 h3.text-xl, .truncate, .client-card span {
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.house-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: var(--app-surface-muted);
+  color: var(--app-text);
+}
+
+.badge-muted {
+  font-size: 0.75rem;
+  background-color: var(--app-surface-muted);
+  color: var(--app-text);
+  padding: 0.15rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.text-muted {
+  color: var(--app-text-muted);
 }
 </style>
