@@ -2,8 +2,8 @@
   <div v-if="showBanner" class="mb-6">
     <Card class="warning-banner" :data-state="bannerState">
       <template #content>
-        <div class="flex items-center justify-between">
-          <div class="flex items-start gap-4">
+        <div class="banner-content">
+          <div class="banner-text">
             <i class="pi pi-exclamation-triangle text-amber-500 text-2xl mt-1"></i>
             <div>
               <h3 class="banner-title text-lg font-semibold mb-1">{{ bannerTitle }}</h3>
@@ -28,13 +28,14 @@
               </div>
             </div>
           </div>
-          <div class="flex gap-2">
+          <div class="banner-actions">
             <GlobalButton
               v-if="showViewAllButton"
               label="View All"
               outlined
               severity="warning"
               size="sm"
+              class="banner-action-btn"
               @click="$emit('view-all')"
             />
             <GlobalButton
@@ -42,6 +43,7 @@
               outlined
               severity="danger"
               size="sm"
+              class="banner-action-btn"
               @click="$emit('add-certificate')"
             />
           </div>
@@ -227,5 +229,47 @@ const showViewAllButton = computed(() => {
   background: var(--banner-chip-bg);
   color: var(--banner-chip-text);
   border: 1px solid var(--banner-chip-border);
+}
+
+.banner-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.banner-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 220px;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.banner-action-btn {
+  min-width: 7rem;
+}
+
+@media (max-width: 640px) {
+  .banner-content {
+    flex-direction: column;
+  }
+
+  .banner-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .banner-action-btn {
+    flex: 1 1 48%;
+  }
 }
 </style>
