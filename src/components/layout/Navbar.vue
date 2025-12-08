@@ -262,8 +262,7 @@ const handleThemeToggle = () => {
         :image="userImage || defaultAvatarUrl"
         :label="!userImage && !defaultAvatarUrl ? initials : undefined"
         shape="circle"
-        size="lg"
-        class="w-12 h-12 cursor-pointer"
+        class="navbar-avatar cursor-pointer"
         @click="toggleMenu"
       />
       <div v-if="!isMobile" class="hidden md:block">
@@ -312,5 +311,18 @@ const handleThemeToggle = () => {
 
 .theme-toggle-button i {
   font-size: 1rem;
+}
+
+.navbar-avatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  transition: transform 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  .navbar-avatar {
+    width: 4.75rem;
+    height: 4.75rem;
+  }
 }
 </style>

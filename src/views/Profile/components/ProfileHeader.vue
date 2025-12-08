@@ -20,26 +20,40 @@
 
         <div class="profile-actions flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
             <div v-if="!editing" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
-            <GlobalButton type="primary" class="profile-btn w-full sm:w-auto" @click="$emit('edit')">
-              <i class="pi pi-user-edit"></i>
-              <span>Edit Profile</span>
-            </GlobalButton>
-            
-            <GlobalButton type="secondary" class="profile-btn w-full sm:w-auto" @click="$emit('change-password')">
-              <i class="pi pi-key"></i>
-              <span>Change Password</span>
-            </GlobalButton>
+            <GlobalButton
+              label="Edit Profile"
+              icon="pi pi-user-edit"
+              severity="primary"
+              class="profile-btn w-full sm:w-auto"
+              @click="$emit('edit')"
+            />
+
+            <GlobalButton
+              label="Change Password"
+              icon="pi pi-key"
+              type="secondary"
+              severity="secondary"
+              class="profile-btn w-full sm:w-auto"
+              @click="$emit('change-password')"
+            />
           </div>
           <div v-else class="flex flex-col sm:flex-row gap-2 w-full md:w-auto md:justify-end">
-            <GlobalButton type="warning" class="profile-btn w-full sm:w-auto" @click="$emit('cancel')">
-              <i class="pi pi-times"></i>
-              <span>Cancel</span>
-            </GlobalButton>
-            
-            <GlobalButton type="primary" class="profile-btn w-full sm:w-auto" @click="$emit('save')">
-              <i class="pi pi-check"></i>
-              <span>Save</span>
-            </GlobalButton>
+            <GlobalButton
+              label="Cancel"
+              icon="pi pi-times"
+              type="warning"
+              severity="warning"
+              class="profile-btn w-full sm:w-auto"
+              @click="$emit('cancel')"
+            />
+
+            <GlobalButton
+              label="Save"
+              icon="pi pi-check"
+              severity="primary"
+              class="profile-btn w-full sm:w-auto"
+              @click="$emit('save')"
+            />
           </div>
         </div>
       </div>
@@ -96,19 +110,27 @@ const displayName = computed(() => {
   with the :global([data-theme='dark']) selector in your CSS.
 */
 
+.profile-header-card {
+  --profile-gradient-start: rgba(102, 126, 234, 0.95);
+  --profile-gradient-end: rgba(118, 75, 162, 0.95);
+  --profile-gradient-border: transparent;
+}
+
+:global([data-theme='dark']) .profile-header-card,
+:global(html.theme-dark) .profile-header-card {
+  --profile-gradient-start: rgba(15, 23, 42, 0.95);
+  --profile-gradient-end: rgba(30, 41, 59, 0.95);
+  --profile-gradient-border: var(--app-border);
+}
+
 :deep(.profile-header-card .p-card) {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--profile-gradient-start) 0%, var(--profile-gradient-end) 100%);
+  border: 1px solid var(--profile-gradient-border);
   box-shadow: var(--app-card-shadow);
   width: 100%;
   border-radius: 1.5rem;
   padding: 0.25rem;
   transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-:global([data-theme='dark']) :deep(.profile-header-card .p-card) {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
-  border-color: var(--app-border);
 }
 
 :deep(.profile-header-card .p-card-content) {
@@ -154,8 +176,8 @@ const displayName = computed(() => {
 /* Custom profile image size for PC */
 @media (min-width: 1024px) {
   .profile-image-pc {
-    width: 150px !important;
-    height: 150px !important;
+    width: 220px !important;
+    height: 220px !important;
   }
 }
 </style>
