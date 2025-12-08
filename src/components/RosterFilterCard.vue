@@ -51,6 +51,8 @@ const filterOptions = computed(() => {
   ]
 })
 
+const selectId = `roster-team-filter-${Math.random().toString(36).slice(2, 8)}`
+
 // Navigation functions
 const goToPreviousMonth = () => {
   const newDate = new Date(currentDate.value)
@@ -83,7 +85,7 @@ watch(() => props.currentDate, (val) => {
 <template>
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-6">
+      <div class="flex flex-col gap-6 xl:flex-row xl:items-center xl:space-x-6">
         <!-- Calendar View Toggle -->
 
         <div class="flex items-center space-x-4">
@@ -105,19 +107,24 @@ watch(() => props.currentDate, (val) => {
             <i class="pi pi-chevron-right text-gray-600"></i>
           </button>
         </div>
-        <div class="flex items-center space-x-3">
-          <select
-            v-model="selectedFilter"
-            class="text-sm app-input app-select"
-          >
-            <option
-              v-for="option in filterOptions"
-              :key="option.value"
-              :value="option.value"
+        <div class="roster-filter__select-group">
+          <label class="roster-filter__label" :for="selectId">Team selection</label>
+          <div class="roster-filter__select-wrapper">
+            <select
+              v-model="selectedFilter"
+              :id="selectId"
+              class="text-sm app-input app-select roster-filter__select"
+              aria-label="Filter team members"
             >
-              {{ option.label }}
-            </option>
-          </select>
+              <option
+                v-for="option in filterOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="flex items-center space-x-2 mr-6">
@@ -133,3 +140,38 @@ watch(() => props.currentDate, (val) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.roster-filter__select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.roster-filter__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--app-text-muted);
+}
+
+.roster-filter__select-wrapper {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.roster-filter__select {
+  min-height: 2.5rem;
+  min-width: 12rem;
+  width: fit-content;
+}
+
+@media (max-width: 767px) {
+  .roster-filter__select-wrapper,
+  .roster-filter__select {
+    width: 100%;
+  }
+}
+</style>

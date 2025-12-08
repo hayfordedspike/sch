@@ -118,12 +118,12 @@ const goToRoster = () => {
       </div>
 
       <div class="filter-card__select-group">
-        <label class="filter-card__label" :for="selectId">Team selection</label>
+       
         <div class="filter-card__select-wrapper">
           <select
             v-model="selectedFilter"
             :id="selectId"
-            class="w-full text-sm app-input app-select filter-card__select"
+            class="text-sm app-input app-select filter-card__select"
             aria-label="Filter team members"
           >
             <option
@@ -203,10 +203,15 @@ button:focus {
 
 .filter-card__select-wrapper {
   position: relative;
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .filter-card__select {
   min-height: 2.75rem;
+  width: fit-content;
+  min-width: 12rem;
 }
 
 .filter-card__roster-btn {
@@ -226,6 +231,11 @@ button:focus {
 
   .filter-card__content {
     gap: 1.25rem;
+  }
+
+  .filter-card__select-wrapper,
+  .filter-card__select {
+    width: 100%;
   }
 }
 </style>

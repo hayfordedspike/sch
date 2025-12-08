@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppTable: typeof import('./src/components/shared/AppTable.vue')['default']
+    Button: typeof import('primevue/button')['default']
     Calendar: typeof import('primevue/calendar')['default']
     Card: typeof import('primevue/card')['default']
     CheckInOutSidebar: typeof import('./src/components/layout/CheckInOutSidebar.vue')['default']
