@@ -9,7 +9,7 @@
             <div>
               <h1 class="text-3xl font-bold text-gray-900 flex items-center">
                 <i class="pi pi-users mr-3 text-blue-600"></i>
-                Employee Management
+                Employees
               </h1>
               <p class="text-muted mt-2">
                 Manage your employees information and status

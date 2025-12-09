@@ -124,13 +124,13 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: "/certificate-management",
-    name: "Certificate Management",
+    path: "/certificates",
+    name: "Certificates",
     component: () => import("@/views/CertificateManagement/index.vue"),
     meta: { 
       layout: "dashboard",
       requiresAuth: true,
-      title: "Certificate Management"
+      title: "Certificates"
     },
   },
   {

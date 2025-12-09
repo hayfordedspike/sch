@@ -3,7 +3,7 @@
     <!-- Header with Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900">Assignment Management</h2>
+        <h2 class="text-2xl font-bold text-gray-900">Assignments</h2>
         <p class="text-muted mt-1">Assign staff to visits and manage schedules</p>
       </div>
 

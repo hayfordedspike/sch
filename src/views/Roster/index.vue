@@ -217,7 +217,7 @@ onMounted(async () => {
             <div>
               <h1 class="text-3xl font-bold text-gray-900 flex items-center">
                 <i class="pi pi-calendar mr-3 text-blue-600"></i>
-                Roster Management
+                Roster
               </h1>
               <p class="text-muted mt-2">
                 Visual Schedule Planning And Team Roster

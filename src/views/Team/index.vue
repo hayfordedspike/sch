@@ -10,7 +10,7 @@
             <div>
               <h1 class="team-hero-title">
                 <i class="pi pi-users mr-3"></i>
-                Team Management
+                Teams
               </h1>
               <p class="text-muted mt-2">
                 Manage your team members, roles and availability

@@ -74,7 +74,7 @@ const performSearch = (query: string) => {
     results.value = [
       {
         id: 1,
-        title: 'Client Management',
+        title: 'Clients',
         subtitle: 'View client details',
         icon: 'pi pi-users',
         route: '/clients'
