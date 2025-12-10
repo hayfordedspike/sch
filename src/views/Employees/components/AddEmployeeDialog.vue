@@ -49,6 +49,19 @@
             <small v-if="errors.last_name" class="text-red-500">{{ errors.last_name }}</small>
           </div>
 
+          <!-- Email -->
+          <div class="flex flex-col gap-2">
+            <label for="email" class="font-semibold">Email *</label>
+            <InputText
+              id="email"
+              v-model="formData.email"
+              placeholder="Enter email address"
+              :class="{ 'p-invalid': errors.email }"
+              type="email"
+            />
+            <small v-if="errors.email" class="text-red-500">{{ errors.email }}</small>
+          </div>
+
           <!-- Phone -->
           <div class="flex flex-col gap-2">
             <label for="phone" class="font-semibold">Phone Number *</label>

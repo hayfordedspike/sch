@@ -138,7 +138,7 @@
               >
                 <slot
                   :index="itemIndex"
-                  :item="{ item, index: itemIndex }"
+                  :item="{ ...item, index: itemIndex }"
                   :name="header.key"
                 >
                   <!-- If this column is a 'list' type, display the first item plus +X,

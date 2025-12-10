@@ -11,22 +11,22 @@
       @item-click="onView"
     >
       <template #house="{ item }">
-        <span class="house-chip">{{ getHouseName(item.item.house_id) }}</span>
+        <span class="house-chip">{{ getHouseName(item.house_id) }}</span>
       </template>
       <template #status="{ item }">
-        <Tag :severity="item.item.is_active ? 'success' : 'danger'" :value="item.item.is_active ? 'Active' : 'Inactive'" class="text-xs font-medium" />
+        <Tag :severity="item.is_active ? 'success' : 'danger'" :value="item.is_active ? 'Active' : 'Inactive'" class="text-xs font-medium" />
       </template>
       <template #phone="{ item }">
         <i class="pi pi-phone mr-2 text-green-500 w-4"></i>
-        {{ formatClientPhone(item.item.phone) }}
+        {{ formatClientPhone(item.phone) }}
       </template>
       <template #email="{ item }">
         <i class="pi pi-envelope mr-2 w-4" style="color: #065986"></i>
-        <span class="truncate">{{ item.item.email }}</span>
+        <span class="truncate">{{ item.email }}</span>
       </template>
       <template #address="{ item }">
         <i class="pi pi-map-marker mr-2 text-red-500 w-4"></i>
-        <span class="truncate">{{ item.item.city }}, {{ item.item.state }}</span>
+        <span class="truncate">{{ item.city }}, {{ item.state }}</span>
       </template>
       <template #appointments="{ item }">
         <i class="pi pi-calendar mr-2 text-purple-400 w-4"></i>
@@ -34,11 +34,11 @@
       </template>
       <template #menu="{ item }">
         <div class="client-table-actions">
-          <GlobalButton icon="pi pi-eye" @click="emit('view', item.item)" class="p-button-rounded p-button-outlined p-button-sm" outlined />
-          <GlobalButton icon="pi pi-pencil" @click="emit('edit', item.item)" class="p-button-rounded p-button-outlined p-button-sm" severity="info" outlined />
-          <GlobalButton icon="pi pi-trash" @click="emit('delete', item.item)" class="p-button-rounded p-button-outlined p-button-sm" severity="danger" outlined />
-          <GlobalButton v-if="!item.item.is_active" icon="pi pi-check" @click="emit('activate', item.item)" class="p-button-rounded p-button-outlined p-button-sm" severity="success" outlined />
-          <GlobalButton v-else icon="pi pi-times" @click="emit('deactivate', item.item)" class="p-button-rounded p-button-outlined p-button-sm" severity="warning" outlined />
+          <GlobalButton icon="pi pi-eye" @click="emit('view', item)" class="p-button-rounded p-button-outlined p-button-sm" outlined />
+          <GlobalButton icon="pi pi-pencil" @click="emit('edit', item)" class="p-button-rounded p-button-outlined p-button-sm" severity="info" outlined />
+          <GlobalButton icon="pi pi-trash" @click="emit('delete', item)" class="p-button-rounded p-button-outlined p-button-sm" severity="danger" outlined />
+          <GlobalButton v-if="!item.is_active" icon="pi pi-check" @click="emit('activate', item)" class="p-button-rounded p-button-outlined p-button-sm" severity="success" outlined />
+          <GlobalButton v-else icon="pi pi-times" @click="emit('deactivate', item)" class="p-button-rounded p-button-outlined p-button-sm" severity="warning" outlined />
         </div>
       </template>
     </AppTable>
@@ -77,7 +77,7 @@ const tableHeaders = [
 ]
 
 function onView(item) {
-  emit('view', item.item)
+  emit('view', item)
 }
 </script>
 
