@@ -8,25 +8,25 @@
       :showTotal="true"
       :totalItems="employees.length"
       tableName="Employees"
-      @item-click="onView"
+      @item-click="(event) => onView(event as unknown as Employee)"
     >
       <template #fullName="{ item }">
-        {{ getDisplayInfo(item).fullName }}
+        {{ getDisplayInfo(item as Employee).fullName }}
       </template>
       <template #status="{ item }">
-        <Tag :severity="getDisplayInfo(item).statusColor" :value="getDisplayInfo(item).statusLabel" class="text-xs font-medium" />
+        <Tag :severity="getDisplayInfo(item as Employee).statusColor" :value="getDisplayInfo(item as Employee).statusLabel" class="text-xs font-medium" />
       </template>
       <template #phone="{ item }">
         <i class="pi pi-phone mr-2 text-green-500 w-4"></i>
-        {{ formatEmployeePhone(item.phone) }}
+        {{ formatEmployeePhone((item as Employee).phone) }}
       </template>
       <template #hireDate="{ item }">
         <i class="pi pi-calendar mr-2 w-4" style="color: #065986"></i>
-        <span>Hired: {{ getDisplayInfo(item).hireDate }}</span>
+        <span>Hired: {{ getDisplayInfo(item as Employee).hireDate }}</span>
       </template>
       <template #daysEmployed="{ item }">
         <i class="pi pi-clock mr-2 text-purple-500 w-4"></i>
-        <span>{{ getDisplayInfo(item).daysEmployed }} days employed</span>
+        <span>{{ getDisplayInfo(item as Employee).daysEmployed }} days employed</span>
       </template>
       <template #menu="{ item }">
         <div class="employee-table-actions">
@@ -46,8 +46,9 @@ import AppTable from '@/components/shared/AppTable.vue'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
 import { useEmployees } from '@/composables/useEmployees'
+import type { Employee } from '../types'
 
-const props = defineProps<{ employees: any[] }>()
+const props = defineProps<{ employees: Employee[] }>()
 const emit = defineEmits(['view', 'edit', 'delete', 'change-status'])
 
 const { formatEmployeePhone, getEmployeeDisplayInfo } = useEmployees()
@@ -61,7 +62,7 @@ const tableHeaders = [
   { key: 'menu', label: 'Actions' }
 ]
 
-function getDisplayInfo(item) {
+function getDisplayInfo(item: Employee) {
   try {
     return getEmployeeDisplayInfo(item)
   } catch {
@@ -75,13 +76,13 @@ function getDisplayInfo(item) {
   }
 }
 
-function getStatusColor(status) {
+function getStatusColor(status: string) {
   return status === 'ACTIVE' ? 'success' : 'danger'
 }
-function getStatusLabel(status) {
+function getStatusLabel(status: string) {
   return status === 'ACTIVE' ? 'Active' : 'Inactive'
 }
-function getHireDateSafe(item) {
+function getHireDateSafe(item: Employee) {
   try {
     const info = getEmployeeDisplayInfo(item)
     return info.hireDate || 'N/A'
@@ -89,7 +90,7 @@ function getHireDateSafe(item) {
     return 'N/A'
   }
 }
-function getDaysEmployedSafe(item) {
+function getDaysEmployedSafe(item: Employee) {
   try {
     const info = getEmployeeDisplayInfo(item)
     return isNaN(info.daysEmployed) ? 'N/A' : info.daysEmployed
@@ -97,7 +98,7 @@ function getDaysEmployedSafe(item) {
     return 'N/A'
   }
 }
-function onView(item) {
+function onView(item: Employee) {
   emit('view', item)
 }
 </script>

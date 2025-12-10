@@ -8,25 +8,25 @@
       :showTotal="true"
       :totalItems="clients.length"
       tableName="Clients"
-      @item-click="onView"
+      @item-click="(event) => onView(event as unknown as Client)"
     >
       <template #house="{ item }">
-        <span class="house-chip">{{ getHouseName(item.house_id) }}</span>
+        <span class="house-chip">{{ getHouseName((item as Client).house_id) }}</span>
       </template>
       <template #status="{ item }">
-        <Tag :severity="item.is_active ? 'success' : 'danger'" :value="item.is_active ? 'Active' : 'Inactive'" class="text-xs font-medium" />
+        <Tag :severity="(item as Client).is_active ? 'success' : 'danger'" :value="(item as Client).is_active ? 'Active' : 'Inactive'" class="text-xs font-medium" />
       </template>
       <template #phone="{ item }">
         <i class="pi pi-phone mr-2 text-green-500 w-4"></i>
-        {{ formatClientPhone(item.phone) }}
+        {{ formatClientPhone((item as Client).phone) }}
       </template>
       <template #email="{ item }">
         <i class="pi pi-envelope mr-2 w-4" style="color: #065986"></i>
-        <span class="truncate">{{ item.email }}</span>
+        <span class="truncate">{{ (item as Client).email }}</span>
       </template>
       <template #address="{ item }">
         <i class="pi pi-map-marker mr-2 text-red-500 w-4"></i>
-        <span class="truncate">{{ item.city }}, {{ item.state }}</span>
+        <span class="truncate">{{ (item as Client).city }}, {{ (item as Client).state }}</span>
       </template>
       <template #appointments="{ item }">
         <i class="pi pi-calendar mr-2 text-purple-400 w-4"></i>
@@ -50,15 +50,16 @@ import { defineProps, defineEmits } from 'vue'
 import AppTable from '@/components/shared/AppTable.vue'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Tag from 'primevue/tag'
+import type { Client } from '../types'
 
-const props = defineProps<{ clients: any[] }>()
+const props = defineProps<{ clients: Client[] }>()
 const emit = defineEmits(['view', 'edit', 'delete', 'activate', 'deactivate'])
 
 import { useClients } from '@/composables/useClients'
 import { useHouses } from '@/composables/useHouses'
 const { formatClientPhone } = useClients()
 const { houses } = useHouses()
-const getHouseName = (houseId) => {
+const getHouseName = (houseId: number | null) => {
   if (!houseId) return 'No house assigned'
   const house = houses.value.find(h => h.id === houseId)
   return house ? house.name : `House #${houseId}`
@@ -76,7 +77,7 @@ const tableHeaders = [
   { key: 'menu', label: 'Actions' }
 ]
 
-function onView(item) {
+function onView(item: Client) {
   emit('view', item)
 }
 </script>

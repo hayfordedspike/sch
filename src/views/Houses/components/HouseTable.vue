@@ -11,19 +11,19 @@
     >
       <template #address="{ item }">
         <i class="pi pi-home mr-2 w-4" style="color: #065986"></i>
-        <span class="truncate">{{ item.address_line1 }}</span>
+        <span class="truncate">{{ (item as House).address_line1 }}</span>
       </template>
       <template #city_region="{ item }">
         <i class="pi pi-map-marker mr-2 text-red-400 w-4"></i>
-        <span>{{ item.city }}, {{ item.region }}</span>
+        <span>{{ (item as House).city }}, {{ (item as House).region }}</span>
       </template>
       <template #postal_code="{ item }">
         <i class="pi pi-envelope mr-2 text-gray-400"></i>
-        <span>{{ item.postal_code }}</span>
+        <span>{{ (item as House).postal_code }}</span>
       </template>
       <template #note="{ item }">
         <i class="pi pi-comment mr-2 text-purple-500"></i>
-        <span class="italic text-gray-500">"{{ item.note }}"</span>
+        <span class="italic text-gray-500">"{{ (item as House).note }}"</span>
       </template>
       <template #teams="{ item }">
         <div class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
@@ -46,8 +46,9 @@
 import { defineProps, defineEmits } from 'vue'
 import AppTable from '@/components/shared/AppTable.vue'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
+import type { House } from '../types'
 
-const props = defineProps<{ houses: any[] }>()
+const props = defineProps<{ houses: House[] }>()
 const emit = defineEmits(['view-teams', 'edit', 'delete'])
 
 const tableHeaders = [

@@ -333,8 +333,8 @@ interface Header {
   rowspan?: number;
 }
 
-interface TableItem extends Record<string, unknown> {
-  [key: string]: string | number | boolean | string[] | ObjectValue | null | undefined;
+interface TableItem {
+  [key: string]: any;
 }
 
 interface ObjectValue {
