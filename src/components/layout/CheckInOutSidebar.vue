@@ -152,7 +152,7 @@
           <div class="stat-label">Pending Check-ins</div>
         </div>
         <div>
-          <div class="stat-value text-blue-500">{{ activeAssignments.length }}</div>
+          <div class="stat-value" style="color: #065986">{{ activeAssignments.length }}</div>
           <div class="stat-label">Active Assignments</div>
         </div>
       </div>

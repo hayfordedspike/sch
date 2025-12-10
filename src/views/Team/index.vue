@@ -78,13 +78,29 @@
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="team-panel">
           <!-- My Teams Content -->
+
           <div v-if="activeTab === 'my-teams'" class="p-6">
+            <div class="flex justify-end mb-4 gap-2">
+              <GlobalButton
+                :label="'Card View'"
+                :severity="!myTeamsTableView ? 'primary' : 'warning'"
+                :outlined="myTeamsTableView"
+                class="min-w-[120px]"
+                @click="myTeamsTableView = false"
+              />
+              <GlobalButton
+                :label="'Table View'"
+                :severity="myTeamsTableView ? 'primary' : 'warning'"
+                :outlined="!myTeamsTableView"
+                class="min-w-[120px]"
+                @click="myTeamsTableView = true"
+              />
+            </div>
             <!-- Loading State -->
             <div v-if="myTeamsLoading && myTeams.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
               <p class="text-muted mt-4">Loading my teams...</p>
             </div>
-
             <!-- Empty State -->
             <div v-else-if="!myTeamsLoading && myTeams.length === 0" class="text-center py-12">
               <div class="team-empty-card">
@@ -103,8 +119,24 @@
                 />
               </div>
             </div>
-
-            <!-- My Teams Grid -->
+            <!-- My Teams Table -->
+            <AppTable
+              v-else-if="myTeamsTableView"
+              :headers="myTeamsTableHeaders"
+              :items="myTeamsTableRows"
+              :showMenu="false"
+              :title="'My Teams'"
+              :showTotal="true"
+              :totalItems="myTeams.length"
+            >
+              <template #menu="{ item }">
+                <div class="team-table-actions">
+                  <GlobalButton icon="pi pi-pencil" @click.stop="handleEditMyTeam(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="info" outlined />
+                  <GlobalButton icon="pi pi-trash" @click.stop="handleDeleteMyTeam(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="danger" outlined />
+                </div>
+              </template>
+            </AppTable>
+            <!-- My Teams Card Grid -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <MyTeamCard
                 v-for="team in myTeams"
@@ -116,14 +148,30 @@
             </div>
           </div>
 
+
           <!-- Members Content -->
           <div v-if="activeTab === 'members'" class="p-6">
+            <div class="flex justify-end mb-4 gap-2">
+              <GlobalButton
+                :label="'Card View'"
+                :severity="!membersTableView ? 'primary' : 'warning'"
+                :outlined="membersTableView"
+                class="min-w-[120px]"
+                @click="membersTableView = false"
+              />
+              <GlobalButton
+                :label="'Table View'"
+                :severity="membersTableView ? 'primary' : 'warning'"
+                :outlined="!membersTableView"
+                class="min-w-[120px]"
+                @click="membersTableView = true"
+              />
+            </div>
             <!-- Loading State -->
             <div v-if="membersLoading && members.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
               <p class="text-muted mt-4">Loading members...</p>
             </div>
-
             <!-- Empty State -->
             <div v-else-if="!membersLoading && filteredMembers.length === 0" class="text-center py-12">
               <div class="team-empty-card">
@@ -142,8 +190,24 @@
                 />
               </div>
             </div>
-
-            <!-- Members Grid -->
+            <!-- Members Table -->
+            <AppTable
+              v-else-if="membersTableView"
+              :headers="membersTableHeaders"
+              :items="membersTableRows"
+              :showMenu="false"
+              :title="'Team Members'"
+              :showTotal="true"
+              :totalItems="filteredMembers.length"
+            >
+              <template #menu="{ item }">
+                <div class="team-table-actions">
+                  <GlobalButton icon="pi pi-pencil" @click.stop="handleEditMember(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="info" outlined />
+                  <GlobalButton icon="pi pi-trash" @click.stop="handleDeleteMember(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="danger" outlined />
+                </div>
+              </template>
+            </AppTable>
+            <!-- Members Card Grid -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <MemberCard
                 v-for="member in filteredMembers"
@@ -158,12 +222,27 @@
 
           <!-- Teams Content -->
           <div v-if="activeTab === 'teams'" class="p-6">
+            <div class="flex justify-end mb-4 gap-2">
+              <GlobalButton
+                :label="'Card View'"
+                :severity="!teamsTableView ? 'primary' : 'warning'"
+                :outlined="teamsTableView"
+                class="min-w-[120px]"
+                @click="teamsTableView = false"
+              />
+              <GlobalButton
+                :label="'Table View'"
+                :severity="teamsTableView ? 'primary' : 'warning'"
+                :outlined="!teamsTableView"
+                class="min-w-[120px]"
+                @click="teamsTableView = true"
+              />
+            </div>
             <!-- Loading State -->
             <div v-if="loading && teams.length === 0" class="text-center py-12">
               <i class="pi pi-spinner pi-spin text-gray-400" style="font-size: 2rem;"></i>
               <p class="text-muted mt-4">Loading teams...</p>
             </div>
-
             <!-- Empty State -->
             <div v-else-if="!loading && filteredTeams.length === 0" class="text-center py-12">
               <div class="team-empty-card">
@@ -182,8 +261,26 @@
                 />
               </div>
             </div>
-
-            <!-- Teams Grid -->
+            <!-- Teams Table -->
+            <AppTable
+              v-else-if="teamsTableView"
+              :headers="teamsTableHeaders"
+              :items="teamsTableRows"
+              :showMenu="false"
+              :title="'Grouped Teams'"
+              :showTotal="true"
+              :totalItems="filteredTeams.length"
+            >
+              <template #menu="{ item }">
+                <div class="team-table-actions">
+                  <GlobalButton icon="pi pi-pencil" @click.stop="handleEditTeam(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="info" outlined />
+                  <GlobalButton icon="pi pi-trash" @click.stop="handleDeleteTeam(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="danger" outlined />
+                  <GlobalButton icon="pi pi-users" @click.stop="handleManageMembers(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="secondary" outlined />
+                  <GlobalButton icon="pi pi-eye" @click.stop="handleViewTeamDetails(item)" class="p-button-rounded p-button-outlined p-button-sm" severity="secondary" outlined />
+                </div>
+              </template>
+            </AppTable>
+            <!-- Teams Card Grid -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <TeamCard
                 v-for="team in filteredTeams"
@@ -196,6 +293,8 @@
               />
             </div>
           </div>
+
+
 
           </div>
         </div>
@@ -270,6 +369,70 @@ import type { TeamMember } from '@/composables/useTeamMembers'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { TeamCard, MemberCard, MyTeamCard, AddTeamDialog, AddMemberDialog, AddMyTeamDialog, ViewTeamDetailsDialog, ManageTeamMembersDialog, AddTeamMemberDialog, EditTeamMemberDialog } from './components/index'
+
+import AppTable from '@/components/shared/AppTable.vue'
+
+// Table view toggles for each tab
+const myTeamsTableView = ref(false)
+const membersTableView = ref(false)
+const teamsTableView = ref(false)
+
+// Table headers and row mapping for My Teams
+const myTeamsTableHeaders = [
+  { key: 'name', label: 'Team Name' },
+  { key: 'description', label: 'Description' },
+  { key: 'manager', label: 'Manager' },
+  { key: 'menu', label: 'Actions' },
+]
+const myTeamsTableRows = computed(() =>
+  myTeams.value.map(team => ({
+    ...team,
+    manager: team.manager_employee_id ? `Employee #${team.manager_employee_id}` : 'Unknown',
+  }))
+)
+
+// Table headers and row mapping for Members
+const membersTableHeaders = [
+  { key: 'name', label: 'Name' },
+  { key: 'role', label: 'Role' },
+  { key: 'team', label: 'Team' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'status', label: 'Status' },
+  { key: 'joined_at', label: 'Member Since' },
+  { key: 'menu', label: 'Actions' },
+]
+const membersTableRows = computed(() =>
+  filteredMembers.value.map(member => ({
+    ...member,
+    name: member.employee_id ? `Employee #${member.employee_id}` : 'Unknown',
+    role: member.role || 'Member',
+    team: member.team_id ? `Team #${member.team_id}` : 'Unknown',
+    phone: member.phone || 'No phone',
+    status: member.status === 'ACTIVE' ? 'Active' : 'Inactive',
+    joined_at: member.joined_at ? new Date(member.joined_at).toLocaleDateString() : '-',
+  }))
+)
+
+// Table headers and row mapping for Grouped Teams
+const teamsTableHeaders = [
+  { key: 'name', label: 'Team Name' },
+  { key: 'totalMembers', label: 'Members' },
+  { key: 'teamLead', label: 'Team Lead' },
+  { key: 'menu', label: 'Actions' },
+]
+const teamsTableRows = computed(() =>
+  filteredTeams.value.map(team => {
+    // Defensive: fallback for missing members
+    const members = team.members || []
+    const totalMembers = Array.isArray(members) ? members.length : 0
+    const teamLead = members.find(m => m.role === 'MANAGER' || m.role === 'ADMIN')
+    return {
+      ...team,
+      totalMembers,
+      teamLead: teamLead ? `Employee #${teamLead.employee_id}` : 'Unassigned',
+    }
+  })
+)
 
 // Interface for member form data (matching AddMemberDialog)
 interface MemberFormData {
@@ -775,6 +938,14 @@ onMounted(async () => {
 
 :deep(.p-button) {
   border-radius: 8px;
+}
+
+.team-table-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 /* Grid responsive adjustments are handled via Tailwind classes */

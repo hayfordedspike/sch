@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">House Management</h1>
+        <h1 class="text-3xl font-bold text-gray-900">Houses</h1>
         <p class="text-gray-600 mt-1">Manage houses and their details</p>
       </div>
       <GlobalButton
@@ -14,38 +14,44 @@
       />
     </div>
 
-    <!-- Search and Filters -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-4 items-center">
-        <div class="flex-1">
-          <SearchBar
-            v-model="searchQuery"
-            placeholder="Search houses by name, city, or region..."
-            @search="handleSearch"
-          />
-        </div>
-        <div class="flex gap-2">
-          <GlobalButton
-            label="Reset"
-            icon="pi pi-refresh"
-            outlined
-            @click="resetFilters"
-          />
-        </div>
-      </div>
-    </div>
-
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <LoadingSpinner message="Loading houses..." />
     </div>
 
-    <!-- Houses Grid -->
-    <div v-else-if="houses.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- View Switcher -->
+    <div v-if="houses.length > 0" class="flex justify-end mb-4 gap-2">
+      <GlobalButton
+        :label="'Card View'"
+        :severity="viewMode === 'card' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'table'"
+        class="min-w-[120px]"
+        @click="viewMode = 'card'"
+      />
+      <GlobalButton
+        :label="'Table View'"
+        :severity="viewMode === 'table' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'card'"
+        class="min-w-[120px]"
+        @click="viewMode = 'table'"
+      />
+    </div>
+
+    <!-- Houses Data -->
+    <div v-if="houses.length > 0 && viewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <HouseCard
         v-for="house in houses"
         :key="house.id"
         :house="house"
+        @edit="editHouse"
+        @delete="confirmDelete"
+        @view-teams="viewHouseTeams"
+      />
+    </div>
+    <div v-else-if="houses.length > 0 && viewMode === 'table'">
+      <HouseTable
+        :houses="houses"
         @edit="editHouse"
         @delete="confirmDelete"
         @view-teams="viewHouseTeams"
@@ -59,10 +65,9 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">No houses found</h3>
       <p class="text-gray-600 mb-4">
-        {{ searchQuery ? 'No houses match your search criteria.' : 'Get started by adding your first house.' }}
+        Get started by adding your first house.
       </p>
       <GlobalButton
-        v-if="!searchQuery"
         label="Add First House"
         icon="pi pi-plus"
         @click="showAddDialog = true"
@@ -100,20 +105,19 @@
 </template>
 
 <script setup lang="ts">
+import HouseTable from './components/HouseTable.vue'
 defineOptions({ name: 'HousesView' })
 
 import { ref, onMounted, watch } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useHouses } from '@/composables/useHouses'
-import { useDebounce } from '@/composables/useDebounce'
 import type { House } from './types'
 
 // Components
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import Paginator from 'primevue/paginator'
 import ConfirmDialog from 'primevue/confirmdialog'
-import SearchBar from '@/components/layout/SearchBar.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import HouseCard from './components/HouseCard.vue'
 import AddHouseDialog from './components/AddHouseDialog.vue'
@@ -127,48 +131,25 @@ const {
   loading,
   totalHouses,
   fetchHouses,
-  deleteHouse,
-  searchHouses
+  deleteHouse
 } = useHouses()
 
 // Reactive state
-const searchQuery = ref('')
 const showAddDialog = ref(false)
 const showTeamsDialog = ref(false)
 const selectedHouse = ref<House | null>(null)
 const currentPage = ref(1)
 const limit = ref(12)
-
-// Debounced search function
-const debouncedSearch = useDebounce(() => {
-  currentPage.value = 1
-  fetchHousesData()
-}, 300)
+const viewMode = ref<'card' | 'table'>('card')
 
 // Methods
-const handleSearch = (query: string) => {
-  searchQuery.value = query
-  currentPage.value = 1
-  fetchHousesData()
-}
-
-const resetFilters = () => {
-  searchQuery.value = ''
-  currentPage.value = 1
-  fetchHousesData()
-}
-
 const fetchHousesData = async () => {
   const params = {
     page: currentPage.value,
     limit: limit.value
   }
 
-  if (searchQuery.value.trim()) {
-    await searchHouses(searchQuery.value.trim())
-  } else {
-    await fetchHouses(params)
-  }
+  await fetchHouses(params)
 }
 
 const handlePageChange = (event: { first: number; rows: number }) => {
@@ -242,11 +223,6 @@ const handleHouseUpdated = () => {
     life: 3000
   })
 }
-
-// Watch for debounced search changes
-watch(searchQuery, () => {
-  debouncedSearch()
-})
 
 // Lifecycle
 onMounted(() => {

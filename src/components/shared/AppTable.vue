@@ -674,4 +674,28 @@ input[type="checkbox"]:disabled {
   background: #f2f4f7;
   cursor: default;
 }
+
+/* Table row hover for light/dark mode */
+
+/* Light mode row hover */
+table tr:hover {
+  background: var(--app-table-hover, #f9fafb) !important;
+  transition: background 0.2s;
+}
+
+/* Force dark mode row hover */
+html.theme-dark table tr:hover,
+.theme-dark table tr:hover {
+  background: #23293a !important;
+  transition: background 0.2s;
+}
+
+:root {
+  --app-table-hover: #f9fafb;
+}
+
+html.theme-dark :root,
+.theme-dark :root {
+  --app-table-hover: #2d3344;
+}
 </style>

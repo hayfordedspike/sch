@@ -332,16 +332,16 @@ watch(
   (newEmployee) => {
     if (newEmployee) {
       formData.value = {
-        first_name: newEmployee.first_name,
-        last_name: newEmployee.last_name,
+        first_name: newEmployee.first_name || '',
+        last_name: newEmployee.last_name || '',
         email: newEmployee.email || '',
-        phone: newEmployee.phone,
-        status: newEmployee.status,
-        hire_date: newEmployee.hire_date,
-        user_id: newEmployee.user_id
+        phone: newEmployee.phone || '',
+        status: newEmployee.status || 'ACTIVE',
+        hire_date: newEmployee.hire_date && !isNaN(new Date(newEmployee.hire_date).getTime()) ? newEmployee.hire_date : '',
+        user_id: newEmployee.user_id || null
       }
-      hireDate.value = new Date(newEmployee.hire_date)
-      const phoneParts = splitPhoneNumber(newEmployee.phone)
+      hireDate.value = newEmployee.hire_date && !isNaN(new Date(newEmployee.hire_date).getTime()) ? new Date(newEmployee.hire_date) : null
+      const phoneParts = splitPhoneNumber(newEmployee.phone || '')
       phoneDialCode.value = phoneParts.dialCode
       phoneLocalNumber.value = phoneParts.nationalNumber
       userSearchEmail.value = newEmployee.email || ''
@@ -376,8 +376,10 @@ watch(
 
 // Watch hireDate changes
 watch(hireDate, (newDate) => {
-  if (newDate) {
+  if (newDate && !isNaN(newDate.getTime())) {
     formData.value.hire_date = newDate.toISOString().split('T')[0]
+  } else {
+    formData.value.hire_date = ''
   }
 })
 

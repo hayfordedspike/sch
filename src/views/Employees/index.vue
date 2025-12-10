@@ -73,58 +73,54 @@
       </div>
     </div>
 
-    <!-- Employees Grid -->
-    <div class="w-full">
-      <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Loading State -->
-        <div v-if="loading && employees.length === 0" class="text-center py-12">
-          <i class="pi pi-spinner pi-spin text-muted" style="font-size: 2rem;"></i>
-          <p class="text-muted mt-4">Loading employees...</p>
-        </div>
+    <!-- View Switcher -->
+    <div class="flex justify-end mb-4 gap-2">
+      <GlobalButton
+        :label="'Card View'"
+        :severity="viewMode === 'card' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'table'"
+        class="min-w-[120px]"
+        @click="viewMode = 'card'"
+      />
+      <GlobalButton
+        :label="'Table View'"
+        :severity="viewMode === 'table' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'card'"
+        class="min-w-[120px]"
+        @click="viewMode = 'table'"
+      />
+    </div>
 
-        <!-- Empty State -->
-        <div v-else-if="!loading && filteredEmployees.length === 0" class="text-center py-12">
-          <div class="employee-section rounded-xl shadow-sm border border-gray-200 p-12">
-            <div class="mb-4">
-              <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No Employees Yet</h3>
-            <p class="text-muted mb-6">
-              Get started by adding your first employee to the system.
-            </p>
-            <GlobalButton
-              @click="handleAddEmployee"
-              icon="pi pi-plus"
-              label="Add Your First Employee"
-              class="bg-blue-600 hover:bg-blue-700 border-0 text-white font-semibold py-3 px-6"
-            />
-          </div>
-        </div>
+    <!-- Employees Data -->
+    <div v-if="viewMode === 'card'" class="employee-grid gap-6">
+      <EmployeeCard
+        v-for="employee in filteredEmployees"
+        :key="employee.id"
+        :employee="employee"
+        @edit="handleEditEmployee"
+        @delete="handleDeleteEmployee"
+        @view-details="handleViewEmployeeDetails"
+        @change-status="handleChangeEmployeeStatus"
+      />
+    </div>
+    <div v-else>
+      <EmployeeTable
+        :employees="filteredEmployees"
+        @view="handleViewEmployeeDetails"
+        @edit="handleEditEmployee"
+        @delete="handleDeleteEmployee"
+      />
+    </div>
 
-        <!-- Employees Grid -->
-        <div v-else class="employee-grid gap-6">
-          <EmployeeCard
-            v-for="employee in filteredEmployees"
-            :key="employee.id"
-            :employee="employee"
-            @edit="handleEditEmployee"
-            @delete="handleDeleteEmployee"
-            @view-details="handleViewEmployeeDetails"
-            @change-status="handleChangeEmployeeStatus"
-          />
-        </div>
-
-        <!-- Load More Button -->
-        <div v-if="!loading && filteredEmployees.length > 0 && hasMoreEmployees" class="text-center mt-8">
-          <GlobalButton
-            @click="loadMoreEmployees"
-            icon="pi pi-angle-down"
-            label="Load More Employees"
-            class="p-button-outlined"
-            :loading="loadingMore"
-          />
-        </div>
-      </div>
+    <!-- Load More Button -->
+    <div v-if="!loading && filteredEmployees.length > 0 && hasMoreEmployees" class="text-center mt-8">
+      <GlobalButton
+        @click="loadMoreEmployees"
+        icon="pi pi-angle-down"
+        label="Load More Employees"
+        class="p-button-outlined"
+        :loading="loadingMore"
+      />
     </div>
 
     <!-- Add/Edit Employee Dialog -->
@@ -156,6 +152,7 @@ import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 // Adjust the import paths to the actual locations of the components
 import { EmployeeCard, AddEmployeeDialog, ViewEmployeeDetailsDialog } from './components'
+import EmployeeTable from './components/EmployeeTable.vue'
 import type { Employee } from './types'
 
 defineOptions({ name: 'EmployeesView' })
@@ -184,6 +181,9 @@ const showAddEmployeeDialog = ref(false)
 const showViewDetailsDialog = ref(false)
 const editingEmployee = ref<Employee | null>(null)
 const viewingEmployee = ref<Employee | null>(null)
+
+// View mode state
+const viewMode = ref<'card' | 'table'>('card')
 
 // Computed
 const filteredEmployees = computed(() => {

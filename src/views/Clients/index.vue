@@ -1,5 +1,5 @@
 <template>
-<div class="p-6 bg-white min-h-screen">
+  <div class="p-6 bg-white min-h-screen">
     <!-- Header Section -->
     <div class="w-full mb-8">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,9 +14,7 @@
               <p class="text-muted mt-2">
                 Manage your clients information and service preferences
               </p>
-
             </div>
-
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
               <GlobalButton
@@ -30,62 +28,62 @@
         </div>
       </div>
     </div>
-
-    <!-- Clients Grid -->
-    <div class="w-full">
-      <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Loading State -->
-        <div v-if="loading && clients.length === 0" class="text-center py-12">
-          <i class="pi pi-spinner pi-spin text-muted" style="font-size: 2rem;"></i>
-          <p class="text-muted mt-4">Loading clients...</p>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else-if="!loading && filteredClients.length === 0" class="text-center py-12">
-          <div class="client-section rounded-xl shadow-sm border border-gray-200 p-12">
-            <div class="mb-4">
-              <i class="pi pi-users text-gray-300" style="font-size: 4rem;"></i>
-            </div>
-            <h3 class="text-lg font-medium text-primary mb-2">No Clients Yet</h3>
-            <p class="text-muted mb-6">
-              Get started by adding your first client to the system.
-            </p>
-            <GlobalButton
-              @click="handleAddClient"
-              icon="pi pi-plus"
-              label="Add Your First Client"
-              class="bg-blue-600 hover:bg-blue-700 border-0 text-white font-semibold py-3 px-6"
-            />
-          </div>
-        </div>
-
-        <!-- Clients Grid -->
-        <div v-else class="grid gap-6 clients-grid">
-          <ClientCard
-            v-for="client in filteredClients"
-            :key="client.id"
-            :client="client"
-            @edit="handleEditClient"
-            @delete="handleDeleteClient"
-            @view-details="handleViewClientDetails"
-            @activate="handleActivateClient"
-            @deactivate="handleDeactivateClient"
-          />
-        </div>
-
-        <!-- Load More Button -->
-        <div v-if="!loading && filteredClients.length > 0 && hasMoreClients" class="text-center mt-8">
-          <GlobalButton
-            @click="loadMoreClients"
-            icon="pi pi-angle-down"
-            label="Load More Clients"
-            class="p-button-outlined"
-            :loading="loadingMore"
-          />
-        </div>
-      </div>
+    <!-- View Switcher -->
+    <div class="flex justify-end mb-4 gap-2">
+      <GlobalButton
+        :label="'Card View'"
+        :severity="viewMode === 'card' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'table'"
+        class="min-w-[120px]"
+        @click="viewMode = 'card'"
+      />
+      <GlobalButton
+        :label="'Table View'"
+        :severity="viewMode === 'table' ? 'primary' : 'warning'"
+        :outlined="viewMode === 'card'"
+        class="min-w-[120px]"
+        @click="viewMode = 'table'"
+      />
     </div>
-
+    <!-- Clients Data -->
+    <div v-if="viewMode === 'card'" class="grid gap-6 clients-grid">
+      <ClientCard
+        v-for="client in filteredClients"
+        :key="client.id"
+        :client="client"
+        @edit="handleEditClient"
+        @delete="handleDeleteClient"
+        @view-details="handleViewClientDetails"
+        @activate="handleActivateClient"
+        @deactivate="handleDeactivateClient"
+      />
+    </div>
+    <div v-else>
+      <ClientTable
+        :clients="filteredClients"
+        @view="handleViewClientDetails"
+        @edit="handleEditClient"
+        @delete="handleDeleteClient"
+        @activate="handleActivateClient"
+        @deactivate="handleDeactivateClient"
+      />
+    </div>
+    <!-- Details Dialog -->
+    <ViewClientDetailsDialog
+      v-model:visible="showDetailsDialog"
+      :client="detailsClient"
+      @edit="handleEditClient"
+    />
+    <!-- Load More Button -->
+    <div v-if="!loading && filteredClients.length > 0 && hasMoreClients" class="text-center mt-8">
+      <GlobalButton
+        @click="loadMoreClients"
+        icon="pi pi-angle-down"
+        label="Load More Clients"
+        class="p-button-outlined"
+        :loading="loadingMore"
+      />
+    </div>
     <!-- Add/Edit Client Dialog -->
     <AddClientDialog
       v-model:visible="showAddClientDialog"
@@ -93,10 +91,8 @@
       @client-added="handleClientAdded"
       @client-updated="handleClientUpdated"
     />
-
     <!-- Client Details Dialog -->
     <!-- TODO: Implement ClientDetailsDialog component -->
-
     <!-- Confirmation Dialog -->
     <ConfirmDialog />
   </div>
@@ -110,6 +106,8 @@ import { useClients } from '@/composables/useClients'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ClientCard, AddClientDialog } from './components'
+import ClientTable from './components/ClientTable.vue'
+import ViewClientDetailsDialog from './components/ViewClientDetailsDialog.vue'
 import type { Client } from './types'
 
 defineOptions({ name: 'ClientsView' })
@@ -135,6 +133,11 @@ const currentLimit = ref(20)
 // Dialog state
 const showAddClientDialog = ref(false)
 const editingClient = ref<Client | null>(null)
+const showDetailsDialog = ref(false)
+const detailsClient = ref<Client | null>(null)
+
+// View mode state
+const viewMode = ref<'card' | 'table'>('card')
 
 // Computed
 const filteredClients = computed(() => {
@@ -210,13 +213,8 @@ const handleClientUpdated = async () => {
 }
 
 const handleViewClientDetails = (client: Client) => {
-  // TODO: Open client details dialog or navigate to details page
-  toast.add({
-    severity: 'info',
-    summary: 'View Details',
-    detail: `Detailed view for ${client.first_name} ${client.last_name} coming soon`,
-    life: 3000
-  })
+  detailsClient.value = client
+  showDetailsDialog.value = true
 }
 
 const handleDeleteClient = (client: Client) => {

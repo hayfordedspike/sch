@@ -18,46 +18,29 @@
           </div>
         </div>
         
-        <!-- Actions Dropdown -->
-        <div class="relative">
+        <!-- Action Buttons -->
+        <div class="flex gap-1">
           <GlobalButton
-            icon="pi pi-ellipsis-v"
-            text
-            rounded
-            size="sm"
-            @click="toggleDropdown"
-            aria-label="House actions"
+            icon="pi pi-users"
+            class="p-button-rounded p-button-outlined p-button-sm"
+            @click.stop="handleViewTeams"
+            v-tooltip="'View Teams'"
+            severity="secondary"
           />
-          <div
-            v-if="showDropdown"
-            class="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[150px]"
-            @click.stop
-          >
-            <div class="py-1">
-              <button
-                @click="handleEdit"
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
-              >
-                <i class="pi pi-pencil mr-2 text-blue-500"></i>
-                Edit House
-              </button>
-              <button
-                @click="handleViewTeams"
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
-              >
-                <i class="pi pi-users mr-2 text-green-500"></i>
-                View Teams
-              </button>
-              <hr class="my-1">
-              <button
-                @click="handleDelete"
-                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-              >
-                <i class="pi pi-trash mr-2"></i>
-                Delete House
-              </button>
-            </div>
-          </div>
+          <GlobalButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-outlined p-button-sm"
+            @click.stop="handleEdit"
+            v-tooltip="'Edit House'"
+            severity="info"
+          />
+          <GlobalButton
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-outlined p-button-sm"
+            @click.stop="handleDelete"
+            v-tooltip="'Delete House'"
+            severity="danger"
+          />
         </div>
       </div>
     </div>
@@ -98,7 +81,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import type { House } from '../types'
 
@@ -115,8 +97,6 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const showDropdown = ref(false)
-
 const getHouseInitials = (house: House): string => {
   return house.name
     .split(' ')
@@ -126,40 +106,17 @@ const getHouseInitials = (house: House): string => {
     .slice(0, 2)
 }
 
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value
-}
-
 const handleEdit = () => {
-  showDropdown.value = false
   emit('edit', props.house)
 }
 
 const handleDelete = () => {
-  showDropdown.value = false
   emit('delete', props.house)
 }
 
 const handleViewTeams = () => {
-  showDropdown.value = false
   emit('view-teams', props.house)
 }
-
-// Close dropdown when clicking outside
-const handleClickOutside = () => {
-  showDropdown.value = false
-}
-
-// Add event listener when component mounts
-import { onMounted, onUnmounted } from 'vue'
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 </script>
 
 <style scoped>

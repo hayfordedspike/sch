@@ -160,9 +160,30 @@ const getHouseInitials = (house: House): string => {
 
 const fetchTeams = async () => {
   if (props.house?.id) {
-    const result = await fetchHouseTeams(props.house.id)
-    if (result) {
-      teams.value = result
+    try {
+      const result = await fetchHouseTeams(props.house.id)
+      if (result) {
+        teams.value = result
+      } else {
+        // Handle case where no teams or API not available
+        teams.value = []
+        toast.add({
+          severity: 'info',
+          summary: 'No Teams',
+          detail: 'This house has no teams assigned yet.',
+          life: 3000
+        })
+      }
+    } catch (error) {
+      console.error('Failed to fetch teams:', error)
+      teams.value = []
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load teams. Please try again.',
+        life: 5000
+      })
+      // Don't close the modal
     }
   }
 }

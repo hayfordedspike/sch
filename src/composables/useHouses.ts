@@ -172,7 +172,11 @@ export function useHouses() {
   const fetchHouseTeams = async (houseId: number) => {
     try {
       const response = await get<HouseTeam[]>(`/houses/${houseId}/teams/`, {
-        showErrorToast: true
+        showErrorToast: false, // Don't show error toast to prevent modal issues
+        customErrorHandler: (error) => {
+          console.error('Error fetching house teams:', error)
+          // Don't redirect on auth errors for this call
+        }
       })
 
       if (response) {
