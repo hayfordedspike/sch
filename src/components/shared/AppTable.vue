@@ -138,7 +138,8 @@
               >
                 <slot
                   :index="itemIndex"
-                  :item="{ ...item, index: itemIndex }"
+                  :item="item"
+                  :itemIndex="itemIndex"
                   :name="header.key"
                 >
                   <!-- If this column is a 'list' type, display the first item plus +X,
@@ -195,7 +196,7 @@ and show the rest on hover in a popover. -->
               </td>
               <!-- menu -->
               <td v-if="showMenu" :class="['z-10  px-3 py-3', menuStyles]">
-                <slot :item="{ ...item, index: itemIndex }" name="menu">
+                <slot :item="item" :itemIndex="itemIndex" name="menu">
                   <i
                     class="pi pi-ellipsis-v hidden md:block w-4 h-4 cursor-pointer"
                     @click="toggleMenu($event, item)"
