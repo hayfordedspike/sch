@@ -2,12 +2,7 @@
   <div class="certificate-list p-4">
     <div class="mb-4 flex justify-between items-center">
       <h3 class="text-lg font-semibold">Certificate List</h3>
-      <GlobalButton
-        label="Add Certificate"
-        icon="pi pi-plus"
-        @click="$emit('add-certificate')"
-        class="p-button-primary"
-      />
+     
     </div>
 
 

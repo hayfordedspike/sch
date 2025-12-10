@@ -54,7 +54,7 @@
 
           <!-- Hire Date -->
           <div class="flex items-center">
-            <i class="pi pi-calendar mr-2 text-blue-500 w-4"></i>
+            <i class="pi pi-calendar mr-2 w-4" style="color: #065986"></i>
             <span>Hired: {{ displayInfo.hireDate }}</span>
           </div>
 

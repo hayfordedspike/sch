@@ -1,9 +1,7 @@
 <template>
   <div class="card">
     <h2 class="text-xl font-semibold mb-4">Certificate Types</h2>
-    <div class="mb-4">
-      <GlobalButton label="Add New Type" @click="handleAddNewType" />
-    </div>
+   
   
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-200">

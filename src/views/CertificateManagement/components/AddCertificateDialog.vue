@@ -7,7 +7,7 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-3xl">
+      <h2 class="font-bold text-3xl" style="color: #065986">
         {{ editMode ? 'Edit Certificate' : 'Add Certificate' }}
       </h2>
     </template>
@@ -117,7 +117,7 @@
           <template v-if="formData.certificate_items.length === 0">
             <div class="flex flex-col items-center">
               <i class="pi pi-upload text-4xl text-blue-400 mb-2"></i>
-              <span class="text-gray-600">Drag your files or <span class="text-blue-500 font-semibold">browse</span></span>
+              <span class="text-gray-600">Drag your files or <span class="font-semibold" style="color: #065986">browse</span></span>
               <span class="text-xs text-gray-400 mt-1">Max 10MB files are allowed</span>
             </div>
           </template>

@@ -185,7 +185,7 @@ const displayInfo = computed(() => {
 const getStatusColor = (status: string) => {
   const colors = {
     TENTATIVE: 'text-orange-500',
-    CONFIRMED: 'text-blue-500',
+    CONFIRMED: 'text-[#065986]',
     IN_PROGRESS: 'text-green-500',
     COMPLETED: 'text-purple-500',
     CANCELLED: 'text-red-500'

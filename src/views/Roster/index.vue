@@ -278,39 +278,23 @@ onMounted(async () => {
     <!-- Tabs Navigation -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="roster-tab-shell p-4">
-          <!-- Custom Tab Navigation -->
-          <div class="inline-flex border-b-2 border-blue-300 relative">
+        <div class="app-tab-card">
+          <div class="app-tab-inline">
             <button
               @click="activeTabIndex = 0"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 0
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['app-tab-button', activeTabIndex === 0 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Schedule
             </button>
             <button
               @click="activeTabIndex = 1"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 1
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['app-tab-button', activeTabIndex === 1 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Visit
             </button>
             <button
               @click="activeTabIndex = 2"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 2
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['app-tab-button', activeTabIndex === 2 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Assignment
             </button>

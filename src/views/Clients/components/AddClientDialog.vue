@@ -16,7 +16,7 @@
       <!-- Personal Information Section -->
       <div class="border border-gray-200 rounded-lg p-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <i class="pi pi-user mr-2 text-blue-500"></i>
+          <i class="pi pi-user mr-2" style="color: #065986"></i>
           Personal Information
         </h3>
 
@@ -125,7 +125,7 @@
                   </div>
                   <!-- Selection Indicator -->
                   <div v-if="formData.house_id === house.id" class="ml-2">
-                    <i class="pi pi-check-circle text-blue-500"></i>
+                    <i class="pi pi-check-circle" style="color: #065986"></i>
                   </div>
                 </div>
 

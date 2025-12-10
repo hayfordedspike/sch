@@ -49,7 +49,7 @@
     <div class="p-4 space-y-3">
       <!-- Address -->
       <div class="flex items-start">
-        <i class="pi pi-home mr-2 text-blue-500 mt-0.5 flex-shrink-0"></i>
+        <i class="pi pi-home mr-2 mt-0.5 flex-shrink-0" style="color: #065986"></i>
         <div class="text-sm text-gray-700">
           <div>{{ house.address_line1 }}</div>
         </div>

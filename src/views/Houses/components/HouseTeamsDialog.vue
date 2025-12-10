@@ -7,7 +7,7 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-3xl">
+      <h2 class="font-bold text-3xl" style="color: #065986">
         Teams for {{ house?.name }}
       </h2>
     </template>

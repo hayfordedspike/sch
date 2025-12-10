@@ -22,27 +22,17 @@
     <!-- Custom Tab Navigation -->
     <div class="w-full mb-6">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white p-4">
-          <div class="inline-flex border-b-2 border-blue-300 relative">
+        <div class="app-tab-card">
+          <div class="app-tab-inline">
             <button
               @click="activeTabIndex = 0"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 0
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['app-tab-button', activeTabIndex === 0 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Certificates
             </button>
             <button
               @click="activeTabIndex = 1"
-              :class="[
-                'px-5 py-3 font-medium transition-all duration-200 relative whitespace-nowrap',
-                activeTabIndex === 1
-                  ? 'text-black font-bold bg-white border-t-2 border-l-2 border-r-2 border-t-blue-300 border-l-blue-300 border-r-blue-300 border-b-2 border-b-white -mb-0.5 z-10'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              ]"
+              :class="['app-tab-button', activeTabIndex === 1 ? 'app-tab-button--active' : 'app-tab-button--inactive']"
             >
               Certificate Types
             </button>
@@ -136,30 +126,4 @@ const handleCertificateAdded = () => {
 </script>
 
 <style scoped>
-:deep(.p-tabview .p-tabview-nav li .p-tabview-nav-link) {
-  border: 1px solid transparent;
-  border-bottom: 1px solid #dee2e6;
-  background: transparent;
-  color: #6c757d;
-  padding: 1rem 1.5rem;
-  font-weight: 500;
-  border-top-right-radius: 6px;
-  border-top-left-radius: 6px;
-  transition: all 0.2s;
-  margin: 0 0.125rem -1px 0;
-}
-
-:deep(.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link) {
-  background: white;
-  border-color: #dee2e6 #dee2e6 white #dee2e6;
-  color: #495057;
-}
-
-:deep(.p-tabview .p-tabview-panels) {
-  background: white;
-  padding: 1.5rem;
-  border: 1px solid #dee2e6;
-  border-top: 0;
-  border-radius: 0 0 6px 6px;
-}
 </style>

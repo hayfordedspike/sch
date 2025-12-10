@@ -7,7 +7,7 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-3xl">
+      <h2 class="font-bold text-3xl" style="color: #065986">
         {{ editMode ? 'Edit House' : 'Add New House' }}
       </h2>
     </template>
@@ -16,7 +16,7 @@
       <!-- Basic Information Section -->
       <div class="border border-gray-200 rounded-lg p-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <i class="pi pi-home mr-2 text-blue-500"></i>
+          <i class="pi pi-home mr-2" style="color: #065986"></i>
           House Information
         </h3>
         

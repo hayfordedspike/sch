@@ -7,7 +7,7 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-3xl">
+      <h2 class="font-bold text-3xl" style="color: #065986">
         {{ editMode ? 'Edit Employee' : 'Add New Employee' }}
       </h2>
     </template>
@@ -17,70 +17,10 @@
         {{ submissionError }}
       </div>
 
-      <!-- User Assignment Section -->
-      <div class="border border-gray-200 rounded-lg p-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <i class="pi pi-user-plus mr-2 text-indigo-500"></i>
-          Assign User Account
-        </h3>
-
-        <div class="grid grid-cols-1 gap-4">
-          <div class="flex flex-col gap-2">
-            <label for="userSearchEmail" class="font-semibold">Search by Email *</label>
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <InputText
-                id="userSearchEmail"
-                v-model.trim="userSearchEmail"
-                placeholder="Enter user email"
-                :class="{ 'p-invalid': !!userLookupError || errors.email }"
-              />
-              <div class="flex gap-2">
-                <GlobalButton
-                  label="Lookup"
-                  icon="pi pi-search"
-                  @click="lookupUserByEmail"
-                  :loading="userLookupLoading"
-                  type="button"
-                  :disabled="!userSearchEmail || userLookupLoading"
-                />
-                <GlobalButton
-                  v-if="selectedUser"
-                  icon="pi pi-times"
-                  severity="secondary"
-                  text
-                  type="button"
-                  @click="clearSelectedUser"
-                />
-              </div>
-            </div>
-            <small v-if="userLookupError" class="text-red-500">{{ userLookupError }}</small>
-            <small v-else-if="errors.user_id" class="text-red-500">{{ errors.user_id }}</small>
-            <small v-else-if="errors.email" class="text-red-500">{{ errors.email }}</small>
-          </div>
-
-          <div v-if="userLookupResults.length" class="flex flex-col gap-2">
-            <span class="font-semibold text-sm text-gray-700">Select Matching User</span>
-            <div class="flex flex-col gap-2">
-              <button
-                v-for="user in userLookupResults"
-                :key="user.id"
-                type="button"
-                class="w-full border rounded-lg px-4 py-3 text-left transition"
-                :class="selectedUser?.id === user.id ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-gray-200 hover:border-indigo-300'"
-                @click="handleUserResultSelection(user)"
-              >
-                <p class="font-semibold text-gray-900">{{ user.first_name }} {{ user.last_name }}</p>
-                <p class="text-sm text-gray-600">{{ user.email }}</p>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Personal Information Section -->
       <div class="border border-gray-200 rounded-lg p-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <i class="pi pi-user mr-2 text-blue-500"></i>
+          <i class="pi pi-user mr-2" style="color: #065986"></i>
           Personal Information
         </h3>
 
@@ -152,6 +92,36 @@
           </div>
         </div>
       </div>
+
+      <!-- User Account Section -->
+      <div class="border border-gray-200 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i class="pi pi-user-plus mr-2 text-indigo-500"></i>
+          User Account
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Is Superuser -->
+          <div class="flex flex-col gap-2">
+            <label for="isSuperuser" class="font-semibold">Superuser</label>
+            <InputSwitch
+              id="isSuperuser"
+              v-model="formData.user.is_superuser"
+            />
+            <small class="text-gray-500">Grant superuser privileges</small>
+          </div>
+
+          <!-- Is Active -->
+          <div class="flex flex-col gap-2">
+            <label for="isActive" class="font-semibold">Active</label>
+            <InputSwitch
+              id="isActive"
+              v-model="formData.user.is_active"
+            />
+            <small class="text-gray-500">User account is active</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <template #footer>
@@ -171,15 +141,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useEmployees } from '@/composables/useEmployees'
-import { useUsers } from '@/composables/useUsers'
 import CountryPhoneInput from '@/components/shared/CountryPhoneInput.vue'
 import { COUNTRY_BY_NAME, DEFAULT_COUNTRY_NAME } from '@/constants/countries'
 import { combineDialCodeAndNumber, splitPhoneNumber, sanitizeDialCode } from '@/lib/phone'
 import type { CreateEmployeeRequest, Employee } from '@/views/Employees/types'
-import type { User } from '@/stores/auth'
 import Dialog from 'primevue/dialog'
 import GlobalButton from '@/components/shared/GlobalButton.vue'
 import InputText from 'primevue/inputtext'
+import InputSwitch from 'primevue/inputswitch'
 import Calendar from 'primevue/calendar'
 import Dropdown from 'primevue/dropdown'
 
@@ -202,7 +171,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const { createEmployee, updateEmployee, loading } = useEmployees()
-const { fetchUserByField, loading: userLookupLoading } = useUsers()
 
 const defaultDialCode = sanitizeDialCode(
   COUNTRY_BY_NAME.get(DEFAULT_COUNTRY_NAME.toLowerCase())?.dial_code
@@ -215,7 +183,10 @@ const formData = ref<CreateEmployeeRequest>({
   phone: '',
   status: 'ACTIVE',
   hire_date: '',
-  user_id: 0
+  user: {
+    is_superuser: false,
+    is_active: false
+  }
 })
 
 const hireDate = ref<Date | null>(null)
@@ -241,70 +212,6 @@ const isVisible = computed({
 
 const editMode = computed(() => !!props.employee)
 
-const userSearchEmail = ref('')
-const selectedUser = ref<User | null>(null)
-const userLookupError = ref<string | null>(null)
-const userLookupResults = ref<User[]>([])
-
-const setSelectedUser = (user: User | null) => {
-  selectedUser.value = user
-  if (user) {
-    formData.value.user_id = user.id
-    formData.value.email = user.email || ''
-    if (!formData.value.first_name) {
-      formData.value.first_name = user.first_name
-    }
-    if (!formData.value.last_name) {
-      formData.value.last_name = user.last_name
-    }
-  } else {
-    formData.value.user_id = 0
-    formData.value.email = ''
-  }
-}
-
-const lookupUserByEmail = async () => {
-  userLookupError.value = null
-  const email = userSearchEmail.value.trim()
-
-  if (!email) {
-    userLookupError.value = 'Please enter an email to lookup'
-    setSelectedUser(null)
-    userLookupResults.value = []
-    return
-  }
-
-  const users = await fetchUserByField('email', email)
-  userLookupResults.value = users
-
-  if (users && users.length > 0) {
-    if (users.length === 1) {
-      setSelectedUser(users[0])
-      userSearchEmail.value = users[0].email || email
-    } else {
-      setSelectedUser(null)
-      userLookupError.value = 'Multiple users found. Please select one below.'
-    }
-  } else {
-    userLookupError.value = 'No user found with that email'
-    setSelectedUser(null)
-    userLookupResults.value = []
-  }
-}
-
-const handleUserResultSelection = (user: User) => {
-  setSelectedUser(user)
-  userLookupError.value = null
-  userSearchEmail.value = user.email || userSearchEmail.value
-}
-
-const clearSelectedUser = () => {
-  setSelectedUser(null)
-  userSearchEmail.value = ''
-  userLookupError.value = null
-  userLookupResults.value = []
-}
-
 // Define resetForm function before it's used
 const resetForm = () => {
   formData.value = {
@@ -314,16 +221,15 @@ const resetForm = () => {
     phone: '',
     status: 'ACTIVE',
     hire_date: '',
-    user_id: 0
+    user: {
+      is_superuser: false,
+      is_active: false
+    }
   }
   hireDate.value = null
   phoneDialCode.value = defaultDialCode
   phoneLocalNumber.value = ''
-  userSearchEmail.value = ''
-  userLookupError.value = null
   submissionError.value = null
-  setSelectedUser(null)
-  userLookupResults.value = []
 }
 
 // Watch for employee changes to populate form in edit mode
@@ -338,37 +244,20 @@ watch(
         phone: newEmployee.phone || '',
         status: newEmployee.status || 'ACTIVE',
         hire_date: newEmployee.hire_date && !isNaN(new Date(newEmployee.hire_date).getTime()) ? newEmployee.hire_date : '',
-        user_id: newEmployee.user_id || null
+        user: {
+          is_superuser: false, // Default values, may need to be fetched from API
+          is_active: false
+        }
       }
       hireDate.value = newEmployee.hire_date && !isNaN(new Date(newEmployee.hire_date).getTime()) ? new Date(newEmployee.hire_date) : null
       const phoneParts = splitPhoneNumber(newEmployee.phone || '')
       phoneDialCode.value = phoneParts.dialCode
       phoneLocalNumber.value = phoneParts.nationalNumber
-      userSearchEmail.value = newEmployee.email || ''
-      if (newEmployee.user_id && newEmployee.email) {
-        const derivedUser: User = {
-          id: newEmployee.user_id,
-          email: newEmployee.email,
-          first_name: newEmployee.first_name,
-          last_name: newEmployee.last_name,
-          is_active: true,
-          is_superuser: false,
-          created_at: newEmployee.created_at,
-          updated_at: newEmployee.updated_at,
-          last_login: undefined
-        }
-        setSelectedUser(derivedUser)
-        userLookupResults.value = [derivedUser]
-      } else {
-        setSelectedUser(null)
-        userLookupResults.value = []
-      }
     } else {
       // Reset form for add mode
       resetForm()
     }
     errors.value = {}
-    userLookupError.value = null
     submissionError.value = null
   },
   { immediate: true }
@@ -430,11 +319,6 @@ const validateForm = (): boolean => {
   // Status validation
   if (!formData.value.status) {
     errors.value.status = 'Employee status is required'
-    isValid = false
-  }
-
-  if (!formData.value.user_id || formData.value.user_id <= 0) {
-    errors.value.user_id = 'Employee must be associated with a user account'
     isValid = false
   }
 

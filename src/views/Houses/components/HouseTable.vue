@@ -10,7 +10,7 @@
       tableName="Houses"
     >
       <template #address="{ item }">
-        <i class="pi pi-home mr-2 text-blue-500 w-4"></i>
+        <i class="pi pi-home mr-2 w-4" style="color: #065986"></i>
         <span class="truncate">{{ item.item.address_line1 }}</span>
       </template>
       <template #city_region="{ item }">

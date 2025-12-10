@@ -70,7 +70,7 @@
 
           <!-- Email -->
           <div class="flex items-center">
-            <i class="pi pi-envelope mr-2 text-blue-500 w-4"></i>
+            <i class="pi pi-envelope mr-2 w-4" style="color: #065986"></i>
             <span class="truncate">{{ client.email }}</span>
           </div>
 

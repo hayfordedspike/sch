@@ -7,7 +7,7 @@
     @hide="handleClose"
   >
     <template #header>
-      <h2 class="text-blue-500 font-bold text-2xl">
+      <h2 class="font-bold text-2xl" style="color: #065986">
         Add Team to House
       </h2>
     </template>

@@ -22,7 +22,10 @@ export interface CreateEmployeeRequest {
   phone: string
   status: EmployeeStatus
   hire_date: string
-  user_id: number
+  user: {
+    is_superuser: boolean
+    is_active: boolean
+  }
 }
 
 export interface UpdateEmployeeRequest {
@@ -32,7 +35,10 @@ export interface UpdateEmployeeRequest {
   phone?: string
   status?: EmployeeStatus
   hire_date?: string
-  user_id?: number
+  user?: {
+    is_superuser?: boolean
+    is_active?: boolean
+  }
 }
 
 export interface EmployeeListResponse {
